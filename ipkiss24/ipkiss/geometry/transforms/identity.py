@@ -1,22 +1,22 @@
 # IPKISS - Parametric Design Framework
 # Copyright (C) 2002-2012  Ghent University - imec
-# 
+#
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License
 # as published by the Free Software Foundation; either version 2
 # of the License, or (at your option) any later version.
-# 
+#
 # This program is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
-# 
+#
 # You should have received a copy of the GNU General Public License
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
-# 
+#
 # i-depot BBIE 7396, 7556, 7748
-# 
+#
 # Contact: ipkiss@intec.ugent.be
 
 from .special import __SpecialNoDistortTransform__
@@ -30,20 +30,22 @@ from types import NoneType
 __all__ = ["IdentityTransform"]
 
 
-class IdentityTransform(Translation, Rotation, Magnification, __SpecialNoDistortTransform__):
+class IdentityTransform(Translation, Rotation, Magnification,
+                        __SpecialNoDistortTransform__):
     """ transform that leaves an object unchanged """
+
     def __init__(self, **kwargs):
         kwargs["rotation_center"] = (0.0, 0.0)
         kwargs["magnification_center"] = (0.0, 0.0)
         super(IdentityTransform, self).__init__(**kwargs)
-    
+
     def apply(self, item):
-        
+
         if isinstance(item, list):
             return shape.Shape(item)
         else:
             return item
-            
+
     def reverse(self, shape):
         if isinstance(item, list):
             return shape.Shape(item)
@@ -65,8 +67,7 @@ class IdentityTransform(Translation, Rotation, Magnification, __SpecialNoDistort
     def reverse_on_coord3(self, coord):
         """ apply reverse transformation to coordinate """
         return coord
-    
-    
+
     def apply_to_array(self, coords):
         """ apply transformation to numpy array"""
         return coords
@@ -93,12 +94,15 @@ class IdentityTransform(Translation, Rotation, Magnification, __SpecialNoDistort
         elif isinstance(other, Translation):
             return Translation(other.translation)
         elif isinstance(other, Rotation):
-            return Rotation(other.rotation_center, other.rotation, other.absolute_rotation)
+            return Rotation(other.rotation_center, other.rotation,
+                            other.absolute_rotation)
         elif isinstance(other, Magnification):
-            return Magnification(other.magnification_center, other.magnification, other.absolute_magnfication)
+            return Magnification(other.magnification_center,
+                                 other.magnification,
+                                 other.absolute_magnfication)
         else:
             return __SpecialNoDistortTransform__.__add__(self, other)
-    
+
     def __iadd__(self, other):
         """ concatenates other to this transform """
         if isinstance(other, (NoneType, IdentityTransform)):

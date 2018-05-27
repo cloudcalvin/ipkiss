@@ -1,22 +1,22 @@
 # IPKISS - Parametric Design Framework
 # Copyright (C) 2002-2012  Ghent University - imec
-# 
+#
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License
 # as published by the Free Software Foundation; either version 2
 # of the License, or (at your option) any later version.
-# 
+#
 # This program is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
-# 
+#
 # You should have received a copy of the GNU General Public License
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
-# 
+#
 # i-depot BBIE 7396, 7556, 7748
-# 
+#
 # Contact: ipkiss@intec.ugent.be
 
 import copy
@@ -27,18 +27,11 @@ import inspect
 # restrictions
 ###################################################
 
-__all__ = ["RestrictNothing",
-           "RestrictLen",
-           "RestrictLenRange",
-           "RestrictRange",
-           "RestrictType",
-           "RestrictFunction",
-           "RestrictIterable",
-           "RestrictClass",
-           "RestrictList",
-           "RestrictTypeList",
-           "RestrictValueList",
-           "RestrictContains"]
+__all__ = [
+    "RestrictNothing", "RestrictLen", "RestrictLenRange", "RestrictRange",
+    "RestrictType", "RestrictFunction", "RestrictIterable", "RestrictClass",
+    "RestrictList", "RestrictTypeList", "RestrictValueList", "RestrictContains"
+]
 
 
 class RestrictionError(ValueError):
@@ -48,6 +41,7 @@ class RestrictionError(ValueError):
 
 class __PropertyRestriction__(MixinBowl):
     """ abstract base class for restrictions on property values """
+
     def __init__(self):
         pass
 
@@ -57,7 +51,8 @@ class __PropertyRestriction__(MixinBowl):
         elif other is None:
             return self
         else:
-            raise TypeError("Cannot AND __PropertyRestriction__ with %s" % type(other))
+            raise TypeError(
+                "Cannot AND __PropertyRestriction__ with %s" % type(other))
 
     def __iand__(self, other):
         C = self.__and__(other)
@@ -70,7 +65,8 @@ class __PropertyRestriction__(MixinBowl):
         elif other is None:
             return self
         else:
-            raise TypeError("Cannot OR __PropertyRestriction__ with %s" % type(other))
+            raise TypeError(
+                "Cannot OR __PropertyRestriction__ with %s" % type(other))
 
     def __ior__(self, other):
         C = self.__and__(other)
@@ -129,11 +125,13 @@ class __PropertyRestrictionNot__(__PropertyRestriction__):
 
 class RestrictNothing(__PropertyRestriction__):
     """ no restriction on the property value """
+
     def __add__(self, other):
         if isinstance(other, __PropertyRestriction__):
             return copy.copy(other)
         else:
-            raise TypeError("Cannot add %s to __PropertyRestriction__" % type(other))
+            raise TypeError(
+                "Cannot add %s to __PropertyRestriction__" % type(other))
 
     def __iadd__(self, other):
         self = copy.copy(other)
@@ -145,32 +143,39 @@ class RestrictNothing(__PropertyRestriction__):
 
 class RestrictType(__PropertyRestriction__):
     """ restrict the type or types the argument can have. Pass a type or tuple of types """
+
     def __init__(self, allowed_types):
         self.allowed_types = ()
-        self .__types_set = False
+        self.__types_set = False
         self.__add_type__(allowed_types)
         if not self.__types_set:
-            raise ValueError("allowed_typed of Type Restriction should be set on initialization")
+            raise ValueError(
+                "allowed_typed of Type Restriction should be set on initialization"
+            )
 
     def __add_type__(self, type_type):
         if isinstance(type_type, type):
-            self.allowed_types += (type_type,)
-            self .__types_set = True
+            self.allowed_types += (type_type, )
+            self.__types_set = True
         elif isinstance(type_type, (tuple, list)):
             for T in type_type:
                 self.__add_type__(T)
         else:
-            raise TypeError("Restrict type should have a 'type' or 'tuple' of types as argument")
+            raise TypeError(
+                "Restrict type should have a 'type' or 'tuple' of types as argument"
+            )
 
     def validate(self, value, obj=None):
         return isinstance(value, self.allowed_types)
 
     def __repr__(self):
-        return "Type Restriction:" + ",".join([T.__name__ for T in self.allowed_types])
+        return "Type Restriction:" + ",".join(
+            [T.__name__ for T in self.allowed_types])
 
 
 class RestrictFunction(__PropertyRestriction__):
     """ restricts the value to those that return 'True' when passed to a given function """
+
     def __init__(self, validator_function):
         self.validator_function = validator_function
 
@@ -188,11 +193,13 @@ class RestrictClass(RestrictType):
         return issubclass(value, self.allowed_types)
 
     def __repr__(self):
-        return "Class Restriction:" + ",".join([T.__name__ for T in self.allowed_types])
+        return "Class Restriction:" + ",".join(
+            [T.__name__ for T in self.allowed_types])
 
 
 class RestrictList(__PropertyRestriction__):
     """ subject all individual elements of an iterable to a certain restriction """
+
     def __init__(self, restriction):
         self.restriction = restriction
 
@@ -211,16 +218,19 @@ class RestrictList(__PropertyRestriction__):
 
 class RestrictTypeList(RestrictList):
     """ restrict the argument to a list which contains a given type or types. Pass a type or tuple of types """
+
     def __init__(self, allowed_types):
 
         RestrictList.__init__(self, restriction=RestrictType(allowed_types))
 
     def __repr__(self):
-        return "Type List Restriction:" + ",".join([T.__name__ for T in self.restriction.allowed_types])
+        return "Type List Restriction:" + ",".join(
+            [T.__name__ for T in self.restriction.allowed_types])
 
 
 class RestrictValueList(__PropertyRestriction__):
     """ restrict the argument to a list of allowed values """
+
     def __init__(self, allowed_values):
         self.allowed_values = allowed_values
 
@@ -228,13 +238,14 @@ class RestrictValueList(__PropertyRestriction__):
         return value in self.allowed_values
 
     def __repr__(self):
-        return "Value List Restriction: [" + ",".join([str(T) for T in self.allowed_values]) + "]"
+        return "Value List Restriction: [" + ",".join(
+            [str(T) for T in self.allowed_values]) + "]"
 
 
 class RestrictIterable(__PropertyRestriction__):
-
     def validate(self, value, obj=None):
-        return isinstance(value, basestring) or getattr(value, '__iter__', False)
+        return isinstance(value, basestring) or getattr(
+            value, '__iter__', False)
 
     def __repr__(self):
         return "Iterable Restriction"
@@ -242,16 +253,21 @@ class RestrictIterable(__PropertyRestriction__):
 
 class RestrictRange(__PropertyRestriction__):
     """ restrict the argument to a given range """
-    def __init__(self, lower=None, upper=None, lower_inc=True, upper_inc=False):
+
+    def __init__(self, lower=None, upper=None, lower_inc=True,
+                 upper_inc=False):
         self.lower = lower
         self.upper = upper
         self.lower_inc = lower_inc
         self.upper_inc = upper_inc
         if lower is None and upper is None:
-            raise ValueError("Range Restriction should have an upper or lower limit")
+            raise ValueError(
+                "Range Restriction should have an upper or lower limit")
         if not upper is None and not lower is None:
             if lower > upper:
-                raise ValueError("lower limit should be smaller than upper limit in Range Restriction")
+                raise ValueError(
+                    "lower limit should be smaller than upper limit in Range Restriction"
+                )
 
     def validate(self, value, obj=None):
         if self.lower is None:
@@ -285,7 +301,8 @@ class RestrictRange(__PropertyRestriction__):
             right_b = "]"
         else:
             right_b = "["
-        S = "Range Restriction: %s%s,%s%s" % (west_b, str(self.lower), str(self.upper), right_b)
+        S = "Range Restriction: %s%s,%s%s" % (west_b, str(self.lower),
+                                              str(self.upper), right_b)
         return S
 
 
@@ -296,10 +313,14 @@ class RestrictLenRange(__PropertyRestriction__):
         self.min_length = min_length
         self.max_length = max_length
         if min_length == None and max_length == None:
-            raise ValueError("Len Range Restriction should have a minimum and/or maximum value")
+            raise ValueError(
+                "Len Range Restriction should have a minimum and/or maximum value"
+            )
         if not min_length is None and not max_length is None:
             if max_length < min_length:
-                raise ValueError("Min_length should be smaller than Max_length Len Range Restriction")
+                raise ValueError(
+                    "Min_length should be smaller than Max_length Len Range Restriction"
+                )
 
     def validate(self, value, obj=None):
         L = len(value)
@@ -313,11 +334,13 @@ class RestrictLenRange(__PropertyRestriction__):
             return T1 and T2
 
     def __repr__(self):
-        return  "Len Range Restriction: %s-%s" % (str(self.min_length), str(self.max_length))
+        return "Len Range Restriction: %s-%s" % (str(self.min_length),
+                                                 str(self.max_length))
 
 
 class RestrictLen(__PropertyRestriction__):
     """ restrict the length of a list, tuple, shape, ... . Value must support __len__ method """
+
     def __init__(self, length):
         self.length = length
 
@@ -325,11 +348,12 @@ class RestrictLen(__PropertyRestriction__):
         return len(value) == self.length
 
     def __repr__(self):
-        return  "Len Restriction: %s" % (str(self.length))
+        return "Len Restriction: %s" % (str(self.length))
 
 
 class RestrictContains(__PropertyRestriction__):
     """ restrict the argument to an object with contains at least one of a set of allowed values """
+
     def __init__(self, allowed_values):
         self.allowed_values = allowed_values
 
@@ -340,4 +364,4 @@ class RestrictContains(__PropertyRestriction__):
         return False
 
     def __repr__(self):
-        return  "Contains Restriction: %s" % (str(self.allowed_values))
+        return "Contains Restriction: %s" % (str(self.allowed_values))

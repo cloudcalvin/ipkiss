@@ -1,22 +1,22 @@
 # IPKISS - Parametric Design Framework
 # Copyright (C) 2002-2012  Ghent University - imec
-# 
+#
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License
 # as published by the Free Software Foundation; either version 2
 # of the License, or (at your option) any later version.
-# 
+#
 # This program is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
-# 
+#
 # You should have received a copy of the GNU General Public License
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
-# 
+#
 # i-depot BBIE 7396, 7556, 7748
-# 
+#
 # Contact: ipkiss@intec.ugent.be
 
 from ..primitives.library import Library
@@ -32,17 +32,17 @@ TECH = get_technology()
 
 __all__ = []
 
+
 #######################################################################
 ## Basic input module
 #######################################################################
 class BasicInput(StrongPropertyInitializer):
-    i_stream = DefinitionProperty(default = sys.stdin) # add limitation
-    def __init__(self, i_stream = sys.stdin, **kwargs):
-        super(BasicInput, self).__init__(
-            i_stream = i_stream,
-            **kwargs)
+    i_stream = DefinitionProperty(default=sys.stdin)  # add limitation
 
-    def read(self, size = None):
+    def __init__(self, i_stream=sys.stdin, **kwargs):
+        super(BasicInput, self).__init__(i_stream=i_stream, **kwargs)
+
+    def read(self, size=None):
         if size is None:
             return self.parse(self.i_stream.read())
         else:
@@ -51,22 +51,21 @@ class BasicInput(StrongPropertyInitializer):
     def parse(self, item):
         return item
 
+
 #######################################################################
 ## Basic GDS input stream
 #######################################################################
 class InputBasic(BasicInput):
-    scaling = PositiveNumberProperty(default = 1.0)
+    scaling = PositiveNumberProperty(default=1.0)
     layer_map = DefinitionProperty()
-    prefix = StringProperty(default = "")
-    
-    def __init__(self, i_stream = sys.stdin, **kwargs):
-        super(InputBasic, self).__init__(
-            i_stream = i_stream,
-            **kwargs)
+    prefix = StringProperty(default="")
+
+    def __init__(self, i_stream=sys.stdin, **kwargs):
+        super(InputBasic, self).__init__(i_stream=i_stream, **kwargs)
         self.library = None
 
     def read(self):
-        return self.parse()        
+        return self.parse()
 
     def parse(self):
         return self.parse_library()
@@ -87,9 +86,10 @@ class InputBasic(BasicInput):
 
     def make_structure_name(self, name):
         return self.prefix + name
-    
+
     def define_layer_map(self):
-        return TECH.GDSII.IMPORT_LAYER_MAP #FIXME : using 'default' for the property would be better, but that gives an exception ...
+        return TECH.GDSII.IMPORT_LAYER_MAP  #FIXME : using 'default' for the property would be better, but that gives an exception ...
+
 
 #################################################
 ## __Element__ Types

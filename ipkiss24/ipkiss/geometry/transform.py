@@ -1,22 +1,22 @@
 # IPKISS - Parametric Design Framework
 # Copyright (C) 2002-2012  Ghent University - imec
-# 
+#
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License
 # as published by the Free Software Foundation; either version 2
 # of the License, or (at your option) any later version.
-# 
+#
 # This program is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
-# 
+#
 # You should have received a copy of the GNU General Public License
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
-# 
+#
 # i-depot BBIE 7396, 7556, 7748
-# 
+#
 # Contact: ipkiss@intec.ugent.be
 
 from copy import deepcopy
@@ -27,12 +27,12 @@ from ipcore.properties.processors import ProcessorTypeCast
 from types import NoneType
 from ipcore.properties.initializer import StrongPropertyInitializer
 
-__all__ = ["generic_TransformationProperty",
-           "TransformationProperty"]
+__all__ = ["generic_TransformationProperty", "TransformationProperty"]
 
 #----------------------------------------------------------------------------
 # Transformation class
 #----------------------------------------------------------------------------
+
 
 class Transform(StrongPropertyInitializer):
     """ abstract base class for generic transform """
@@ -44,9 +44,8 @@ class Transform(StrongPropertyInitializer):
             L = Shape(item)
             L.transform(self)
             return L
-        else: 
+        else:
             return item.transform(self)
-
 
     def apply_to_copy(self, item):
         """ applies the transform to a copy of the transformable item """
@@ -64,7 +63,7 @@ class Transform(StrongPropertyInitializer):
             return self
         if isinstance(item, Transform):
             return item + self
-        else: #shape, coordinatelist or transformable
+        else:  #shape, coordinatelist or transformable
             return self.apply_to_copy(item)
 
     # define addition
@@ -85,18 +84,20 @@ class Transform(StrongPropertyInitializer):
     def is_identity(self):
         """ returns True is the transformation does nothing """
         return True
-    
+
     def is_isometric(self):
         """ returns True if the transformation conserves angles and distances """
         return True
-    
+
     def is_homothetic(self):
         """ returns True if the transformation conserves angles """
         return True
 
+
 #----------------------------------------------------------------------------
 # Reversible Transformationclass
 #----------------------------------------------------------------------------
+
 
 class __ReversibleTransform__(Transform):
     """ base class for a transformation that can be reversed """
@@ -153,6 +154,7 @@ class __ReversibleTransform__(Transform):
 #
 #----------------------------------------------------------------------------
 
+
 class GenericNoDistortTransform(__ReversibleTransform__):
     pass
 
@@ -163,16 +165,18 @@ class GenericNoDistortTransform(__ReversibleTransform__):
 # for concatenations, a compound transformation is created
 #----------------------------------------------------------------------------
 
+
 class CompoundTransform(Transform):
     """ a store for the concatenation of (non-homothetic) transforms """
+
     # a concatenation of transforms
-    def __init__(self, transforms = [], **kwargs):
+    def __init__(self, transforms=[], **kwargs):
         if isinstance(transforms, list):
             self.__subtransforms__ = transforms
         elif isinstance(transforms, CompoundTransform):
             self.__subtransforms__ = []
             self.__subtransforms__.extend(transforms)
-        else:            
+        else:
             self.__subtransforms__ = [transforms]
         super(CompoundTransform, self).__init__(**kwargs)
 
@@ -213,15 +217,16 @@ class CompoundTransform(Transform):
 
     def add(self, other):
         """ concatenate another transform to the compound transform """
-        if other is None: return 
+        if other is None: return
         if isinstance(other, CompoundTransform):
             for c in other.__subtransforms__:
                 self.add(other)
         elif isinstance(other, Transform):
             self.elements.append(other)
         else:
-            raise TypeError("Cannot add object of type " + str(type(other)) + " to transform")
-        
+            raise TypeError("Cannot add object of type " + str(type(other)) +
+                            " to transform")
+
     def is_identity(self):
         """ returns True if the transformation does nothing """
         for c in self.__subtransforms__:
@@ -233,7 +238,7 @@ class CompoundTransform(Transform):
         for c in self.__subtransforms__:
             if not c.is_isometric(): return False
         return True
-    
+
     def is_homothetic(self):
         """ returns True if the transformation conserves angles """
         """ returns True if the transformation does nothing """
@@ -241,7 +246,7 @@ class CompoundTransform(Transform):
             if not c.is_homothetic(): return False
         return True
 
-        
+
 class ReversibleCompoundTransform(CompoundTransform, __ReversibleTransform__):
     """ a store for the concatenation of (non-homthetic) reversible transformas """
 
@@ -259,7 +264,6 @@ class ReversibleCompoundTransform(CompoundTransform, __ReversibleTransform__):
         else:
             for c in reversed(self.__subtransforms__):
                 item = c.reverse(item)
-
 
     def reverse_on_coord(self, coord):
         """ apply reverse transformation to coordinate """
@@ -292,9 +296,8 @@ class ReversibleCompoundTransform(CompoundTransform, __ReversibleTransform__):
 
     def __isub__(self, other):
         """ concatenates the reverse of other to this transform """
-        self.add(- other)
+        self.add(-other)
         return self
-
 
     def add(self, other):
         """ concatenates the other transform to this """
@@ -307,7 +310,8 @@ class ReversibleCompoundTransform(CompoundTransform, __ReversibleTransform__):
             self.__make_irreversible__()
             self.elements.append(other)
         else:
-            raise TypeError("Cannot add object of type " + str(type(other)) + " to transform")
+            raise TypeError("Cannot add object of type " + str(type(other)) +
+                            " to transform")
 
     def __neg__(self):
         """ returns the reverse transform """
@@ -316,13 +320,13 @@ class ReversibleCompoundTransform(CompoundTransform, __ReversibleTransform__):
             T.add(-c)
         return T
 
+
 #----------------------------------------------------------------------------
 # Transformations that do distort the shape
 # these can be used only on shapes.
 # for concatenations, a compound transformation is created
 #----------------------------------------------------------------------------
 
-    
 #----------------------------------------------------------------------------
 # Shape rotations and translation functions
 #----------------------------------------------------------------------------
@@ -331,44 +335,50 @@ class ReversibleCompoundTransform(CompoundTransform, __ReversibleTransform__):
 class ProcessorTransformation(ProcessorTypeCast):
     def __init__(self):
         ProcessorTypeCast.__init__(self, Transform)
-    
-    def process(self, value, obj= None):
-        from .transforms.identity import IdentityTransform
-        if value is None:
-            return IdentityTransform()
-        else:
-            return ProcessorTypeCast.process(self, value, obj)
-        
-class ProcessorNoDistortTransformation(ProcessorTypeCast):
-    def __init__(self):
-        ProcessorTypeCast.__init__(self, GenericNoDistortTransform)
-   
+
     def process(self, value, obj=None):
         from .transforms.identity import IdentityTransform
         if value is None:
             return IdentityTransform()
         else:
             return ProcessorTypeCast.process(self, value, obj)
-                
-        
 
-def generic_TransformationProperty(internal_member_name=None, restriction=None, preprocess=None, **kwargs):
+
+class ProcessorNoDistortTransformation(ProcessorTypeCast):
+    def __init__(self):
+        ProcessorTypeCast.__init__(self, GenericNoDistortTransform)
+
+    def process(self, value, obj=None):
+        from .transforms.identity import IdentityTransform
+        if value is None:
+            return IdentityTransform()
+        else:
+            return ProcessorTypeCast.process(self, value, obj)
+
+
+def generic_TransformationProperty(internal_member_name=None,
+                                   restriction=None,
+                                   preprocess=None,
+                                   **kwargs):
     R = RestrictType(Transform) & restriction
     P = ProcessorTransformation() + preprocess
     if "default" in kwargs:
         default = kwargs["default"]
     else:
         default = None
-    return RestrictedProperty(internal_member_name, default = default, restriction = R, preprocess = P)
+    return RestrictedProperty(
+        internal_member_name, default=default, restriction=R, preprocess=P)
 
-def TransformationProperty(internal_member_name=None, restriction=None, preprocess=None, **kwargs):
+
+def TransformationProperty(internal_member_name=None,
+                           restriction=None,
+                           preprocess=None,
+                           **kwargs):
     R = RestrictType(GenericNoDistortTransform) & restriction
     P = ProcessorNoDistortTransformation() + preprocess
     if "default" in kwargs:
         default = kwargs["default"]
     else:
         default = None
-    return RestrictedProperty(internal_member_name, default = default, restriction = R, preprocess = P)
-
-
-
+    return RestrictedProperty(
+        internal_member_name, default=default, restriction=R, preprocess=P)

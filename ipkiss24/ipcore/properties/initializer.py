@@ -1,22 +1,22 @@
 # IPKISS - Parametric Design Framework
 # Copyright (C) 2002-2012  Ghent University - imec
-# 
+#
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License
 # as published by the Free Software Foundation; either version 2
 # of the License, or (at your option) any later version.
-# 
+#
 # This program is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
-# 
+#
 # You should have received a copy of the GNU General Public License
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
-# 
+#
 # i-depot BBIE 7396, 7556, 7748
-# 
+#
 # Contact: ipkiss@intec.ugent.be
 
 from .descriptor import __BasePropertyDescriptor__, CACHED, SET_EXTERNALLY
@@ -28,7 +28,7 @@ from ipcore.helperfunc import *
 from ipcore.exceptions.exc import IpcoreAttributeException
 import inspect
 
-SUPPRESSED = (None,)
+SUPPRESSED = (None, )
 
 _REGISTERED_CLASSES = set()
 
@@ -111,7 +111,8 @@ class MetaPropertyInitializer(MetaMixinBowl):
                     if hasattr(prop_attr, "__doc__"):
                         doc += " : " + prop_attr.__doc__
                     if hasattr(prop_attr, "restriction"):
-                        doc += "\n\t\t - restriction = *" + str(prop_attr.restriction) + "*\n"
+                        doc += "\n\t\t - restriction = *" + str(
+                            prop_attr.restriction) + "*\n"
 
         if len(op) > 0:
             doc += "\n- Optional parameters :\n"
@@ -122,10 +123,13 @@ class MetaPropertyInitializer(MetaMixinBowl):
                     if hasattr(prop_attr, "__doc__"):
                         doc += " : " + prop_attr.__doc__
                     if hasattr(prop_attr, "restriction"):
-                        doc += "\n\t\t - restriction = *" + str(prop_attr.restriction) + "*"
+                        doc += "\n\t\t - restriction = *" + str(
+                            prop_attr.restriction) + "*"
                     if hasattr(prop_attr, "default"):
-                        doc += "\n\t\t - default = *" + str(prop_attr.default) + "*"
-                    if hasattr(prop_attr, "allow_none") and (prop_attr.allow_none):
+                        doc += "\n\t\t - default = *" + str(
+                            prop_attr.default) + "*"
+                    if hasattr(prop_attr,
+                               "allow_none") and (prop_attr.allow_none):
                         doc += "\n\t\t - *None* allowed"
                     doc += "\n"
 
@@ -141,8 +145,10 @@ class MetaPropertyInitializer(MetaMixinBowl):
                     (args, varargs, varkw, defaults) = inspect.getargspec(attr)
                     len_args = len(args) if args is not None else 0
                     len_defaults = len(defaults) if defaults is not None else 0
-                    default_completed = list((None,) * (len_args - len_defaults))
-                    default_completed.extend(defaults if defaults is not None else [])
+                    default_completed = list(
+                        (None, ) * (len_args - len_defaults))
+                    default_completed.extend(defaults
+                                             if defaults is not None else [])
                     if len_args > 0:
                         param_doc = "("
                         for arg, default in zip(args, default_completed):
@@ -242,7 +248,9 @@ class PropertyInitializer(MixinBowl):
         for p in self.__unlocked_properties__():
             prop = getattr(self.__class__, p)
             if isinstance(prop, DefinitionProperty):
-                if (prop.__value_was_stored__(self)) and (prop.__get_property_value_origin__(self) == SET_EXTERNALLY):
+                if (prop.__value_was_stored__(self)) and (
+                        prop.__get_property_value_origin__(
+                            self) == SET_EXTERNALLY):
                     es_props.append(p)
             else:
                 es_props.append(p)
@@ -311,7 +319,6 @@ class PropertyInitializer(MixinBowl):
 
 
 class StrongPropertyInitializer(PropertyInitializer):
-
     def __init__(self, **kwargs):
         self.is_static = False
         self.flag_busy_initializing = True
@@ -324,7 +331,9 @@ class StrongPropertyInitializer(PropertyInitializer):
 
         for p in req_props:
             if not p in kwargs:
-                raise IpcoreAttributeException("Required property '%s' is not found in keyword arguments of '%s' initialization." % (p, str(type(self))))
+                raise IpcoreAttributeException(
+                    "Required property '%s' is not found in keyword arguments of '%s' initialization."
+                    % (p, str(type(self))))
 
         self.flag_busy_initializing = False
 
@@ -358,14 +367,18 @@ class StrongPropertyInitializer(PropertyInitializer):
         props = self.__properties__()
         for (key, value) in kwargs.items():
             if (not key in props) and (not allow_unmatched_kwargs):
-                raise IpcoreAttributeException("Keyword argument '%s' does not match a property of %s." % (key, str(type(self))))
+                raise IpcoreAttributeException(
+                    "Keyword argument '%s' does not match a property of %s." %
+                    (key, str(type(self))))
             if not is_suppressed(value):
                 setattr(self, key, value)
 
     def __do_validation__(self):
         if not self.validate_properties():
             from ipcore.exceptions.exc import IpcorePropertyDescriptorException
-            raise IpcorePropertyDescriptorException("Validation failed for object %s of type %s." % (str(self), str(self.__class__)))
+            raise IpcorePropertyDescriptorException(
+                "Validation failed for object %s of type %s." %
+                (str(self), str(self.__class__)))
 
     def __make_static__(self):
         """Disables the automatic clearing of cached values when a property is externally set.
@@ -379,7 +392,8 @@ class StrongPropertyInitializer(PropertyInitializer):
 
     def __clear_cached_values_in_store__(self):
         if (not self.is_static):
-            super(StrongPropertyInitializer, self).__clear_cached_values_in_store__()
+            super(StrongPropertyInitializer,
+                  self).__clear_cached_values_in_store__()
 
     def validate_properties(self):
         """Check whether a combination of properties is valid.
@@ -392,9 +406,10 @@ class StrongPropertyInitializer(PropertyInitializer):
             True: When the properties for this StrongPropertyInitializer are valid.
             False: When the properties are not valid. In this case, an IpcorePropertyDescriptorException will be raised
                    in StrongPropertyInitializer.__do_validation__
-        """         
+        """
         return True
 
     def __property_was_externally_set__(self, property_name):
         property_name = "__prop_%s__" % property_name
-        return (property_name in self.__store__) and (self.__store__[property_name][1] == 0)  # 0=SET_EXTERNALLY
+        return (property_name in self.__store__) and (
+            self.__store__[property_name][1] == 0)  # 0=SET_EXTERNALLY
