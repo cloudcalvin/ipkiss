@@ -24,6 +24,7 @@ from ipkiss.all import *
 
 # our basic component that we will use...
 from picazzo.filters.ring import RingRect180DropFilter
+
 my_ring = RingRect180DropFilter(name="My_Ring")
 
 from picazzo.container import RoutePortsAroundCorner
@@ -33,7 +34,8 @@ my_ring_routed = RoutePortsAroundCorner(
     structure=my_ring,
     port_labels=["W1", "W0"],  # ports to be routed
     first_step_direction=SOUTH,  # when rounding corner, go this direction first
-    output_direction=EAST)  # final output direction
+    output_direction=EAST,
+)  # final output direction
 my_ring_routed.write_gdsii("route_ports_1.gds")
 
 # customizing: similar as fanout
@@ -42,14 +44,12 @@ my_ring_routed_2 = RoutePortsAroundCorner(
     port_labels=["W1", "W0"],
     first_step_direction=SOUTH,
     first_step_spacing=4.0,  # spacing of wavegudies in the first step
-    reference_coordinate_first_step=
-    -15.0,  # x-location of the first vertical waveguide
+    reference_coordinate_first_step=-15.0,  # x-location of the first vertical waveguide
     output_direction=EAST,
     spacing=20.0,  # spacing between outputs
-    reference_coordinate=
-    -12.5,  # y-coordinate (or x for NORTH and SOUTH) of first waveguide
-    target_coordinate=
-    20.0,  # x-coordinate (or y for NORTH and SOUTH) of output port
+    reference_coordinate=-12.5,  # y-coordinate (or x for NORTH and SOUTH) of first waveguide
+    target_coordinate=20.0,  # x-coordinate (or y for NORTH and SOUTH) of output port
     manhattan=True,  # Adds rectangles to corners, to reduce sharp angle errors
-    bundled=True)  # if True, adds a trench between the waveguides
+    bundled=True,
+)  # if True, adds a trench between the waveguides
 my_ring_routed_2.write_gdsii("route_ports_2.gds")

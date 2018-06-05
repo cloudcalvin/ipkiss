@@ -24,4 +24,9 @@
 from ..tapers.basic import __WgElTaper__, __WgElPortTaper__
 from ..tapers.parabolic.layout import WgElTaperParabolic
 from ..tapers.linear.layout import WgElTaperLinear, WgElPortTaperLinear
-from ..wgdefs.wg_fc import WgElTaperDeepShallow, WgElTaperShallowDeep, WgElPortTaperFromShallow, WgElPortTaperToShallow
+from ..wgdefs.wg_fc import (
+    WgElTaperDeepShallow,
+    WgElTaperShallowDeep,
+    WgElPortTaperFromShallow,
+    WgElPortTaperToShallow,
+)

@@ -26,6 +26,7 @@ from ring import RingResonator
 class TwoRings(Structure):
     """ structure with two rings defined by the user, which are stacked 
         vertically, with the bottom one flipped. """
+
     __name_prefix__ = "TWORING"
     ring1 = DefinitionProperty(restriction=RestrictType(RingResonator))
     ring2 = DefinitionProperty(restriction=RestrictType(RingResonator))

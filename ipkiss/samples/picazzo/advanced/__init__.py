@@ -23,7 +23,8 @@ from .example import *
 from .example2 import *
 from .example3 import *
 from .example4 import *
-#from example5 import *
-#from example_awg import *
+
+# from example5 import *
+# from example_awg import *
 from .example_tapers_extended import *
 from .example_window_waveguides import *

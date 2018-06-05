@@ -38,14 +38,12 @@ class PicazzoExample1(Structure):
 
         wg_def2 = WgElDefinition(wg_width=0.5, trench_width=7.0)
         align2_wg = wg_def2(shape=[(0.0, 0.0), (100.0, 0.0)])
-        align2 = Structure(
-            name="align2", elements=[align2_wg], ports=align2_wg.ports)
+        align2 = Structure(name="align2", elements=[align2_wg], ports=align2_wg.ports)
         layout += align2
 
         wg_def3 = WgElDefinition(wg_width=2.0, trench_width=7.0)
         align3_wg = wg_def3(shape=[(0.0, 0.0), (200.0, 0.0)])
-        align3 = Structure(
-            name="align3", elements=[align3_wg], ports=align3_wg.ports)
+        align3 = Structure(name="align3", elements=[align3_wg], ports=align3_wg.ports)
         layout += align3
 
         elems += layout
@@ -58,6 +56,7 @@ if __name__ == "__main__":
     layout.write_gdsii("example1.gds")
     # -------- verify the fabrication materials with a 2D visualization
     from ipkiss.plugins.vfabrication import *
+
     layout.visualize_2d()
     # -------- export a GDS file with the virtual fabrication
     layout.write_gdsii_vfabrication("example1_vfab.gds")

@@ -33,24 +33,23 @@ class __StructureContainer__(Structure):
     """ Base Container class which contains one structure.
         Subclasses can then add additional elements 
     """
+
     __name_prefix__ = "CONTAINER"
     structure = StructureProperty(required=True)
     structure_transformation = TransformationProperty()
 
     def define_elements(self, elems):
         elems += SRef(
-            reference=self.structure,
-            transformation=self.structure_transformation)
+            reference=self.structure, transformation=self.structure_transformation
+        )
         return elems
 
     @cache()
     def get_structure_port_list(self):
-        return self.structure.ports.transform_copy(
-            self.structure_transformation)
+        return self.structure.ports.transform_copy(self.structure_transformation)
 
     def define_ports(self, ports):
-        ports += self.structure.ports.transform_copy(
-            self.structure_transformation)
+        ports += self.structure.ports.transform_copy(self.structure_transformation)
         return ports
 
 
@@ -64,7 +63,8 @@ class __StructureContainerWithPortLabels__(__StructureContainer__):
         allow_none=True,
         restriction=RestrictTypeList(str),
         doc="labels of ports to be processes. \
-                                            Set to None to process all ports")
+                                            Set to None to process all ports",
+    )
 
     # FIXME - Cache me
     def __get_labeled_ports__(self):
@@ -87,12 +87,12 @@ class __StructureContainerWithWaveguides__(__StructureContainer__):
     """ Base Container class which contains one structure.
         Also adds additional waveguides in the define_waveguides method
     """
+
     waveguides = DefinitionProperty(fdef_name="define_waveguides")
     bundled = BoolProperty(default=False)
 
     def define_elements(self, elems):
-        super(__StructureContainerWithWaveguides__,
-              self).define_elements(elems)
+        super(__StructureContainerWithWaveguides__, self).define_elements(elems)
 
         wgs = self.waveguides
         if self.bundled:
@@ -102,15 +102,14 @@ class __StructureContainerWithWaveguides__(__StructureContainer__):
         return elems
 
 
-class __StructureContainerWithRoutes__(__RoundedWaveguide__,
-                                       __StructureContainerWithWaveguides__):
+class __StructureContainerWithRoutes__(
+    __RoundedWaveguide__, __StructureContainerWithWaveguides__
+):
     """ Base Container class which contains one structure.
         Also adds additional waveguides by specifying routes in the define_routes method
     """
+
     routes = DefinitionProperty(fdef_name="define_routes")
 
     def define_waveguides(self):
-        return [
-            RouteConnector(route=R, manhattan=self.manhattan)
-            for R in self.routes
-        ]
+        return [RouteConnector(route=R, manhattan=self.manhattan) for R in self.routes]

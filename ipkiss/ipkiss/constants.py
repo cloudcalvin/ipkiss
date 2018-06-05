@@ -25,9 +25,9 @@ from ipkiss.geometry.coord import Coord2
 DEG2RAD = _pi / 180.0
 RAD2DEG = 180.0 / _pi
 
-#----------------------------------------------------------------------------
-#Some global constants
-#----------------------------------------------------------------------------
+# ----------------------------------------------------------------------------
+# Some global constants
+# ----------------------------------------------------------------------------
 TEXT_ALIGN_LEFT = 0
 TEXT_ALIGN_CENTER = 1
 TEXT_ALIGN_RIGHT = 2
@@ -54,19 +54,7 @@ EAST = Coord2(1.0, 0.0)
 WEST = Coord2(-1.0, 0.0)
 
 _sqrt2_2 = _sqrt(0.5)
-NORTHEAST = Coord2(
-    _sqrt2_2,
-    _sqrt2_2,
-)
-NORTHWEST = Coord2(
-    -_sqrt2_2,
-    _sqrt2_2,
-)
-SOUTHEAST = Coord2(
-    _sqrt2_2,
-    -_sqrt2_2,
-)
-SOUTHWEST = Coord2(
-    -_sqrt2_2,
-    -_sqrt2_2,
-)
+NORTHEAST = Coord2(_sqrt2_2, _sqrt2_2)
+NORTHWEST = Coord2(-_sqrt2_2, _sqrt2_2)
+SOUTHEAST = Coord2(_sqrt2_2, -_sqrt2_2)
+SOUTHWEST = Coord2(-_sqrt2_2, -_sqrt2_2)

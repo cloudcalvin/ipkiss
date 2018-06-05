@@ -34,20 +34,21 @@ my_combiner = BentDirectionalCoupler(coupler_length=8.0, bend_angle=30.0)
 my_combiner_transform = Translation((50, 0))
 my_arm1 = MziArmWaveguide(
     splitter_port=my_splitter.ports["E1"],
-    combiner_port=my_combiner.ports.transform_copy(my_combiner_transform)[
-        "W1"])
+    combiner_port=my_combiner.ports.transform_copy(my_combiner_transform)["W1"],
+)
 my_arm2 = MziArmWaveguide(
     splitter_port=my_splitter.ports["E0"],
-    combiner_port=my_combiner.ports.transform_copy(my_combiner_transform)[
-        "W0"],
+    combiner_port=my_combiner.ports.transform_copy(my_combiner_transform)["W0"],
     route_south=True,
-    extra_length=40.0)
+    extra_length=40.0,
+)
 my_mzi = MZI(
     arm1=my_arm1,
     arm2=my_arm2,
     splitter=my_splitter,
     combiner=my_combiner,
-    combiner_transformation=my_combiner_transform)
+    combiner_transformation=my_combiner_transform,
+)
 
 my_mzi.write_gdsii("mzi1.gds")
 
@@ -55,7 +56,6 @@ my_mzi.write_gdsii("mzi1.gds")
 # use our MZIWaveguides class
 #
 
-my_mzi2 = MZIWaveguides(
-    splitter=my_splitter, combiner=my_combiner, delay_length=-40.0)
+my_mzi2 = MZIWaveguides(splitter=my_splitter, combiner=my_combiner, delay_length=-40.0)
 
 my_mzi2.write_gdsii("mzi2.gds")

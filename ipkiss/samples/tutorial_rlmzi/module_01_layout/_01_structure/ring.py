@@ -41,12 +41,12 @@ class RingResonator(Structure):
     bus_wg_width = PositiveNumberProperty(default=0.5)
     coupler_spacing = PositiveNumberProperty(
         default=1.0,
-        doc="spacing between centerline of bus waveguide and ring waveguide")
+        doc="spacing between centerline of bus waveguide and ring waveguide",
+    )
 
     def validate_properties(self):
         """ check whether the combination of properties is valid """
-        if self.coupler_spacing <= 0.5 * (
-                self.ring_wg_width + self.bus_wg_width):
+        if self.coupler_spacing <= 0.5 * (self.ring_wg_width + self.bus_wg_width):
             return False  # waveguides would touch: Not OK
         if self.ring_radius < self.ring_wg_width:
             return False  # ring would become a disc

@@ -30,6 +30,7 @@ __all__ = []
 # this mixes new properties into existing material classes
 class __OpticalMaterial__(__Material__):
     """ Material with optical properties """
+
     n = NumberProperty(default=1.0)
 
     def get_n(self, environment=DEFAULT_ENVIRONMENT):
@@ -38,11 +39,13 @@ class __OpticalMaterial__(__Material__):
 
 class __BlendedOpticalMaterial__(__Material__):
     """ Material with optical properties """
+
     n = FunctionNameProperty("get_n")
 
     def get_n(self, environment=DEFAULT_ENVIRONMENT):
         return self.fraction * self.material_1.get_n(DEFAULT_ENVIRONMENT) + (
-            1 - self.fraction) * self.material_2.get_n(DEFAULT_ENVIRONMENT)
+            1 - self.fraction
+        ) * self.material_2.get_n(DEFAULT_ENVIRONMENT)
 
 
 Material.mixin(__OpticalMaterial__)

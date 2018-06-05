@@ -27,7 +27,7 @@ from ipkiss.primitives.elements.basic import __Element__
 from ipkiss.primitives.elements import SRef, ARef
 
 
-#this is called when ipkiss.all is loaded
+# this is called when ipkiss.all is loaded
 def load_aspects():
     Structure.mixin_first(StructureLayoutAspect)
     Structure.mixin_first(StructureOutputAspect)

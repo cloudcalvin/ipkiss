@@ -56,40 +56,64 @@ class WgElTaperSlotted(__WgElTaper__):
 
         # outline of ridge
         o_shape = Shape(
-            [(0.0, 0.5 * start_slot_width), (0.0, 0.5 * start_width),
-             (L1b, w_min), (L1b + L1c, w_min),
-             (angled_slot_length, 0.5 * end_width),
-             (slot_length, 0.5 * end_width), (slot_length, -0.5 * end_width),
-             (slot_length, -0.5 * start_width - start_slot_rib_width -
-              start_slot_width + TECH.TECH.MINIMUM_LINE),
-             (slot_length,
-              -0.5 * start_width - start_slot_rib_width - start_slot_width),
-             (angled_slot_length,
-              -0.5 * start_width - start_slot_rib_width - start_slot_width),
-             (0.0, -0.5 * start_width), (0.0, -0.5 * start_slot_width)],
-            closed=True)
+            [
+                (0.0, 0.5 * start_slot_width),
+                (0.0, 0.5 * start_width),
+                (L1b, w_min),
+                (L1b + L1c, w_min),
+                (angled_slot_length, 0.5 * end_width),
+                (slot_length, 0.5 * end_width),
+                (slot_length, -0.5 * end_width),
+                (
+                    slot_length,
+                    -0.5 * start_width
+                    - start_slot_rib_width
+                    - start_slot_width
+                    + TECH.TECH.MINIMUM_LINE,
+                ),
+                (
+                    slot_length,
+                    -0.5 * start_width - start_slot_rib_width - start_slot_width,
+                ),
+                (
+                    angled_slot_length,
+                    -0.5 * start_width - start_slot_rib_width - start_slot_width,
+                ),
+                (0.0, -0.5 * start_width),
+                (0.0, -0.5 * start_slot_width),
+            ],
+            closed=True,
+        )
         e += Boundary(
             layer=PPLayer(self.start_wg_def.process, TECH.PURPOSE.LF.LINE),
-            shape=o_shape)
+            shape=o_shape,
+        )
         # slot shape
         s_shape = Shape(
             [
                 (0.0, 0.5 * start_slot_width),
-                (L1a, -0.5 * start_slot_rib_width
-                 ),  # if needed, replace by 2 points with smoother transition
+                (
+                    L1a,
+                    -0.5 * start_slot_rib_width,
+                ),  # if needed, replace by 2 points with smoother transition
                 (angled_slot_length, -0.5 * end_width),
                 (slot_length, -0.5 * end_width),
-                (slot_length,
-                 -0.5 * start_width - start_slot_rib_width - start_slot_width +
-                 TECH.TECH.MINIMUM_LINE),  # add curvature if needed
+                (
+                    slot_length,
+                    -0.5 * start_width
+                    - start_slot_rib_width
+                    - start_slot_width
+                    + TECH.TECH.MINIMUM_LINE,
+                ),  # add curvature if needed
                 (angled_slot_length, -0.5 * end_width - start_slot_width),
-                (0.0, -0.5 * start_slot_width)
+                (0.0, -0.5 * start_slot_width),
             ],
-            closed=True)
+            closed=True,
+        )
         e += Boundary(
-            layer=PPLayer(self.start_wg_def.slot_process,
-                          TECH.PURPOSE.DF.TRENCH),
-            shape=s_shape)
+            layer=PPLayer(self.start_wg_def.slot_process, TECH.PURPOSE.DF.TRENCH),
+            shape=s_shape,
+        )
 
         # trench shape
         t_shape = Shape(
@@ -97,35 +121,46 @@ class WgElTaperSlotted(__WgElTaper__):
                 (0.0, 0.5 * start_slot_width),
                 (0.0, 0.5 * start_width),
                 (0.0, 0.5 * start_width + self.start_wg_def.trench_width),
-                (0.25 * slot_length,
-                 0.5 * start_width + self.start_wg_def.trench_width),
-                (0.75 * slot_length,
-                 0.5 * end_width + self.end_wg_def.trench_width),
+                (
+                    0.25 * slot_length,
+                    0.5 * start_width + self.start_wg_def.trench_width,
+                ),
+                (0.75 * slot_length, 0.5 * end_width + self.end_wg_def.trench_width),
                 (slot_length, 0.5 * end_width + self.end_wg_def.trench_width),
                 (slot_length, 0.5 * end_width),
                 (slot_length, -0.5 * end_width),
-                (slot_length,
-                 -0.5 * start_width - start_slot_rib_width - start_slot_width +
-                 TECH.TECH.MINIMUM_LINE),  # add curvature if needed
-                (slot_length,
-                 -0.5 * start_width - start_slot_rib_width - start_slot_width),
+                (
+                    slot_length,
+                    -0.5 * start_width
+                    - start_slot_rib_width
+                    - start_slot_width
+                    + TECH.TECH.MINIMUM_LINE,
+                ),  # add curvature if needed
+                (
+                    slot_length,
+                    -0.5 * start_width - start_slot_rib_width - start_slot_width,
+                ),
                 (slot_length, -0.5 * end_width - self.end_wg_def.trench_width),
-                (0.75 * slot_length,
-                 -0.5 * end_width - self.end_wg_def.trench_width),
-                (0.25 * slot_length,
-                 -0.5 * start_width - self.start_wg_def.trench_width),
+                (0.75 * slot_length, -0.5 * end_width - self.end_wg_def.trench_width),
+                (
+                    0.25 * slot_length,
+                    -0.5 * start_width - self.start_wg_def.trench_width,
+                ),
                 (0.0, -0.5 * start_width - self.start_wg_def.trench_width),
                 (0.0, -0.5 * start_width),
-                (0.0, -0.5 * start_slot_width)
+                (0.0, -0.5 * start_slot_width),
             ],
-            closed=True)
+            closed=True,
+        )
         e += Boundary(
             layer=PPLayer(self.start_wg_def.process, TECH.PURPOSE.LF_AREA),
-            shape=t_shape)
+            shape=t_shape,
+        )
 
         # transformation
-        T = Rotation((0.0, 0.0), angle_deg(
-            end_position, start_position)) + Translation(start_position)
+        T = Rotation((0.0, 0.0), angle_deg(end_position, start_position)) + Translation(
+            start_position
+        )
         e.transform(T)
         elems += e
         return elems
@@ -135,9 +170,9 @@ class WgElTaperSlotted(__WgElTaper__):
 
 
 class WgElPortTaperSlotted(WgElTaperSlotted, __WgElPortTaper__):
-    #Note: The end of the taper is the slotted part, while the start is a normal wire/waveguide.
-    #This class defines a taper to be placed on a port, the start_port. As for most applications this port is slotted,
-    #this implicates that the end of the taper will be placed on the start_port
+    # Note: The end of the taper is the slotted part, while the start is a normal wire/waveguide.
+    # This class defines a taper to be placed on a port, the start_port. As for most applications this port is slotted,
+    # this implicates that the end of the taper will be placed on the start_port
 
     length = NonNegativeNumberProperty(default=12.0)
 
@@ -149,5 +184,6 @@ class WgElPortTaperSlotted(WgElTaperSlotted, __WgElPortTaper__):
 from .wgdef import SlottedWaveguideElementDefinition
 from ipkiss.plugins.photonics.wg.basic import WgElDefinition
 
-TECH.WGDEF.AUTO_TAPER_DATA_BASE.add(SlottedWaveguideElementDefinition,
-                                    WgElDefinition, WgElPortTaperSlotted)
+TECH.WGDEF.AUTO_TAPER_DATA_BASE.add(
+    SlottedWaveguideElementDefinition, WgElDefinition, WgElPortTaperSlotted
+)

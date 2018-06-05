@@ -19,10 +19,21 @@
 #
 # Contact: ipkiss@intec.ugent.be
 
-from ipcore.properties.predefined import NonNegativeNumberProperty, RestrictedProperty, restrictions
+from ipcore.properties.predefined import (
+    NonNegativeNumberProperty,
+    RestrictedProperty,
+    restrictions,
+)
 from ipkiss.all import Shape, VMirror, PPLayer, Boundary, Rectangle
-from ipkiss.plugins.photonics.wg.connect import WaveguidePointRoundedConnectElementDefinition, __RoundedWaveguide__
-from ipkiss.geometry.shapes.spline import ShapeRoundAdiabaticSpline, SplineRoundingAlgorithm, ShapeRoundAdiabaticSplineGeneric
+from ipkiss.plugins.photonics.wg.connect import (
+    WaveguidePointRoundedConnectElementDefinition,
+    __RoundedWaveguide__,
+)
+from ipkiss.geometry.shapes.spline import (
+    ShapeRoundAdiabaticSpline,
+    SplineRoundingAlgorithm,
+    ShapeRoundAdiabaticSplineGeneric,
+)
 from picazzo.wg.coupler.layout import __DirectionalCoupler__
 from ipkiss.technology import get_technology
 import functools
@@ -39,20 +50,29 @@ def PartialProperty(internal_member_name=None, restriction=None, **kwargs):
 
 class SplineDirectionalCoupler(__RoundedWaveguide__, __DirectionalCoupler__):
     __name_prefix__ = "SplineDircoup_"
-    rounding_algorithm = PartialProperty(
+    rounding_algorithm = (
+        PartialProperty()
     )  # FIXME: Rounding algorithms should be callables that are instances of rounding algorithm classes
     adiabatic_angle_in_coupler = NonNegativeNumberProperty(default=10.0)
     adiabatic_angle_in_access = NonNegativeNumberProperty(default=10.0)
 
     def define_rounding_algorithm(self):
-        return SplineRoundingAlgorithm(adiabatic_angles=(
-            self.adiabatic_angle_in_coupler, self.adiabatic_angle_in_access))
+        return SplineRoundingAlgorithm(
+            adiabatic_angles=(
+                self.adiabatic_angle_in_coupler,
+                self.adiabatic_angle_in_access,
+            )
+        )
 
     def get_bend90_size(self):
         B = self.rounding_algorithm(
-            original_shape=[(-100 * self.bend_radius, 0.0), (0.0, 0.0),
-                            (0.0, 100 * self.bend_radius)],
-            radius=self.bend_radius)
+            original_shape=[
+                (-100 * self.bend_radius, 0.0),
+                (0.0, 0.0),
+                (0.0, 100 * self.bend_radius),
+            ],
+            radius=self.bend_radius,
+        )
         bend_size = B[1:-1].size_info.size
         return (bend_size[0] + 0.01, bend_size[1] + 0.01)
 
@@ -62,35 +82,36 @@ class SplineDirectionalCoupler(__RoundedWaveguide__, __DirectionalCoupler__):
         elems += Rectangle(
             layer=PPLayer(self.wg_definition1.process, TECH.PURPOSE.LF_AREA),
             center=SI.center,
-            box_size=(SI.width, SI.height))
+            box_size=(SI.width, SI.height),
+        )
         return elems
 
     def define_waveguides(self):
         (bs1, bs2) = self.get_bend90_size()
         rect_size = (bs1 + self.length, bs2)
         S = Shape(
-            [(-bs1 - 0.5 * self.length, -bs2), (-bs1 - 0.5 * self.length, 0.0),
-             (-0.5 * self.length, 0.0), (0.5 * self.length, 0.0),
-             (bs1 + 0.5 * self.length, 0.0), (bs1 + 0.5 * self.length, -bs2)])
+            [
+                (-bs1 - 0.5 * self.length, -bs2),
+                (-bs1 - 0.5 * self.length, 0.0),
+                (-0.5 * self.length, 0.0),
+                (0.5 * self.length, 0.0),
+                (bs1 + 0.5 * self.length, 0.0),
+                (bs1 + 0.5 * self.length, -bs2),
+            ]
+        )
         S = ShapeRoundAdiabaticSplineGeneric(
             original_shape=S,
             radii=[self.bend_radius for i in range(len(S))],
-            adiabatic_angles_list=[(self.adiabatic_angle_in_access,
-                                    self.adiabatic_angle_in_access),
-                                   (self.adiabatic_angle_in_access,
-                                    self.adiabatic_angle_in_coupler),
-                                   (self.adiabatic_angle_in_coupler,
-                                    self.adiabatic_angle_in_coupler),
-                                   (self.adiabatic_angle_in_coupler,
-                                    self.adiabatic_angle_in_coupler),
-                                   (self.adiabatic_angle_in_coupler,
-                                    self.adiabatic_angle_in_access),
-                                   (self.adiabatic_angle_in_access,
-                                    self.adiabatic_angle_in_access)])
+            adiabatic_angles_list=[
+                (self.adiabatic_angle_in_access, self.adiabatic_angle_in_access),
+                (self.adiabatic_angle_in_access, self.adiabatic_angle_in_coupler),
+                (self.adiabatic_angle_in_coupler, self.adiabatic_angle_in_coupler),
+                (self.adiabatic_angle_in_coupler, self.adiabatic_angle_in_coupler),
+                (self.adiabatic_angle_in_coupler, self.adiabatic_angle_in_access),
+                (self.adiabatic_angle_in_access, self.adiabatic_angle_in_access),
+            ],
+        )
         S.move((0.0, -0.5 * self.spacing))
         S2 = S.transform_copy(VMirror())
-        waveguides = [
-            self.wg_definition1(shape=S),
-            self.wg_definition2(shape=S2)
-        ]
+        waveguides = [self.wg_definition1(shape=S), self.wg_definition2(shape=S2)]
         return waveguides

@@ -27,11 +27,18 @@ from . import size_info
 from copy import copy, deepcopy
 from numpy import *
 
-from ipcore.properties.descriptor import DefinitionProperty, FunctionProperty, RestrictedProperty
+from ipcore.properties.descriptor import (
+    DefinitionProperty,
+    FunctionProperty,
+    RestrictedProperty,
+)
 from ipcore.properties.restrictions import RestrictType
 from ipcore.properties.processors import ProcessorTypeCast
 from ipcore.properties.predefined import BoolProperty, AngleProperty
-from ipcore.properties.initializer import StrongPropertyInitializer, MetaPropertyInitializer
+from ipcore.properties.initializer import (
+    StrongPropertyInitializer,
+    MetaPropertyInitializer,
+)
 
 from ipkiss.log import IPKISS_LOG as LOG
 from ipcore.mixin.mixin import MixinBowl
@@ -41,34 +48,35 @@ from ipkiss.exceptions.exc import *
 import numpy
 
 __all__ = [
-    "PointsDefinitionProperty", "Shape", "ShapeProperty",
-    "points_add_relative", "points_add_polar"
+    "PointsDefinitionProperty",
+    "Shape",
+    "ShapeProperty",
+    "points_add_relative",
+    "points_add_polar",
 ]
 
 
-def convert_coord_to_array(c):  #this can be Coord2, a tuple or a list
+def convert_coord_to_array(c):  # this can be Coord2, a tuple or a list
     return asarray([c[0], c[1]], dtype=numpy.float64)
 
 
 convert_coord_list_to_numpy_array_vectorized = numpy.vectorize(
-    convert_coord_to_array, otypes=[tuple])
+    convert_coord_to_array, otypes=[tuple]
+)
 
 
 class PointsDefinitionProperty(DefinitionProperty):
-    __allowed_keyword_arguments__ = [
-        "required", "restriction", "default", "fdef_name"
-    ]
+    __allowed_keyword_arguments__ = ["required", "restriction", "default", "fdef_name"]
 
     def __call_getter_function__(self, obj):
         f = self.__get_getter_function__(obj)
         value = f([])
-        if (value is None):
+        if value is None:
             value = self.__process__([])
         else:
-            value = self.__process__([
-                c.convert_to_array() if isinstance(c, Coord) else c
-                for c in value
-            ])
+            value = self.__process__(
+                [c.convert_to_array() if isinstance(c, Coord) else c for c in value]
+            )
         self.__cache_property_value_on_object__(obj, value)
         return value
 
@@ -92,7 +100,8 @@ class PointsDefinitionProperty(DefinitionProperty):
         else:
             raise TypeError(
                 "Invalid type of points in setting value of PointsDefinitionProperty: "
-                + str(type(points)))
+                + str(type(points))
+            )
 
     def __set__(self, obj, points):
         points = self.__process__(points)
@@ -104,8 +113,7 @@ class PointsDefinitionProperty(DefinitionProperty):
 #########################################################
 def points_add_relative(pts, coordinate):
     """ add a point with a relative position of the last point """
-    if shape(pts) == (2, ) and (isinstance(pts[0], int)
-                                or isinstance(pts[0], float)):
+    if shape(pts) == (2,) and (isinstance(pts[0], int) or isinstance(pts[0], float)):
         pts = [pts]
     pts.append([pts[-1][0] + coordinate[0], pts[-1][1] + coordinate[1]])
     return pts
@@ -113,35 +121,39 @@ def points_add_relative(pts, coordinate):
 
 def points_add_polar(pts, distance, angle=0.0):
     """ add a point with a relative distance and angle from the last point """
-    pts = points_add_relative(pts, (distance * cos(constants.DEG2RAD * angle),
-                                    distance * sin(constants.DEG2RAD * angle)))
+    pts = points_add_relative(
+        pts,
+        (
+            distance * cos(constants.DEG2RAD * angle),
+            distance * sin(constants.DEG2RAD * angle),
+        ),
+    )
     return pts
 
 
-#----------------------------------------------------------------------------
+# ----------------------------------------------------------------------------
 # Basic shape
-#----------------------------------------------------------------------------
+# ----------------------------------------------------------------------------
 
 
 class Shape(transformable.Transformable, StrongPropertyInitializer, MixinBowl):
-    '''Basic shape'''
+    """Basic shape"""
+
     points = PointsDefinitionProperty(fdef_name="define_points")
     start_face_angle = AngleProperty(
         allow_none=True,
-        doc=
-        "Use this to overrule the 'dangling' angle at the start of an open shape"
+        doc="Use this to overrule the 'dangling' angle at the start of an open shape",
     )
     end_face_angle = AngleProperty(
         allow_none=True,
-        doc=
-        "Use this to overrule the 'dangling' angle at the end of an open shape"
+        doc="Use this to overrule the 'dangling' angle at the end of an open shape",
     )
 
     def __init__(self, points=[], closed=None, **kwargs):
         if not (isinstance(points, Shape) and (closed is None)):
             kwargs["closed"] = closed
         else:
-            if (points.closed):
+            if points.closed:
                 kwargs["closed"] = True
 
         if isinstance(points, Shape):
@@ -150,17 +162,22 @@ class Shape(transformable.Transformable, StrongPropertyInitializer, MixinBowl):
             if not "end_face_angle" in kwargs:
                 kwargs["end_face_angle"] = points.end_face_angle
 
-        if (points != None):
-            if (isinstance(points, list) or isinstance(points, ndarray)
-                    or isinstance(points, Shape) or isinstance(points, tuple)):
-                if (len(points) > 0):
+        if points != None:
+            if (
+                isinstance(points, list)
+                or isinstance(points, ndarray)
+                or isinstance(points, Shape)
+                or isinstance(points, tuple)
+            ):
+                if len(points) > 0:
                     kwargs["points"] = points
-            elif (isinstance(points, Coord2)):
+            elif isinstance(points, Coord2):
                 kwargs["points"] = [points]
             else:
                 try:
                     from dependencies.shapely_wrapper import CoordinateSequence
-                    if (isinstance(points, CoordinateSequence)):
+
+                    if isinstance(points, CoordinateSequence):
                         pl = [pt for pt in points]
                         kwargs["points"] = pl
                     else:
@@ -168,11 +185,12 @@ class Shape(transformable.Transformable, StrongPropertyInitializer, MixinBowl):
                 except Exception as e:
                     raise IpkissException(
                         "Unexpected type %s for parameter 'points' in Shape::__init__"
-                        % str(type(points)))
+                        % str(type(points))
+                    )
         super(Shape, self).__init__(**kwargs)
 
     def define_points(self, pts):
-        return pts  #to be overridden by subclasses
+        return pts  # to be overridden by subclasses
 
     def clear(self):
         """ clears all points """
@@ -195,8 +213,7 @@ class Shape(transformable.Transformable, StrongPropertyInitializer, MixinBowl):
         elif value is None:
             self.__closed__ = None
         else:
-            raise TypeError(
-                "closed attribute of Shape must be True, False or None")
+            raise TypeError("closed attribute of Shape must be True, False or None")
 
     def is_closed(self):
         if len(self.points) == 0:
@@ -214,13 +231,18 @@ class Shape(transformable.Transformable, StrongPropertyInitializer, MixinBowl):
     #########################################################
     def add_relative(self, coordinate):
         """ add a point with a relative position of the last point """
-        self += Coord2(self.points[-1][0] + coordinate[0],
-                       self.points[-1][1] + coordinate[1])
+        self += Coord2(
+            self.points[-1][0] + coordinate[0], self.points[-1][1] + coordinate[1]
+        )
 
     def add_polar(self, distance, angle=0.0):
         """ add a point with a relative distance and angle from the last point """
-        self.add_relative((distance * cos(constants.DEG2RAD * angle),
-                           distance * sin(constants.DEG2RAD * angle)))
+        self.add_relative(
+            (
+                distance * cos(constants.DEG2RAD * angle),
+                distance * sin(constants.DEG2RAD * angle),
+            )
+        )
 
     #########################################################
     #  Transforms
@@ -232,10 +254,10 @@ class Shape(transformable.Transformable, StrongPropertyInitializer, MixinBowl):
         self.points = transformation.apply_to_array(self.points)
         if not self.start_face_angle is None:
             self.start_face_angle = transformation.apply_to_angle_deg(
-                self.start_face_angle)
+                self.start_face_angle
+            )
         if not self.end_face_angle is None:
-            self.end_face_angle = transformation.apply_to_angle_deg(
-                self.end_face_angle)
+            self.end_face_angle = transformation.apply_to_angle_deg(self.end_face_angle)
         return self
 
     def move(self, position):
@@ -257,16 +279,16 @@ class Shape(transformable.Transformable, StrongPropertyInitializer, MixinBowl):
     def snap_to_grid(self, grids_per_unit=None):
         """ snaps all points to grid """
         from .. import settings
+
         if grids_per_unit is None:
             grids_per_unit = settings.get_grids_per_unit()
-        self.points = (
-            floor(self.points * grids_per_unit + 0.5)) / grids_per_unit
+        self.points = (floor(self.points * grids_per_unit + 0.5)) / grids_per_unit
         return self
 
     def len_without_identicals(self):
         """ returns the length without identicals """
         pts = self.points
-        if (len(pts) > 1):
+        if len(pts) > 1:
             identicals = sum(pts != roll(pts, -1, 0), 1)
             if not self.closed:
                 identicals[0] = True
@@ -278,11 +300,14 @@ class Shape(transformable.Transformable, StrongPropertyInitializer, MixinBowl):
         # FIXME: in some cases a series of many points close together is removed, even if they form
         # together a valid shape...
         from .. import settings
+
         pts = self.points
         if len(pts) > 1:
             identicals = prod(
-                abs(pts - roll(self.points, -1, 0)) <
-                0.5 / settings.get_grids_per_unit(), 1)
+                abs(pts - roll(self.points, -1, 0))
+                < 0.5 / settings.get_grids_per_unit(),
+                1,
+            )
             if not self.closed:
                 identicals[-1] = False
             self.points = delete(pts, identicals.nonzero()[0], 0)
@@ -295,8 +320,8 @@ class Shape(transformable.Transformable, StrongPropertyInitializer, MixinBowl):
         pts = self.points
         if len(pts) > 1:
             straight = (
-                abs(abs((self.turns_rad() + (0.5 * pi)) % pi) - 0.5 * pi) <
-                0.00001)  # (self.turns_rad()%pi == 0.0)
+                abs(abs((self.turns_rad() + (0.5 * pi)) % pi) - 0.5 * pi) < 0.00001
+            )  # (self.turns_rad()%pi == 0.0)
             if not self.closed:
                 straight[0] = False
                 straight[-1] = False
@@ -306,6 +331,7 @@ class Shape(transformable.Transformable, StrongPropertyInitializer, MixinBowl):
     def remove_loops(self):
         """ removes local loops"""
         from . import shape_info
+
         pts = self.points
         if len(pts) <= 3:
             return self
@@ -353,7 +379,7 @@ class Shape(transformable.Transformable, StrongPropertyInitializer, MixinBowl):
     def distances(self):
         """ returns the distance from each point to each next point """
         pts = self.points
-        return sqrt(sum((roll(pts, -1, 0) - pts)**2, 1))
+        return sqrt(sum((roll(pts, -1, 0) - pts) ** 2, 1))
 
     def relative(self):
         """ returns an array with the relative displacement to each point to the next point """
@@ -414,6 +440,7 @@ class Shape(transformable.Transformable, StrongPropertyInitializer, MixinBowl):
         ## uses the winding number algorithm
         ## http://www.geometryalgorithms.com/Archive/algorithm_0103/algorithm_0103.htm#wn_PinPolygon()
         from . import shape_info
+
         wn = 0  # the winding number counter
         ## loop through all edges of the polygon
         S = Shape(point)  # convert input to uniform data format shape
@@ -425,16 +452,14 @@ class Shape(transformable.Transformable, StrongPropertyInitializer, MixinBowl):
 
         wn = zeros(size(P, 0))
         for i in range(N):
-            v_sign0 = (
-                (V0[i, 1] <= P[:, 1]) * 2 - 1)  # positive if V0 is below P
-            v_sign1 = (
-                (V1[i, 1] > P[:, 1]) * 2 - 1)  # positive if V1 is above P
+            v_sign0 = (V0[i, 1] <= P[:, 1]) * 2 - 1  # positive if V0 is below P
+            v_sign1 = (V1[i, 1] > P[:, 1]) * 2 - 1  # positive if V1 is above P
             if inclusive:
                 wn += (v_sign0 == v_sign1) * numpy.sign(
-                    shape_info.is_west(P, V0[i], V1[i]) - 0.1)
+                    shape_info.is_west(P, V0[i], V1[i]) - 0.1
+                )
             else:
-                wn += (
-                    v_sign0 == v_sign1) * shape_info.is_west(P, V0[i], V1[i])
+                wn += (v_sign0 == v_sign1) * shape_info.is_west(P, V0[i], V1[i])
         if len(wn) == 1:
             return wn[0] / 2
         return wn / 2
@@ -452,8 +477,7 @@ class Shape(transformable.Transformable, StrongPropertyInitializer, MixinBowl):
 
             if len(outer):
                 pivot = sample[argmax(dists)]
-                return link(
-                    dome(outer, edge(h, pivot)), dome(outer, edge(pivot, t)))
+                return link(dome(outer, edge(h, pivot)), dome(outer, edge(pivot, t)))
             else:
                 return base
 
@@ -462,14 +486,16 @@ class Shape(transformable.Transformable, StrongPropertyInitializer, MixinBowl):
             base = take(self.points, [argmin(axis), argmax(axis)], axis=0)
             return Shape(
                 link(dome(self.points, base), dome(self.points, base[::-1])),
-                closed=True)
+                closed=True,
+            )
         else:
             return Shape(self.points)
 
     def encloses(self, point, inclusive=False):
         """ tests whether a point lies in the shape (closed) """
-        if not self.size_info.encloses(point, inclusive): return False
-        return (self.winding_number_test(point, inclusive) != 0)
+        if not self.size_info.encloses(point, inclusive):
+            return False
+        return self.winding_number_test(point, inclusive) != 0
 
     def x_coords(self):
         """ returns the x coordinates """
@@ -490,8 +516,8 @@ class Shape(transformable.Transformable, StrongPropertyInitializer, MixinBowl):
 
         if mini == maxi or maxi - mini == 1:
             return [Shape(pts)]
-        S1 = Shape(pts[mini:maxi + 1], True)
-        S2 = Shape(roll(pts, -maxi, 0)[0:(l - maxi + mini + 1)])
+        S1 = Shape(pts[mini : maxi + 1], True)
+        S2 = Shape(roll(pts, -maxi, 0)[0 : (l - maxi + mini + 1)])
         return [S1, S2]
 
     def is_empty(self):
@@ -514,7 +540,14 @@ class Shape(transformable.Transformable, StrongPropertyInitializer, MixinBowl):
 
     def intersections(self, other_shape):
         """ the intersections with this shape and the other shape """
-        from .shape_info import intersection, lines_cross, lines_coincide, sort_points_on_line, points_unique
+        from .shape_info import (
+            intersection,
+            lines_cross,
+            lines_coincide,
+            sort_points_on_line,
+            points_unique,
+        )
+
         s = Shape(self)
         s.remove_straight_angles()
         segments1 = s.segments()
@@ -534,8 +567,7 @@ class Shape(transformable.Transformable, StrongPropertyInitializer, MixinBowl):
                     intersections += [intersection(s1[0], s1[1], s2[0], s2[1])]
                 elif lines_coincide(s1[0], s1[1], s2[0], s2[1]):
                     pl = sort_points_on_line([s1[0], s1[1], s2[0], s2[1]])
-                    intersections += [pl[1],
-                                      pl[2]]  # the two middlemost points
+                    intersections += [pl[1], pl[2]]  # the two middlemost points
         intersections = points_unique(intersections)
         return Shape(intersections)
 
@@ -561,22 +593,22 @@ class Shape(transformable.Transformable, StrongPropertyInitializer, MixinBowl):
                 if len(pointlist.shape) == 2 and (pointlist.shape[1] == 2):
                     points = append(self.points, pointlist, 0)
                 elif len(pointlist.shape) == 1 and (
-                        pointlist.shape[0] == 2):  #individual point
-                    points = append(self.points,
-                                    [(pointlist[0], pointlist[1])], 0)
+                    pointlist.shape[0] == 2
+                ):  # individual point
+                    points = append(self.points, [(pointlist[0], pointlist[1])], 0)
             elif isinstance(pointlist, (Coord2, tuple)):  # indiviual points
                 points = append(self.points, [(pointlist[0], pointlist[1])], 0)
             else:
-                raise TypeError("Wrong type " + str(type(pointlist)) +
-                                " to add to Shape")
+                raise TypeError(
+                    "Wrong type " + str(type(pointlist)) + " to add to Shape"
+                )
         return Shape(points, self.closed)
 
     def __iadd__(self, pointlist):
         """ adds points to this shape """
         if len(self.points) == 0:
             self.points = pointlist
-        elif (not isinstance(pointlist, (Coord2, tuple))
-              and (len(pointlist) == 0)):
+        elif not isinstance(pointlist, (Coord2, tuple)) and (len(pointlist) == 0):
             return self
         else:
             if isinstance(pointlist, Shape):
@@ -588,11 +620,13 @@ class Shape(transformable.Transformable, StrongPropertyInitializer, MixinBowl):
             elif isinstance(pointlist, (ndarray)):
                 self.points = append(self.points, pointlist, 0)
             elif isinstance(pointlist, (Coord2, tuple)):  # indiviual points
-                self.points = append(self.points,
-                                     array([(pointlist[0], pointlist[1])]), 0)
+                self.points = append(
+                    self.points, array([(pointlist[0], pointlist[1])]), 0
+                )
             else:
-                raise TypeError("Wrong type " + str(type(pointlist)) +
-                                " to add to Shape")
+                raise TypeError(
+                    "Wrong type " + str(type(pointlist)) + " to add to Shape"
+                )
         return self
 
     def __len__(self):
@@ -655,13 +689,12 @@ class Shape(transformable.Transformable, StrongPropertyInitializer, MixinBowl):
             else:
                 self.points = array(point_arr)
         else:
-            raise TypeError("Wrong type " + str(type(point)) +
-                            " to append to Shape")
+            raise TypeError("Wrong type " + str(type(point)) + " to append to Shape")
         return self
 
     def extend(self, pointlist):
         """ adds a list of points """
-        if (len(self.points) == 0):
+        if len(self.points) == 0:
             self.points = pointlist
         else:
             if isinstance(pointlist, Shape):
@@ -669,8 +702,9 @@ class Shape(transformable.Transformable, StrongPropertyInitializer, MixinBowl):
             elif isinstance(pointlist, (list, ndarray)):
                 self.points = vstack((self.points, pointlist))
             else:
-                raise TypeError("Wrong type " + str(type(pointlist)) +
-                                " to extend Shape with")
+                raise TypeError(
+                    "Wrong type " + str(type(pointlist)) + " to extend Shape with"
+                )
         return self
 
     def insert(self, i, item):
@@ -682,8 +716,7 @@ class Shape(transformable.Transformable, StrongPropertyInitializer, MixinBowl):
         elif isinstance(item, (Coord2, tuple)):  # indiviual points
             self.points = insert(self.points, i, [(item[0], item[1])], 0)
         else:
-            raise TypeError("Wrong type " + str(type(item)) +
-                            " to extend Shape with")
+            raise TypeError("Wrong type " + str(type(item)) + " to extend Shape with")
         return self
 
     def __contains__(self, point):
@@ -702,16 +735,20 @@ class Shape(transformable.Transformable, StrongPropertyInitializer, MixinBowl):
         """ get the index of a specific point """
         i = prod(self.points == array([item[0], item[1]]), 1).nonzero()[0]
         if len(i) == 0:
-            raise IndexError("Coordinate (", +str(item[0]) + "," +
-                             str(item[1]) + ") cannot be found in shape")
+            raise IndexError(
+                "Coordinate (",
+                +str(item[0]) + "," + str(item[1]) + ") cannot be found in shape",
+            )
         return i[0]
 
     def reverse(self):
         """ reverses the order of the shape """
         self.points = flipud(self.points)
         sfa, efa = self.start_face_angle, self.end_face_angle
-        if not sfa is None: self.end_face_angle = sfa
-        if not efa is None: self.start_face_angle = efa
+        if not sfa is None:
+            self.end_face_angle = sfa
+        if not efa is None:
+            self.start_face_angle = efa
         return self
 
     def reversed(self):
@@ -719,11 +756,12 @@ class Shape(transformable.Transformable, StrongPropertyInitializer, MixinBowl):
         return self.modified_copy(
             points=flipud(self.points),
             start_face_angle=self.end_face_angle,
-            end_face_angle=self.start_face_angle)
-        #return Shape(flipud(self.points),
-        #start_face_angle = self.end_face_angle,
-        #end_face_angle = self.start_face_angle,
-        #closed = self.closed)
+            end_face_angle=self.start_face_angle,
+        )
+        # return Shape(flipud(self.points),
+        # start_face_angle = self.end_face_angle,
+        # end_face_angle = self.start_face_angle,
+        # closed = self.closed)
 
     def __str__(self):
         """ string representation """
@@ -741,8 +779,8 @@ class Shape(transformable.Transformable, StrongPropertyInitializer, MixinBowl):
         myPoints = self.remove_identicals().points
         otherPoints = other.remove_identicals().points
         if not array(
-            [myP == otherP
-             for myP, otherP in zip(myPoints, otherPoints)]).all():
+            [myP == otherP for myP, otherP in zip(myPoints, otherPoints)]
+        ).all():
             return False
         else:
             return True
@@ -751,24 +789,25 @@ class Shape(transformable.Transformable, StrongPropertyInitializer, MixinBowl):
         return not self.__eq__(other)
 
     def __deepcopy__(
-            self, memo
-    ):  #FIXME: this should be removed (fallback on __deepcopy__ from initializer.py, but for some reason this gives wrong results in test_ipkiss.test_ipkiss_examples (logo's)... so we leave it for now
+        self, memo
+    ):  # FIXME: this should be removed (fallback on __deepcopy__ from initializer.py, but for some reason this gives wrong results in test_ipkiss.test_ipkiss_examples (logo's)... so we leave it for now
         return Shape(
             points=deepcopy(self.points),
             closed=self.closed,
             start_face_angle=self.start_face_angle,
-            end_face_angle=self.end_face_angle)
+            end_face_angle=self.end_face_angle,
+        )
 
 
 # empty shape for quick reference
 EMPTY_SHAPE = Shape()
 
 
-def ShapeProperty(internal_member_name=None,
-                  restriction=None,
-                  preprocess=None,
-                  **kwargs):
+def ShapeProperty(
+    internal_member_name=None, restriction=None, preprocess=None, **kwargs
+):
     R = RestrictType(Shape) & restriction
     P = ProcessorTypeCast(Shape) + preprocess
     return RestrictedProperty(
-        internal_member_name, restriction=R, preprocess=P, **kwargs)
+        internal_member_name, restriction=R, preprocess=P, **kwargs
+    )

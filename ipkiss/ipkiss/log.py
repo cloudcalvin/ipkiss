@@ -25,6 +25,6 @@ import logging
 import sys
 
 IPKISS_LOGGING_HANDLER = logging.StreamHandler(sys.stderr)
-IPKISS_LOG = logging.getLogger('IPKISS')
+IPKISS_LOG = logging.getLogger("IPKISS")
 IPKISS_LOG.setLevel(logging.ERROR)
 IPKISS_LOG.addHandler(IPKISS_LOGGING_HANDLER)

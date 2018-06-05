@@ -29,7 +29,8 @@ ring = RingRectSBend180DropFilter(
     coupler_angles=[30.0, 10.0],
     coupler_spacings=[1.0, 0.8],
     coupler_lengths=[6.0, 2.0],
-    coupler_radii=[3.0, 7.0])
+    coupler_radii=[3.0, 7.0],
+)
 
 ring.visualize_2d()
 ring.write_gdsii("ring.gds")
@@ -43,5 +44,6 @@ socket = BroadWgSocket(wg_definition=wg_def, wg_length=15.0)
 C = FiberCouplerGratingLine(
     line_widths_positions=[(1.0, 1.0), (3.0, 3.0), (4.0, 7.0)],
     line_length=7.0,
-    socket=socket)
+    socket=socket,
+)
 C.visualize_2d()

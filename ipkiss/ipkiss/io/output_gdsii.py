@@ -49,26 +49,29 @@ import copy
 TECH = get_technology()
 
 __all__ = [
-    "OutputGdsii", "FileOutputGdsii", "MemoryOutputGdsii",
-    "FileOutputXmlWithGDSFilters"
+    "OutputGdsii",
+    "FileOutputGdsii",
+    "MemoryOutputGdsii",
+    "FileOutputXmlWithGDSFilters",
 ]
 
 
 class OutputGdsii(OutputBasic):
     """ Writes GDS output to a stream """
+
     userefcache = BoolProperty(default=False)
     name_filter = RestrictedProperty(
         default=TECH.GDSII.NAME_FILTER,
         restriction=RestrictType(Filter),
-        doc="filter class which is applied to all names")
+        doc="filter class which is applied to all names",
+    )
 
     def __init__(self, o_stream=sys.stdout, **kwargs):
         kwargs["allow_unmatched_kwargs"] = True
         super(OutputGdsii, self).__init__(o_stream=o_stream, **kwargs)
-        if 'flatten_structure_container' in kwargs:
-            self.flatten_structure_container = kwargs.get(
-                'flatten_structure_container')
-        elif hasattr(TECH.GDSII, 'FLATTEN_STRUCTURE_CONTAINER'):
+        if "flatten_structure_container" in kwargs:
+            self.flatten_structure_container = kwargs.get("flatten_structure_container")
+        elif hasattr(TECH.GDSII, "FLATTEN_STRUCTURE_CONTAINER"):
             self.flatten_structure_container = TECH.GDSII.FLATTEN_STRUCTURE_CONTAINER
         else:
             self.flatten_structure_container = False
@@ -76,6 +79,7 @@ class OutputGdsii(OutputBasic):
         if sys.platform == "win32":
             import os
             import msvcrt
+
             msvcrt.setmode(self.o_stream.fileno(), os.O_BINARY)
 
     def __init_collector__(self):
@@ -85,16 +89,18 @@ class OutputGdsii(OutputBasic):
         self.do_collect(item, **kwargs)
         return
 
-    #----------------------------------------------------------------------------
-    #Layout-level output functions
-    #----------------------------------------------------------------------------
+    # ----------------------------------------------------------------------------
+    # Layout-level output functions
+    # ----------------------------------------------------------------------------
 
     def collect_Library(self, library, **kwargs):
         self.__collect_library_header__(library)
         unreferenced_structures = self.library.unreferenced_structures(
-            usecache=self.userefcache)
+            usecache=self.userefcache
+        )
         referenced_structures = self.library.referenced_structures(
-            usecache=self.userefcache)
+            usecache=self.userefcache
+        )
         self.collect(unreferenced_structures, **kwargs)
         collected_referenced_structures = []
         while len(self.__ref_referenced_structures__) > 0:
@@ -111,14 +117,16 @@ class OutputGdsii(OutputBasic):
     def __collect_library_header__(self, library):
         self.collector += [
             __str_record__(gds_records.Header, __hex_int2__(5)),
-            __str_record__(gds_records.BgnLib,
-                           __hex_date__(library.modified) +
-                           __hex_date__(library.accessed)),
+            __str_record__(
+                gds_records.BgnLib,
+                __hex_date__(library.modified) + __hex_date__(library.accessed),
+            ),
             __str_record__(gds_records.LibName, __hex_text__(library.name)),
             __str_record__(
                 gds_records.Units,
-                __hex_float__(self.library.grid / self.library.unit) +
-                __hex_float__(self.library.grid))
+                __hex_float__(self.library.grid / self.library.unit)
+                + __hex_float__(self.library.grid),
+            ),
         ]
         return
 
@@ -132,22 +140,25 @@ class OutputGdsii(OutputBasic):
         self.collector += [
             __str_record__(
                 gds_records.BgnStr,
-                __hex_date__(item.created) + __hex_date__(item.modified)),
-            __str_record__(gds_records.StrName, __hex_text__(sname))
+                __hex_date__(item.created) + __hex_date__(item.modified),
+            ),
+            __str_record__(gds_records.StrName, __hex_text__(sname)),
         ]
 
-    #generate the footer for any structure
+    # generate the footer for any structure
     def __collect_structure_footer__(self, item):
         self.collector += [__str_record__(gds_records.EndStr)]
         return
 
-    #----------------------------------------------------------------------------
-    #__Element__ level output functions
-    #----------------------------------------------------------------------------
+    # ----------------------------------------------------------------------------
+    # __Element__ level output functions
+    # ----------------------------------------------------------------------------
 
-    #text
+    # text
     def collect_Label(self, item, additional_transform=None):
-        T = item.transformation + additional_transform  # make a copy because there is also the height
+        T = (
+            item.transformation + additional_transform
+        )  # make a copy because there is also the height
         layer = self.map_layer(item.layer)
         if layer is None:
             return
@@ -157,40 +168,44 @@ class OutputGdsii(OutputBasic):
             __str_record__(gds_records.Text),
             self.__str_layer__(layer.number),
             __str_record__(gds_records.TextType, __hex_int2__(0)),
-            __str_record__(gds_records.Presentation,
-                           __hex_int2__(
-                               (item.h_alignment + 4 * item.v_alignment +
-                                8 * item.font % 4))),
-            __str_record__(gds_records.PathType, __hex_int2__(1))
+            __str_record__(
+                gds_records.Presentation,
+                __hex_int2__(
+                    (item.h_alignment + 4 * item.v_alignment + 8 * item.font % 4)
+                ),
+            ),
+            __str_record__(gds_records.PathType, __hex_int2__(1)),
         ]
         self.collector += __list_transformation__(T)
         self.collector += [
             self.__str_coordinatelist__(coordinates),
             __str_record__(gds_records.String, __hex_text__(item.text)),
-            __str_record__(gds_records.EndEl)
+            __str_record__(gds_records.EndEl),
         ]
         return
 
-    #references
+    # references
     def collect_SRef(self, item, additional_transform=None):
-        T = item.transformation + Translation(
-            item.position.snap_to_grid()) + additional_transform
+        T = (
+            item.transformation
+            + Translation(item.position.snap_to_grid())
+            + additional_transform
+        )
         coordinates = Shape((0.0, 0.0)).transform(T)
         sname = self.name_filter(item.reference.name)[0]
         self.collector += [
             __str_record__(gds_records.SRef),
-            __str_record__(gds_records.SName, __hex_text__(sname))
+            __str_record__(gds_records.SName, __hex_text__(sname)),
         ]
         self.collector += __list_transformation__(T)
         self.collector += [
             self.__str_coordinatelist__(coordinates),
-            __str_record__(gds_records.EndEl)
+            __str_record__(gds_records.EndEl),
         ]
         self.__ref_referenced_structures__.add(item.reference)
 
     def collect_ARef(self, item, additional_transform=None):
-        T = item.transformation + Translation(
-            item.origin) + additional_transform
+        T = item.transformation + Translation(item.origin) + additional_transform
         p = Coord2(item.period).snap_to_grid()
         corner1 = Coord2(item.n_o_periods[0] * p[0], 0.0)
         corner2 = Coord2(0.0, item.n_o_periods[1] * p[1])
@@ -198,15 +213,16 @@ class OutputGdsii(OutputBasic):
         sname = self.name_filter(item.reference.name)[0]
         self.collector += [
             __str_record__(gds_records.ARef),
-            __str_record__(gds_records.SName, __hex_text__(sname))
+            __str_record__(gds_records.SName, __hex_text__(sname)),
         ]
         self.collector += __list_transformation__(T)
         self.collector += [
-            __str_record__(gds_records.ColRow,
-                           __hex_int2__(item.n_o_periods[0]) +
-                           __hex_int2__(item.n_o_periods[1])),
+            __str_record__(
+                gds_records.ColRow,
+                __hex_int2__(item.n_o_periods[0]) + __hex_int2__(item.n_o_periods[1]),
+            ),
             self.__str_coordinatelist__(coordinates),
-            __str_record__(gds_records.EndEl)
+            __str_record__(gds_records.EndEl),
         ]
         self.__ref_referenced_structures__.add(item.reference)
         return
@@ -222,7 +238,7 @@ class OutputGdsii(OutputBasic):
             self.__str_layer__(layer.number),
             __str_record__(gds_records.BoxType, __hex_int2__(0)),
             self.__str_coordinatelist__(coordinates),
-            __str_record__(gds_records.EndEl)
+            __str_record__(gds_records.EndEl),
         ]
         return
 
@@ -235,10 +251,11 @@ class OutputGdsii(OutputBasic):
             self.__str_layer__(L.number),
             self.__str_datatype__(L.datatype),
             __str_record__(gds_records.PathType, __hex_int2__(path_type)),
-            __str_record__(gds_records.Width,
-                           __hex_int4__(self.__db_value__(line_width))),
+            __str_record__(
+                gds_records.Width, __hex_int4__(self.__db_value__(line_width))
+            ),
             self.__str_shape__(coordinates),
-            __str_record__(gds_records.EndEl)
+            __str_record__(gds_records.EndEl),
         ]
         return
 
@@ -252,7 +269,7 @@ class OutputGdsii(OutputBasic):
             self.__str_layer__(L.number),
             self.__str_datatype__(L.datatype),
             self.__str_shape__(coordinates),
-            __str_record__(gds_records.EndEl)
+            __str_record__(gds_records.EndEl),
         ]
         return
 
@@ -260,19 +277,26 @@ class OutputGdsii(OutputBasic):
         # FIXME. Containers are PICAZZO classes. This method should be converted to a Filter or a mixin
         from picazzo.container.container import __StructureContainer__
         from ipkiss.primitives.elements.reference import __RefElement__
+
         if isinstance(item, __StructureContainer__) and isinstance(
-                item.elements[0], __RefElement__):
+            item.elements[0], __RefElement__
+        ):
             sref = item.elements[0]
             sref_elements = sref.reference.elements
             sref_transformation = sref.transformation + Translation(
-                translation=sref.position)
+                translation=sref.position
+            )
             sref_elements_transformed = sref_elements.transform_copy(
-                transformation=sref_transformation)
+                transformation=sref_transformation
+            )
             new_elements = ElementList()
-            if (isinstance(sref.reference, __StructureContainer__)):
-                (inner_container_elements,
-                 sref_level_counter) = self.__collect_container_elements__(
-                     sref.reference, sref_level_counter + 1)
+            if isinstance(sref.reference, __StructureContainer__):
+                (
+                    inner_container_elements,
+                    sref_level_counter,
+                ) = self.__collect_container_elements__(
+                    sref.reference, sref_level_counter + 1
+                )
                 new_elements.extend(inner_container_elements)
                 if len(item.elements) > 1:
                     new_elements.extend(item.elements[1:])
@@ -287,15 +311,20 @@ class OutputGdsii(OutputBasic):
     def collect___StructureContainer__(self, item):
         # FIXME. Containers are PICAZZO classes. This method should be converted to a Filter or a mixin
         from ipkiss.primitives.elements.reference import __RefElement__
+
         if self.flatten_structure_container and isinstance(
-                item.elements[0], __RefElement__):
+            item.elements[0], __RefElement__
+        ):
             sref = item.elements[0]
             (new_elements, sref_levels) = self.__collect_container_elements__(
-                item=item, sref_level_counter=1)
+                item=item, sref_level_counter=1
+            )
             sref_transformation = sref.transformation + Translation(
-                translation=sref.position)
+                translation=sref.position
+            )
             new_elements_transformed = new_elements.transform_copy(
-                transformation=sref_transformation)
+                transformation=sref_transformation
+            )
             if sref_levels >= 1:
                 if len(item.elements) > 1:
                     new_elements_transformed.extend(item.elements[1:])
@@ -304,21 +333,21 @@ class OutputGdsii(OutputBasic):
                 item.__make_dynamic__()
         self.collect_Structure(item)
 
-    #----------------------------------------------------------------------------
+    # ----------------------------------------------------------------------------
     # unit conversion
-    #----------------------------------------------------------------------------
+    # ----------------------------------------------------------------------------
 
     def __db_value__(self, value):
-        #convents absolute coordinates to database units
+        # convents absolute coordinates to database units
         return round(value * self.__structure_scale__ * self.grids_per_unit)
 
     def __db_value_array__(
-            self, value_array):  #faster, direct operation on numpy array
-        result = np.round(
-            value_array * self.__structure_scale__ * self.grids_per_unit)
+        self, value_array
+    ):  # faster, direct operation on numpy array
+        result = np.round(value_array * self.__structure_scale__ * self.grids_per_unit)
         return result
 
-    #generate coordinate strings from a shape or list of coordinates
+    # generate coordinate strings from a shape or list of coordinates
     def __str_coordinatelist__(self, coords):
         if isinstance(coords, Shape):
             db_value_coordinates = self.__db_value_array__(coords.points)
@@ -328,8 +357,11 @@ class OutputGdsii(OutputBasic):
             ]
         else:
             ret_data = [
-                "%s%s" % (__hex_int4__(self.__db_value__(c[0])),
-                          __hex_int4__(self.__db_value__(c[1])))
+                "%s%s"
+                % (
+                    __hex_int4__(self.__db_value__(c[0])),
+                    __hex_int4__(self.__db_value__(c[1])),
+                )
                 for c in coords
             ]
         return __str_record__(gds_records.XY, "".join(ret_data))
@@ -376,7 +408,8 @@ class GzipOutputGdsii(OutputGdsii):
 
     def write(self, item):
         from gzip import GzipFile
-        fStr = GzipFile(self.FileName, mode='wb')
+
+        fStr = GzipFile(self.FileName, mode="wb")
         self.o_stream = fStr
         self.collector.o_stream = fStr
         self.o_stream.write(self.str(item))
@@ -386,10 +419,12 @@ class GzipOutputGdsii(OutputGdsii):
 
 class FileOutputXmlWithGDSFilters(FileOutputXml):
     """Writes XML output to a file, but with the data filtered according to GDS standards"""
+
     name_filter = RestrictedProperty(
         default=TECH.GDSII.NAME_FILTER,
         restriction=RestrictType(Filter),
-        doc="filter class which is applied to all names")
+        doc="filter class which is applied to all names",
+    )
 
     def __init__(self, FileName, **kwargs):
         super(FileOutputXmlWithGDSFilters, self).__init__(FileName, **kwargs)
@@ -405,21 +440,21 @@ class MemoryOutputGdsii(OutputGdsii):
     def write(self, item):
         self.o_stream.write(self.str(item))
         self.o_stream.flush()
-        self.o_stream.seek(0)  #reset to beginning of the buffer
+        self.o_stream.seek(0)  # reset to beginning of the buffer
         return self.o_stream
 
 
-#----------------------------------------------------------------------------
+# ----------------------------------------------------------------------------
 # Low-level output
-#----------------------------------------------------------------------------
+# ----------------------------------------------------------------------------
 
 
-#Generate record
+# Generate record
 def __str_record__(record_type, hex_data=""):
     length = len(hex_data) / 2 + 4
-    return ''.join([__hex_int2__(length),
-                    __hex_int2__(record_type),
-                    hex_data])  #fastest string concatenation
+    return "".join(
+        [__hex_int2__(length), __hex_int2__(record_type), hex_data]
+    )  # fastest string concatenation
 
 
 def __hex_int2__(number):
@@ -440,7 +475,7 @@ def __hex_float__(number):
             B1 = 128
             number = abs(number)
         E = int(math.ceil(math.log(number) / math.log(16)))
-        inumber = int(number * 16**(-E + 14))
+        inumber = int(number * 16 ** (-E + 14))
         B1 += E + 64
         B2 = (inumber / 281474976710656) % 256
         if B2 == 0:
@@ -458,9 +493,10 @@ def __hex_text__(text):
     return t
 
 
-#Create the date strings
+# Create the date strings
 def __hex_date__(T=None):
-    if T is None: T = time()
+    if T is None:
+        T = time()
     t = localtime(T)
     ret_data = [
         __hex_int2__(t[0] % 100),
@@ -468,14 +504,14 @@ def __hex_date__(T=None):
         __hex_int2__(t[2]),
         __hex_int2__(t[3]),
         __hex_int2__(t[4]),
-        __hex_int2__(t[5])
+        __hex_int2__(t[5]),
     ]
     return "".join(ret_data)
 
 
-#Generate comment in the Key file
+# Generate comment in the Key file
 def __list_comment__(text):
-    #not available n GDSII. Supported for compatibility with Key
+    # not available n GDSII. Supported for compatibility with Key
     return ""
 
 
@@ -499,5 +535,5 @@ def __list_transformation__(transform):
     return [
         __str_record__(gds_records.STrans, __hex_int2__(strans)),
         __str_record__(gds_records.Mag, __hex_float__(T)),
-        __str_record__(gds_records.Angle, __hex_float__(rotation))
+        __str_record__(gds_records.Angle, __hex_float__(rotation)),
     ]

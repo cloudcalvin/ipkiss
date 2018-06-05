@@ -27,11 +27,11 @@ __all__ = ["RouteBundleConnectRounded"]
 
 class RouteBundleConnectRounded(WgElBundleConnectRoundedGeneric):
     """ bundle of rounded waveguide routes, with a common inversion layer. the shapes should be in the east order for the inversion layer to work """
+
     wg_widths = DefinitionProperty(fdef_name="define_wg_widths")
     trench_widths = DefinitionProperty(fdef_name="define_trench_widths")
     bend_radii = DefinitionProperty(fdef_name="define_bend_radii")
-    shapes = RestrictedProperty(
-        restriction=RestrictTypeList(Shape), required=True)
+    shapes = RestrictedProperty(restriction=RestrictTypeList(Shape), required=True)
 
     def define_wg_widths(self):
         wg_widths = []

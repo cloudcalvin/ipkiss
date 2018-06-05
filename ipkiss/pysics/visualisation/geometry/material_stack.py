@@ -20,7 +20,11 @@
 # Contact: ipkiss@intec.ugent.be
 
 from ipcore.all import *
-from ...basics.geometry.material_stack import MaterialStackGeometry1D, MaterialStackGeometry2D, MaterialStackGeometry3D
+from ...basics.geometry.material_stack import (
+    MaterialStackGeometry1D,
+    MaterialStackGeometry2D,
+    MaterialStackGeometry3D,
+)
 
 __all__ = []
 
@@ -34,30 +38,29 @@ class __MaterialStackGeometry1DVisualizationMixin__(StrongPropertyInitializer):
         """ generate a matplotlib Figure of a MaterialStackGeometry1D object """
 
         from dependencies.matplotlib_wrapper import Figure, Rectangle
+
         fig = Figure()
-        axes = fig.add_axes([0.1, 0.1, 0.8, 0.8], projection='rectilinear')
+        axes = fig.add_axes([0.1, 0.1, 0.8, 0.8], projection="rectilinear")
 
         self.__plot_material_stack_on_axes__(axes, x_start=0.0, x_end=width)
 
         axes.set_xlim(0, width)
         axes.set_ylim(self.origin_z, self.origin_z + self.thickness)
-        axes.set_aspect('equal')
+        axes.set_aspect("equal")
 
         return fig
 
-    def __plot_material_stack_on_axes__(self,
-                                        axes,
-                                        x_start=0.0,
-                                        x_end=1.0,
-                                        references_for_legend={}):
+    def __plot_material_stack_on_axes__(
+        self, axes, x_start=0.0, x_end=1.0, references_for_legend={}
+    ):
         from dependencies.matplotlib_wrapper import Rectangle
+
         width = x_end - x_start
         height = 0.0
         for m, h in self.materials_thicknesses:
             color = m.display_style.color.html_string()
             hatch = m.display_style.stipple.matplotlib_hatch
-            patch = Rectangle(
-                (x_start, height), width, h, fc=color, hatch=hatch)
+            patch = Rectangle((x_start, height), width, h, fc=color, hatch=hatch)
             patch.set_linewidth(0)
             axes.add_patch(patch)
             if m not in references_for_legend:
@@ -75,29 +78,27 @@ class __MaterialStackGeometry2DVisualizationMixin__(StrongPropertyInitializer):
         """ generate a matplotlib Figure of a MaterialStackGeometry1D object """
 
         from dependencies.matplotlib_wrapper import Figure, Rectangle, font_manager
+
         fig = Figure()
-        axes = fig.add_axes([0.1, 0.1, 0.8, 0.8], projection='rectilinear')
+        axes = fig.add_axes([0.1, 0.1, 0.8, 0.8], projection="rectilinear")
         legend_refs = {}
         x = self.origin_x
         for ms, w in self.stacks_widths:
             ms.__plot_material_stack_on_axes__(
-                axes,
-                x_start=x,
-                x_end=x + w,
-                references_for_legend=legend_refs)
+                axes, x_start=x, x_end=x + w, references_for_legend=legend_refs
+            )
             x += w
 
         SI = self.size_info()
         axes.set_xlim(SI.west, SI.east)
         axes.set_ylim(SI.south, SI.north)
-        axes.set_aspect('equal')
+        axes.set_aspect("equal")
 
         # legend
         prop = font_manager.FontProperties(size=10)
         patches_for_legend = [ref[0] for ref in list(legend_refs.values())]
         labels_for_legend = [ref[1] for ref in list(legend_refs.values())]
-        axes.legend(
-            patches_for_legend, labels_for_legend, loc=(0.5, 0.9), prop=prop)
+        axes.legend(patches_for_legend, labels_for_legend, loc=(0.5, 0.9), prop=prop)
 
         return fig
 
@@ -118,12 +119,15 @@ class __MaterialStackGeometry3DVisualizationMixin__(StrongPropertyInitializer):
 
         N = 0  # running point index: increases when new points are added
 
-        for shape, stack in self.shapes_stacks:  # check whether it needs reverse iteration
+        for (
+            shape,
+            stack,
+        ) in self.shapes_stacks:  # check whether it needs reverse iteration
             points2d = numpy.flipud(shape.points)  # numpy array
             n_points = len(points2d)  # number of points in this shape
-            points = numpy.hstack([points2d,
-                                   numpy.zeros([n_points,
-                                                1])])  # 2D to 3D array
+            points = numpy.hstack(
+                [points2d, numpy.zeros([n_points, 1])]
+            )  # 2D to 3D array
 
             # polygon cell with one shape
             polys = tvtk.CellArray()
@@ -144,21 +148,21 @@ class __MaterialStackGeometry3DVisualizationMixin__(StrongPropertyInitializer):
             ## step 3: generate a second set of top and bottom triangles
 
             point_array = triangle_pd.points.to_array()
-            #n = len(point_array)
-            #point_array_bottom = point_array + array([0,0,0])
-            #point_array_top = point_array + array([0,0,0.5])
-            #new_point_array = numpy.vstack([point_array_bottom, point_array_top])
-            #index_array = triangle_pd.polys.data.to_array()
-            #n_triangles = len(index_array)/4
-            #index_array_bottom = index_array
-            #index_array_top = numpy.ravel(index_array.reshape(n_triangles, 4) + array([0, n, n, n]))
-            #new_index_array = numpy.hstack([index_array_bottom, index_array_top])
+            # n = len(point_array)
+            # point_array_bottom = point_array + array([0,0,0])
+            # point_array_top = point_array + array([0,0,0.5])
+            # new_point_array = numpy.vstack([point_array_bottom, point_array_top])
+            # index_array = triangle_pd.polys.data.to_array()
+            # n_triangles = len(index_array)/4
+            # index_array_bottom = index_array
+            # index_array_top = numpy.ravel(index_array.reshape(n_triangles, 4) + array([0, n, n, n]))
+            # new_index_array = numpy.hstack([index_array_bottom, index_array_top])
 
-            #new_polys = tvtk.CellArray()
-            #new_polys.set_cells(2*n_triangles, new_index_array)
-            #new_pd = tvtk.PolyData()
-            #new_pd.points = new_point_array
-            #new_pd.polys = new_polys
+            # new_polys = tvtk.CellArray()
+            # new_polys.set_cells(2*n_triangles, new_index_array)
+            # new_pd = tvtk.PolyData()
+            # new_pd.points = new_point_array
+            # new_pd.polys = new_polys
 
             ##view([new_pd], mapper_type = tvtk.PolyDataMapper)
 
@@ -172,24 +176,29 @@ class __MaterialStackGeometry3DVisualizationMixin__(StrongPropertyInitializer):
                 # create the Wedge cell points and indices
                 # reuse the top points of the last cell as the bottom points of the new cell
                 wedge_points.append(point_array + numpy.array([0, 0, z]))
-                wedge_points.append(point_array + numpy.array(
-                    [0, 0, z + 0.999 * thickness]))
+                wedge_points.append(
+                    point_array + numpy.array([0, 0, z + 0.999 * thickness])
+                )
                 wedge_cell_indices.append(
-                    numpy.hstack([
-                        iar + numpy.array(
-                            [3, N, N, N]),  # 3 adds to the existing 3: makes 6
-                        iar[:, 1:] +
-                        numpy.array([N + n_points, N + n_points, N + n_points])
-                    ]).ravel())
+                    numpy.hstack(
+                        [
+                            iar
+                            + numpy.array(
+                                [3, N, N, N]
+                            ),  # 3 adds to the existing 3: makes 6
+                            iar[:, 1:]
+                            + numpy.array([N + n_points, N + n_points, N + n_points]),
+                        ]
+                    ).ravel()
+                )
                 N += 2 * n_points
                 z += thickness
 
                 if not material in materials:
                     materials.append(material)
-                wedge_cell_values.extend(
-                    [materials.index(material)] * n_triangles)
-                #ds = material.display_style
-                #wedge_cell_values.extend([[ds.color.red, ds.color.green, ds.color.blue, ds.alpha]]*n_triangles)
+                wedge_cell_values.extend([materials.index(material)] * n_triangles)
+                # ds = material.display_style
+                # wedge_cell_values.extend([[ds.color.red, ds.color.green, ds.color.blue, ds.alpha]]*n_triangles)
 
         # create material color lookup table
         colors = []
@@ -199,32 +208,34 @@ class __MaterialStackGeometry3DVisualizationMixin__(StrongPropertyInitializer):
         color_lut.number_of_colors = n_mat
         for i in range(n_mat):
             ds = materials[i].display_style
-            color_lut.set_table_value(i, ds.color.red, ds.color.green,
-                                      ds.color.blue, ds.alpha)  #RGBA
+            color_lut.set_table_value(
+                i, ds.color.red, ds.color.green, ds.color.blue, ds.alpha
+            )  # RGBA
         color_lut.build
 
         ## create mapper
         mapper = tvtk.DataSetMapper()
         mapper.lookup_table = color_lut
         mapper.scalar_range = (0, n_mat - 1)
-        #mapper.map_scalars(1)
+        # mapper.map_scalars(1)
 
         # build cells
         n_cells = len(wedge_cell_indices) * n_triangles
         cell_array = tvtk.CellArray()
         cell_array.set_cells(n_cells, numpy.hstack(wedge_cell_indices))
         cell_types = numpy.array([wedge_type for i in range(n_cells)])
-        cell_offset = numpy.array(list(range(
-            0, 7 * n_cells, 7)))  # each cell has one counter and 6 points
+        cell_offset = numpy.array(
+            list(range(0, 7 * n_cells, 7))
+        )  # each cell has one counter and 6 points
 
         # Now create the UnstructuredGrid which will contain the material data.
         ug = tvtk.UnstructuredGrid(points=numpy.vstack(wedge_points))
         # Now just set the cell types and reuse the ug locations and cells.
         ug.set_cells(cell_types, cell_offset, cell_array)
-        #scalars = numpy.random.random([n_cells, 1]) # use random data to visualize the triangulation
+        # scalars = numpy.random.random([n_cells, 1]) # use random data to visualize the triangulation
         scalars = numpy.array(wedge_cell_values)
         ug.cell_data.scalars = scalars
-        ug.cell_data.scalars.name = 'material_color'
+        ug.cell_data.scalars.name = "material_color"
         ug.cell_data.set_active_scalars("material_color")
 
         return (ug, mapper)

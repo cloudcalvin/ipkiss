@@ -32,22 +32,24 @@ class __RoundHole__(Structure):
     purpose = PurposeProperty(default=TECH.PURPOSE.DF.HOLE)
 
     def define_name(self):
-        return "%s_%d_C%d_%d_A%d_P%s_PP%s" % (self.__name_prefix__,
-                                              self.radius * 1000,
-                                              self.center.x * 1000,
-                                              self.center.y * 1000,
-                                              self.angle * 1000,
-                                              self.process.extension,
-                                              self.purpose.extension)
+        return "%s_%d_C%d_%d_A%d_P%s_PP%s" % (
+            self.__name_prefix__,
+            self.radius * 1000,
+            self.center.x * 1000,
+            self.center.y * 1000,
+            self.angle * 1000,
+            self.process.extension,
+            self.purpose.extension,
+        )
 
 
 class HexHole(__RoundHole__):
     __name_prefix__ = "HEX"
 
     def define_elements(self, elems):
-        sh = ShapeHexagon(
-            center=self.center, radius=self.radius).rotate((0.0, 0.0),
-                                                           self.angle)
+        sh = ShapeHexagon(center=self.center, radius=self.radius).rotate(
+            (0.0, 0.0), self.angle
+        )
         elems += Boundary(PPLayer(self.process, self.purpose), sh)
         return elems
 
@@ -57,7 +59,7 @@ class DodecHole(__RoundHole__):
 
     def define_elements(self, elems):
         sh = ShapeRegularPolygon(
-            center=self.center, radius=self.radius, n_o_sides=12).rotate(
-                (0.0, 0.0), self.angle)
+            center=self.center, radius=self.radius, n_o_sides=12
+        ).rotate((0.0, 0.0), self.angle)
         elems += Boundary(PPLayer(self.process, self.purpose), sh)
         return elems

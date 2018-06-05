@@ -19,4 +19,11 @@
 #
 # Contact: ipkiss@intec.ugent.be
 
-from .layer import PPLayer, ProcessPurposeLayer, ProcessProperty, PurposeProperty, ProcessLayer, PatternPurpose
+from .layer import (
+    PPLayer,
+    ProcessPurposeLayer,
+    ProcessProperty,
+    PurposeProperty,
+    ProcessLayer,
+    PatternPurpose,
+)

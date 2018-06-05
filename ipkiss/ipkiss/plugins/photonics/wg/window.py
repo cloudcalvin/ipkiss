@@ -20,11 +20,13 @@
 # Contact: ipkiss@intec.ugent.be
 
 from ipkiss.all import *
-from .definition import BaseWaveguideDefinition, SingleShapeWaveguideElement, WaveguideDefProperty
+from .definition import (
+    BaseWaveguideDefinition,
+    SingleShapeWaveguideElement,
+    WaveguideDefProperty,
+)
 
-__all__ = [
-    "PathWindow", "WindowWaveguideDefinition", "WindowsOnWaveguideDefinition"
-]
+__all__ = ["PathWindow", "WindowWaveguideDefinition", "WindowsOnWaveguideDefinition"]
 
 
 class __ShapeWindow__(StrongPropertyInitializer):
@@ -32,8 +34,7 @@ class __ShapeWindow__(StrongPropertyInitializer):
 
     shape_property_name = StringProperty(
         default="shape",
-        doc=
-        "Name of the property of the __WindowDefinition__ object that is used to generate the window elements"
+        doc="Name of the property of the __WindowDefinition__ object that is used to generate the window elements",
     )
 
     @cache()
@@ -55,8 +56,7 @@ class __OffsetPathWindow__(__ShapeWindow__):
     start_offset = NumberProperty(required=True)
     end_offset = NumberProperty(required=True)
 
-    def get_path_shape_with_termination_offsets(self, shape,
-                                                termination_offsets):
+    def get_path_shape_with_termination_offsets(self, shape, termination_offsets):
         offsets = termination_offsets
         o1 = min(self.start_offset, self.end_offset)
         o2 = max(self.start_offset, self.end_offset)
@@ -64,14 +64,13 @@ class __OffsetPathWindow__(__ShapeWindow__):
         C_start = Shape()
         C_end = Shape()
 
-        red_shape = Shape(shape).remove_identicals(
-        )  # FIXME: can we make this more efficient? We only need the first and last segment.
+        red_shape = Shape(
+            shape
+        ).remove_identicals()  # FIXME: can we make this more efficient? We only need the first and last segment.
         s1 = Shape(
-            [red_shape[0], red_shape[1]],
-            start_face_angle=shape.start_face_angle)
-        s2 = Shape(
-            [red_shape[-2], red_shape[-1]],
-            end_face_angle=shape.end_face_angle)
+            [red_shape[0], red_shape[1]], start_face_angle=shape.start_face_angle
+        )
+        s2 = Shape([red_shape[-2], red_shape[-1]], end_face_angle=shape.end_face_angle)
         for o in offsets:
             if o > o1 and o < o2:
                 s = ShapeOffset(original_shape=s1, offset=o)
@@ -91,6 +90,7 @@ class __OffsetPathWindow__(__ShapeWindow__):
 
 class PathWindow(__OffsetPathWindow__):
     """ Defines a window to be extruded along a shape in the form of a path"""
+
     layer = LayerProperty(required=True)
 
     @cache()
@@ -100,6 +100,7 @@ class PathWindow(__OffsetPathWindow__):
 
     def get_elements_from_shape(self, shape, termination_offsets=[], **kwargs):
         from ipkiss.primitives.elements import ElementList
+
         elems = ElementList()
         offsets = termination_offsets
         o1 = min(self.start_offset, self.end_offset)
@@ -113,19 +114,22 @@ class PathWindow(__OffsetPathWindow__):
         if not shape.closed:
             shapes = [
                 self.get_path_shape_with_termination_offsets(
-                    shape=shape, termination_offsets=termination_offsets)
+                    shape=shape, termination_offsets=termination_offsets
+                )
             ]
         else:
-            #we do not want closed Boundaries as resulting elements, as this gives troubles in other parts of the framework, i.e. with Shapely
-            #FIXME : better alternative?
-            #Wim: This should not be handled here! This should be processed at the interface with Shapely.
+            # we do not want closed Boundaries as resulting elements, as this gives troubles in other parts of the framework, i.e. with Shapely
+            # FIXME : better alternative?
+            # Wim: This should not be handled here! This should be processed at the interface with Shapely.
             from ipkiss.primitives.filters.path_cut_filter import ShapeCutFilter
             import sys
+
             f = ShapeCutFilter(max_path_length=sys.maxsize)
             shapes_to_offset = f(shape)
             shapes = [
                 self.get_path_shape_with_termination_offsets(
-                    shape=sh, termination_offsets=[])
+                    shape=sh, termination_offsets=[]
+                )
                 for sh in shapes_to_offset
             ]
 
@@ -137,12 +141,14 @@ class PathWindow(__OffsetPathWindow__):
         shape = getattr(path_definition, self.shape_property_name)
         return self.get_elements_from_shape(
             shape=shape,
-            termination_offsets=path_definition.definition().get_offset_list())
+            termination_offsets=path_definition.definition().get_offset_list(),
+        )
 
 
 class __WindowDefinition__(StrongPropertyInitializer):
     windows = RestrictedProperty(
-        default=[], restriction=RestrictTypeList(__ShapeWindow__))
+        default=[], restriction=RestrictTypeList(__ShapeWindow__)
+    )
 
     @cache()
     def get_offset_list(self):
@@ -166,18 +172,18 @@ class __CompatibilityWithAdapters__(StrongPropertyInitializer):
     # can return a value for wg_width and process
 
     wg_width = PositiveNumberProperty(
-        required=True)  # have no function except for the ports
-    process = ProcessProperty(
-        required=True)  # have no function except for the ports
+        required=True
+    )  # have no function except for the ports
+    process = ProcessProperty(required=True)  # have no function except for the ports
     trench_width = NonNegativeNumberProperty(
-        required=True)  # have no function except for the ports
+        required=True
+    )  # have no function except for the ports
 
 
-class WindowWaveguideDefinition(__WindowDefinition__,
-                                __CompatibilityWithAdapters__,
-                                BaseWaveguideDefinition):
-    class __WindowWaveguideDefinitionPathDefinition__(
-            SingleShapeWaveguideElement):
+class WindowWaveguideDefinition(
+    __WindowDefinition__, __CompatibilityWithAdapters__, BaseWaveguideDefinition
+):
+    class __WindowWaveguideDefinitionPathDefinition__(SingleShapeWaveguideElement):
         def __get_wg_elements_from_windows_and_shape__(self, windows, shape):
             #### Deprecated, does not work with some new Window types
             return [w.get_elements_from_shape(shape) for w in windows]
@@ -195,27 +201,31 @@ class WindowWaveguideDefinition(__WindowDefinition__,
             return elems
 
 
-__WindowWaveguideDefinitionPathDefinition__ = WindowWaveguideDefinition.__WindowWaveguideDefinitionPathDefinition__
+__WindowWaveguideDefinitionPathDefinition__ = (
+    WindowWaveguideDefinition.__WindowWaveguideDefinitionPathDefinition__
+)
 
 
 # adds windows to an exsiting waveguide definition
-class WindowsOnWaveguideDefinition(__WindowDefinition__,
-                                   BaseWaveguideDefinition):
+class WindowsOnWaveguideDefinition(__WindowDefinition__, BaseWaveguideDefinition):
     wg_definition = WaveguideDefProperty(required=True)
     wg_width = ReadOnlyIndirectProperty("wg_definition")
     process = ReadOnlyIndirectProperty("wg_definition")
     trench_width = ReadOnlyIndirectProperty("wg_definition")
 
     class __WindowsOnWaveguideDefinitionPathDefinition__(
-            WindowWaveguideDefinition.
-            __WindowWaveguideDefinitionPathDefinition__):
+        WindowWaveguideDefinition.__WindowWaveguideDefinitionPathDefinition__
+    ):
         def define_elements(self, elems):
             elems += self.wg_definition.wg_definition(shape=self.shape)
-            return super(__WindowsOnWaveguideDefinitionPathDefinition__,
-                         self).define_elements(elems)
+            return super(
+                __WindowsOnWaveguideDefinitionPathDefinition__, self
+            ).define_elements(elems)
 
     def definition(self):
         return self.wg_definiton.definition()
 
 
-__WindowsOnWaveguideDefinitionPathDefinition__ = WindowsOnWaveguideDefinition.__WindowsOnWaveguideDefinitionPathDefinition__
+__WindowsOnWaveguideDefinitionPathDefinition__ = (
+    WindowsOnWaveguideDefinition.__WindowsOnWaveguideDefinitionPathDefinition__
+)

@@ -27,6 +27,7 @@ class TwoRings(Structure):
     """ structure with two rings defined by the user, which are stacked 
         vertically, with the bottom one flipped. The rings are cascaded in series
         with a route."""
+
     __name_prefix__ = "TWORING"
     ring1 = DefinitionProperty(restriction=RestrictType(RingResonator))
     ring2 = DefinitionProperty(restriction=RestrictType(RingResonator))
@@ -48,9 +49,11 @@ class TwoRings(Structure):
         # using an automatic routing function
         t1, t2 = self.get_transformations()
         from ipkiss.plugins.photonics.routing.manhattan import RouteManhattan
+
         route_between = RouteManhattan(
             input_port=self.ring1.ports[1].transform_copy(t1),
-            output_port=self.ring2.ports[0].transform_copy(t2))
+            output_port=self.ring2.ports[0].transform_copy(t2),
+        )
 
         return [route_between]
 
@@ -64,6 +67,7 @@ class TwoRings(Structure):
 
         # add the routes
         from ipkiss.plugins.photonics.routing.connect import RouteConnectorRounded
+
         for r in self.get_routes():
             elems += RouteConnectorRounded(route=r)
         return elems

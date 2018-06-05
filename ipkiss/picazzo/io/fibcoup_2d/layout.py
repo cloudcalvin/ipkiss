@@ -33,15 +33,19 @@ from ipcore.properties.predefined import FloatProperty
 #################################
 
 __all__ = [
-    "IoSingleSided2dFibcoup", "IoDoubleSided2dFibcoupArray",
-    "IoSingleSided2dFibcoup", "IoSingleSided2dFibcoupArray",
-    "FibcoupDuplex3Port", "FibcoupDuplex4Port"
+    "IoSingleSided2dFibcoup",
+    "IoDoubleSided2dFibcoupArray",
+    "IoSingleSided2dFibcoup",
+    "IoSingleSided2dFibcoupArray",
+    "FibcoupDuplex3Port",
+    "FibcoupDuplex4Port",
 ]
 
 
-#base class !
+# base class !
 class Io2dFibcoup(Structure):
     """base class for 2D fibre couplers with inputs and outputs"""
+
     __name_prefix__ = "Io2dFibcoup"
 
     fibcoup = StructureProperty(required=True)
@@ -53,7 +57,8 @@ class Io2dFibcoup(Structure):
     start_coords = DefinitionProperty(fdef_name="define_start_coords")
     end_coords = DefinitionProperty(fdef_name="define_end_coords")
     start_coords_end_coords = DefinitionProperty(
-        fdef_name="define_start_coords_end_coords")
+        fdef_name="define_start_coords_end_coords"
+    )
 
     def define_elements(self, elems):
         elems += SRef(self.fibcoup, (0.0, 0.0))
@@ -67,10 +72,10 @@ class Io2dFibcoup(Structure):
         for p in self.fibcoup.optical_ports:
             start_coords += p
             end_coords += OpticalPort(
-                position=p.position.move_polar_copy(self.taper_length,
-                                                    p.angle_deg),
+                position=p.position.move_polar_copy(self.taper_length, p.angle_deg),
                 wg_definition=self.wg_definition,
-                angle=p.angle_deg)
+                angle=p.angle_deg,
+            )
         return (start_coords, end_coords)
 
     def define_start_coords(self):
@@ -89,7 +94,8 @@ class Io2dFibcoup(Structure):
                 start_position=sp[i].position,
                 end_position=ep[i].position,
                 start_wg_def=sp[i].wg_definition,
-                end_wg_def=ep[i].wg_definition)
+                end_wg_def=ep[i].wg_definition,
+            )
         return elems
 
 
@@ -107,7 +113,8 @@ class IoSingleSided2dFibcoupBase(Io2dFibcoup):
             port = OutOpticalPort(
                 wg_definition=port.wg_definition,
                 position=port.position,
-                angle=port.angle)
+                angle=port.angle,
+            )
             ports += port
         return ports
 
@@ -116,7 +123,8 @@ def IoSingleSided2dFibcoup(wg_definition=TECH.WGDEF.WIRE, taper_length=250.0):
     return IoSingleSided2dFibcoupBase(
         fibcoup=TECH.IO.FIBCOUP.DEFAULT_2D_GRATING,
         wg_definition=wg_definition,
-        taper_length=taper_length)
+        taper_length=taper_length,
+    )
 
 
 class IoDoubleSided2dFibcoupBase(Io2dFibcoup):
@@ -139,7 +147,8 @@ def IoDoubleSided2dFibcoup(wg_definition=TECH.WGDEF.WIRE, taper_length=250.0):
     return IoDoubleSided2dFibcoupBase(
         fibcoup=TECH.IO.FIBCOUP.DEFAULT_2D_GRATING,
         wg_definition=wg_definition,
-        taper_length=taper_length)
+        taper_length=taper_length,
+    )
 
 
 class FibcoupDuplex4Port(Io2dFibcoup):
@@ -180,15 +189,15 @@ class FibcoupDuplex3Port(Io2dFibcoup):
 ############################################
 
 
-def IoSingleSided2dFibcoupArray(num_fibcoup=4,
-                                wg_definition=TECH.WGDEF.WIRE,
-                                spacing=250.0):
+def IoSingleSided2dFibcoupArray(
+    num_fibcoup=4, wg_definition=TECH.WGDEF.WIRE, spacing=250.0
+):
     FC = IoSingleSided2dFibcoup(wg_definition, 140.0)
     return IoPeriodicArray(FC, num_fibcoup, spacing)
 
 
-def IoDoubleSided2dFibcoupArray(num_fibcoup=4,
-                                wg_definition=TECH.WGDEF.WIRE,
-                                spacing=250.0):
+def IoDoubleSided2dFibcoupArray(
+    num_fibcoup=4, wg_definition=TECH.WGDEF.WIRE, spacing=250.0
+):
     FC = IoDoubleSided2dFibcoup(wg_definition, 140.0)
     return IoPeriodicArray(FC, num_fibcoup, spacing, library)

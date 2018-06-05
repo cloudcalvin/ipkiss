@@ -38,11 +38,11 @@ class Library(UnitGridContainer, MixinBowl):
     modified = TimeProperty(doc="Timestamp at which the library was modified.")
     layout = BoolProperty(
         default=True,
-        doc=
-        "Indicates whether the library contains a layout : in that case, there should be only 1 top-level structure."
+        doc="Indicates whether the library contains a layout : in that case, there should be only 1 top-level structure.",
     )
     allow_empty_structures = BoolProperty(
-        default=True, doc="Indicates whether empty structures are allowed.")
+        default=True, doc="Indicates whether empty structures are allowed."
+    )
 
     def __init__(self, name, **kwargs):
         super(Library, self).__init__(name=name, **kwargs)
@@ -59,12 +59,14 @@ class Library(UnitGridContainer, MixinBowl):
         return settings.snap_shape(coordinates, self.grids_per_unit)
 
     def add(self, structure):
-        if isinstance(structure, Structure) or isinstance(
-                structure, StructureList):
+        if isinstance(structure, Structure) or isinstance(structure, StructureList):
             self.structures.add(structure)
         else:
-            raise TypeError("Wrong type " + str(type(structure)) +
-                            "of argument in Library.structure_exists.")
+            raise TypeError(
+                "Wrong type "
+                + str(type(structure))
+                + "of argument in Library.structure_exists."
+            )
 
     def __iadd__(self, other):
         if isinstance(other, Structure) or isinstance(other, StructureList):
@@ -78,20 +80,23 @@ class Library(UnitGridContainer, MixinBowl):
         return structure in self.structures
 
     def clean_up(self):
-        if self.allow_empty_structures: return
+        if self.allow_empty_structures:
+            return
 
         # remove references to empty structures
         for s in self.structures:
             empty_e = []
             e_list = s.elements
             for i in range(len(e_list)):
-                if e_list[i].is_empty: empty_e.append(i)
+                if e_list[i].is_empty:
+                    empty_e.append(i)
             del s.elements[empty_e]
 
         # remove empty structures
         empty_s = []
         for s in range(0, len(self.structures)):
-            if self.structures[s].is_empty(): empty_s.append(s)
+            if self.structures[s].is_empty():
+                empty_s.append(s)
         del self.structures[empty_s]
 
     def is_empty(self):
@@ -125,15 +130,18 @@ class Library(UnitGridContainer, MixinBowl):
             else:
                 LOG.warning(
                     "There is no top_level structure in library %s. This could be caused by a circular reference"
-                    % self.name)
+                    % self.name
+                )
                 return None
         elif self.layout:
             warning_string = """There is more than one top-level structure in library %s. 
                                 This is ambiguous if the library is to be used as a layout.
                                 Please make sure that all but the top-level structures are referred to.
                                 #The following structures are 'floating': 
-                                #%s """ % (self.name,
-                                           "#\n".join([s.name for s in L]))
+                                #%s """ % (
+                self.name,
+                "#\n".join([s.name for s in L]),
+            )
             LOG.warning(warning_string)
 
     def set_referenced(self, struct):
@@ -178,7 +186,8 @@ class Library(UnitGridContainer, MixinBowl):
             if not s in self.structures:
                 LOG.error(
                     "The structure %s you refer to is not part of library %s "
-                    % (s.name, self.name))
+                    % (s.name, self.name)
+                )
                 raise SystemExit
 
         Not_Referred_to_list = StructureList()
@@ -192,7 +201,8 @@ class Library(UnitGridContainer, MixinBowl):
     def __fast_get_structure__(self, str_name):
         """ returns the structure if it exists or returns None"""
         for s in self.structures:
-            if s.name == str_name: return s
+            if s.name == str_name:
+                return s
         return None
 
     def __fast_add__(self, new_str):
@@ -217,10 +227,11 @@ class Library(UnitGridContainer, MixinBowl):
         if len(self.structures) != len(other.structures):
             return False
         for struct1, struct2 in zip(self.structures, other.structures):
-            if (struct1.name != struct2.
-                    name):  # check that all structure elements have identical names (this is not required by the __eq__ operator in Structure
+            if (
+                struct1.name != struct2.name
+            ):  # check that all structure elements have identical names (this is not required by the __eq__ operator in Structure
                 return False
-            if (struct1 != struct2):
+            if struct1 != struct2:
                 return False
         return True
 

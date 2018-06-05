@@ -56,11 +56,11 @@ class OutputXml(OutputBasic):
         self.do_collect(item, **kwargs)
         return
 
-    #FIXME - to be further implemented
+    # FIXME - to be further implemented
     def __collect_library_header__(self, library):
         return
 
-    #FIXME - to be further implemented
+    # FIXME - to be further implemented
     def __collect_library_footer__(self):
         return
 
@@ -72,42 +72,42 @@ class OutputXml(OutputBasic):
         self.topElem = self.__makeXMLElement__("IPKISSLIBRARY", attribs)
         self.referedItemsInLibrary = []
         self.collect(library.structures, **kwargs)
-        #all the items that were refered to (by SRef or ARef) should be defined in the top level, i.e. at the level of the library
-        #while collecting these, the list can grow. Continue to collect, while removing duplicates and collected items
+        # all the items that were refered to (by SRef or ARef) should be defined in the top level, i.e. at the level of the library
+        # while collecting these, the list can grow. Continue to collect, while removing duplicates and collected items
         while len(self.referedItemsInLibrary) > 0:
-            #remove duplicates
+            # remove duplicates
             self.referedItemsInLibrary = list(set(self.referedItemsInLibrary))
             self.referedItemsInLibrary.sort()
-            #make a working copy
+            # make a working copy
             items = list(self.referedItemsInLibrary)
             for referedItem in items:
                 self.collect(referedItem)
                 self.referedItemsInLibrary.remove(referedItem)
         return
 
-    #FIXME - to be further implemented
+    # FIXME - to be further implemented
     def __collect_structure_header__(self, item):
         return
 
-    #FIXME - to be further implemented
+    # FIXME - to be further implemented
     def __collect_structure_footer__(self, item):
         return
 
     def __makeXMLElement__(self, p_tag, p_attribs, p_parentXMLElement=None):
-        '''Create an XML element as top element (without parent) or as subelement (with the given parent)'''
+        """Create an XML element as top element (without parent) or as subelement (with the given parent)"""
 
-        #force all attribute values to string
+        # force all attribute values to string
         for k in list(p_attribs.keys()):
             p_attribs[k] = str(p_attribs[k])
 
-        if (p_parentXMLElement == None):
+        if p_parentXMLElement == None:
             el = etree.Element(p_tag, p_attribs)
         else:
             el = etree.SubElement(p_parentXMLElement, p_tag, p_attribs)
         return el
 
     def __makePointXMLElement(self, p_coordinate, p_parentXMLElement=None):
-        '''Create an XML element representing a point on the grid (if p_parent is provided, the XML element is created as a subelement)'''
+        """Create an XML element representing a point on the grid (if p_parent is provided, the XML element is created as a subelement)"""
         gridsperunit = self.library.grids_per_unit
         xCo = int(p_coordinate[0] * gridsperunit)
         yCo = int(p_coordinate[1] * gridsperunit)
@@ -115,53 +115,59 @@ class OutputXml(OutputBasic):
         el = self.__makeXMLElement__("POINT", attrib, p_parentXMLElement)
         return el
 
-    def __makePointlistXMLElement(self,
-                                  p_tag,
-                                  p_name,
-                                  p_coordinates,
-                                  p_layer,
-                                  p_purpose,
-                                  p_parentXMLElement=None,
-                                  p_extraAttrib={}):
-        '''Create an XML element that groups a number of points (on given layer and purpose)'''
+    def __makePointlistXMLElement(
+        self,
+        p_tag,
+        p_name,
+        p_coordinates,
+        p_layer,
+        p_purpose,
+        p_parentXMLElement=None,
+        p_extraAttrib={},
+    ):
+        """Create an XML element that groups a number of points (on given layer and purpose)"""
         n = p_coordinates.shape[0]
         attribs = {"countPoints": n, "layer": p_layer, "purpose": p_purpose}
         attribs.update(p_extraAttrib)
-        if (p_name != None):
+        if p_name != None:
             attribs["name"] = p_name
-        pointlistXMLElement = self.__makeXMLElement__(p_tag, attribs,
-                                                      p_parentXMLElement)
+        pointlistXMLElement = self.__makeXMLElement__(
+            p_tag, attribs, p_parentXMLElement
+        )
         for pnt in p_coordinates:
             self.__makePointXMLElement(pnt, pointlistXMLElement)
         return pointlistXMLElement
 
-    def __makeBoundaryXMLElement(self,
-                                 p_name,
-                                 p_coordinates,
-                                 p_layer,
-                                 p_purpose,
-                                 p_parentXMLElement=None):
-        '''Create and XML element representing a boundary'''
-        return self.__makePointlistXMLElement("BOUNDARY", p_name,
-                                              p_coordinates, p_layer,
-                                              p_purpose, p_parentXMLElement)
+    def __makeBoundaryXMLElement(
+        self, p_name, p_coordinates, p_layer, p_purpose, p_parentXMLElement=None
+    ):
+        """Create and XML element representing a boundary"""
+        return self.__makePointlistXMLElement(
+            "BOUNDARY", p_name, p_coordinates, p_layer, p_purpose, p_parentXMLElement
+        )
 
-    def __makePathXMLElement(self,
-                             p_name,
-                             p_coordinates,
-                             p_layer,
-                             p_purpose,
-                             p_LineWidth,
-                             p_parentXMLElement=None):
-        '''Create and XML element representing a shape'''
-        return self.__makePointlistXMLElement("PATH", p_name, p_coordinates,
-                                              p_layer, p_purpose,
-                                              p_parentXMLElement, {
-                                                  "linewidth": p_LineWidth
-                                              })
+    def __makePathXMLElement(
+        self,
+        p_name,
+        p_coordinates,
+        p_layer,
+        p_purpose,
+        p_LineWidth,
+        p_parentXMLElement=None,
+    ):
+        """Create and XML element representing a shape"""
+        return self.__makePointlistXMLElement(
+            "PATH",
+            p_name,
+            p_coordinates,
+            p_layer,
+            p_purpose,
+            p_parentXMLElement,
+            {"linewidth": p_LineWidth},
+        )
 
     def __getLayerPurposeNmbr(self, p_Item):
-        '''Derive the layer number and purpose number using the appropriate layer map (i.e. GDS)'''
+        """Derive the layer number and purpose number using the appropriate layer map (i.e. GDS)"""
         try:
             gdsLayer = self.layer_map.get(p_Item, None)
             lyr = gdsLayer.number
@@ -169,14 +175,17 @@ class OutputXml(OutputBasic):
         except Exception as e:
             LOG.error(
                 "Warning: layer %s not found: %s - forcing layer number to 1."
-                % (p_Item, e))
+                % (p_Item, e)
+            )
             lyr = 1
             pur = 100
         return (lyr, pur)
 
     def collect_Label(self, item, additional_transform=None):
-        #resolve the attributes
-        T = item.transformation + additional_transform  # make a copy because there is also the height
+        # resolve the attributes
+        T = (
+            item.transformation + additional_transform
+        )  # make a copy because there is also the height
         lyrPurp = self.__getLayerPurposeNmbr(item.layer)
         lyr = lyrPurp[0]
         purp = lyrPurp[1]
@@ -186,7 +195,7 @@ class OutputXml(OutputBasic):
         textAlign = str(item.alignment)
         textFont = str(item.font)
         textHeight = int(item.height)
-        #create the XML element representing the text
+        # create the XML element representing the text
         attribs = {
             "alignment": textAlign,
             "font": textFont,
@@ -194,7 +203,7 @@ class OutputXml(OutputBasic):
             "layer": lyr,
             "purpose": purp,
             "x": coordinates[0][0],
-            "y": coordinates[0][1]
+            "y": coordinates[0][1],
         }
         labelElem = self.__makeXMLElement__("TEXT", attribs, self.topElem)
         labelElem.text = item.text
@@ -204,8 +213,8 @@ class OutputXml(OutputBasic):
         self.set_current_structure(item)
         self.prevTopElem = self.topElem
         self.topElem = self.__makeXMLElement__(
-            "STRUCTURE", {"name": self.name_filter(item.name)[0]},
-            self.prevTopElem)
+            "STRUCTURE", {"name": self.name_filter(item.name)[0]}, self.prevTopElem
+        )
         self.__collect_structure_header__(item)
         self.collect(item.elements, **kwargs)
         self.__collect_structure_footer__(item)
@@ -213,44 +222,41 @@ class OutputXml(OutputBasic):
         return
 
     def collect_SRef(self, item, additional_transform=None):
-        T = item.transformation + Translation(
-            item.position) + additional_transform
+        T = item.transformation + Translation(item.position) + additional_transform
         sname = self.name_filter(item.reference.name)[0]
-        #sname = sname.replace("-","_").replace(" ","_").replace(".","_")
-        self.__makeXMLElement__("SREF",
-                                {"referee": sname,
-                                 "transformation": str(T)}, self.topElem)
+        # sname = sname.replace("-","_").replace(" ","_").replace(".","_")
+        self.__makeXMLElement__(
+            "SREF", {"referee": sname, "transformation": str(T)}, self.topElem
+        )
         self.referedItemsInLibrary.append(
             item.reference
-        )  #collect them add the end and add as top-level XML-elements
+        )  # collect them add the end and add as top-level XML-elements
         return
 
     def collect_ARef(self, item, additional_transform=None):
-        T = item.transformation + Translation(
-            item.origin) + additional_transform
+        T = item.transformation + Translation(item.origin) + additional_transform
         aname = self.name_filter(item.reference.name)[0]
-        #aname = aname.replace("-","_").replace(" ","_").replace(".","_")
-        #self.__makeXMLElement__("AREF", {"referee" : aname, "n_o_periods" : str(item.n_o_periods), "period" : str(item.period), "transformation": str(T)}, self.topElem)
-        self.__makeXMLElement__("AREF", {
-            "referee":
-            aname,
-            "n_o_periods":
-            str(item.n_o_periods),
-            "period":
-            self.coord_format_str % (item.period[0], item.period[1]),
-            "transformation":
-            str(T)
-        }, self.topElem)
+        # aname = aname.replace("-","_").replace(" ","_").replace(".","_")
+        # self.__makeXMLElement__("AREF", {"referee" : aname, "n_o_periods" : str(item.n_o_periods), "period" : str(item.period), "transformation": str(T)}, self.topElem)
+        self.__makeXMLElement__(
+            "AREF",
+            {
+                "referee": aname,
+                "n_o_periods": str(item.n_o_periods),
+                "period": self.coord_format_str % (item.period[0], item.period[1]),
+                "transformation": str(T),
+            },
+            self.topElem,
+        )
         self.referedItemsInLibrary.append(
             item.reference
-        )  #collect them add the end and add as top-level XML-elements
+        )  # collect them add the end and add as top-level XML-elements
         return
 
     def collect_BoxElement(self, item, additional_transform=None):
         try:
             T = item.transformation + additional_transform
-            coordinates = T(ShapeRectangle(item.center,
-                                           item.box_size)).tolist()
+            coordinates = T(ShapeRectangle(item.center, item.box_size)).tolist()
             self.collect_boundary_element(item.layer, coordinates)
         except Exception as err:
             msg = "OutputXml::Fatal exception in collect_BoxElement : %s" % err
@@ -261,8 +267,14 @@ class OutputXml(OutputBasic):
     def collect_path_element(self, layer, coordinates, line_width, path_type):
         try:
             lyrPurp = self.__getLayerPurposeNmbr(layer)
-            self.__makePathXMLElement(None, coordinates.points, lyrPurp[0],
-                                      lyrPurp[1], line_width, self.topElem)
+            self.__makePathXMLElement(
+                None,
+                coordinates.points,
+                lyrPurp[0],
+                lyrPurp[1],
+                line_width,
+                self.topElem,
+            )
         except Exception as err:
             msg = "OutputXml::Fatal exception in collect_path_element : %s" % err
             LOG.error(msg)
@@ -272,8 +284,9 @@ class OutputXml(OutputBasic):
     def collect_boundary_element(self, layer, coordinates):
         try:
             lyrPurp = self.__getLayerPurposeNmbr(layer)
-            self.__makeBoundaryXMLElement(None, coordinates.points, lyrPurp[0],
-                                          lyrPurp[1], self.topElem)
+            self.__makeBoundaryXMLElement(
+                None, coordinates.points, lyrPurp[0], lyrPurp[1], self.topElem
+            )
         except Exception as err:
             msg = "OutputXml::Fatal exception in collect_boundary_element : %s" % err
             LOG.error(msg)
@@ -282,7 +295,7 @@ class OutputXml(OutputBasic):
 
     def write(self, item):
         self.collect(item)
-        self.o_stream.write(etree.tostring(self.topElem).replace('><', '>\n<'))
+        self.o_stream.write(etree.tostring(self.topElem).replace("><", ">\n<"))
         self.o_stream.flush()
 
 
@@ -310,5 +323,5 @@ class MemoryOutputXml(OutputXml):
 
     def write(self, item):
         super(MemoryOutputXml, self).write(item)
-        self.o_stream.seek(0)  #reset to beginning of the buffer
+        self.o_stream.seek(0)  # reset to beginning of the buffer
         return self.o_stream

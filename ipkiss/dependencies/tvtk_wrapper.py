@@ -20,12 +20,28 @@
 # Contact: ipkiss@intec.ugent.be
 
 from sys import stderr
+
 try:
     from tvtk.api import tvtk
 
 except ImportError as e:
-    print("*************************** DEPENDENCY NOT FOUND **************************************************************************************** ", file=stderr)
-    print("**** MODULE TVTK COULD NOT BE FOUND, PLEASE INSTALL IT                                                                                *** ", file=stderr)
-    print("****                                                                                                                                  *** ", file=stderr)
-    print("****     it is part of the Entought Python distribution (you might need to install a more recent version)                             *** ", file=stderr)
-    print("***************************************************************************************************************************************** ", file=stderr)
+    print(
+        "*************************** DEPENDENCY NOT FOUND **************************************************************************************** ",
+        file=stderr,
+    )
+    print(
+        "**** MODULE TVTK COULD NOT BE FOUND, PLEASE INSTALL IT                                                                                *** ",
+        file=stderr,
+    )
+    print(
+        "****                                                                                                                                  *** ",
+        file=stderr,
+    )
+    print(
+        "****     it is part of the Entought Python distribution (you might need to install a more recent version)                             *** ",
+        file=stderr,
+    )
+    print(
+        "***************************************************************************************************************************************** ",
+        file=stderr,
+    )

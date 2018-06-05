@@ -88,7 +88,9 @@ class InputBasic(BasicInput):
         return self.prefix + name
 
     def define_layer_map(self):
-        return TECH.GDSII.IMPORT_LAYER_MAP  #FIXME : using 'default' for the property would be better, but that gives an exception ...
+        return (
+            TECH.GDSII.IMPORT_LAYER_MAP
+        )  # FIXME : using 'default' for the property would be better, but that gives an exception ...
 
 
 #################################################

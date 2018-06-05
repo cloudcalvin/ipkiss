@@ -37,7 +37,7 @@ def cache():
             if key in obj.__IPCORE_CACHE__:
                 return obj.__IPCORE_CACHE__[key]
 
-            #not in cache... call the underlying function, then case the result
+            # not in cache... call the underlying function, then case the result
             result = function(*args, **kw)
             obj.__IPCORE_CACHE__[key] = result
             return result

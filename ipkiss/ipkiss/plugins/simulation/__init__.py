@@ -22,8 +22,12 @@
 from pysimul.runtime.basic import *
 from pysimul.runtime.processor import *
 from pysimul.runtime.animation import *
+
 try:
-    from pysimul.runtime.MeepFDTD.MeepFDTD import MeepSimulationEngine, LowLevelPythonMeepProcedure
+    from pysimul.runtime.MeepFDTD.MeepFDTD import (
+        MeepSimulationEngine,
+        LowLevelPythonMeepProcedure,
+    )
 except:
     pass
 from pysimul.runtime.MeepFDTD.meep_scripter import MeepScripter, MeepScripterProcedure

@@ -37,13 +37,11 @@ class PicazzoExample3(Structure):
         # alignment waveguide
         wg_def = WgElDefinition()
         align_wg = wg_def(shape=[(0.0, 0.0), (50.0, 0.0)])
-        align = Structure(
-            name="align", elements=[align_wg], ports=align_wg.ports)
+        align = Structure(name="align", elements=[align_wg], ports=align_wg.ports)
         layout += align
         # add 2 ThreePort components
         layout += ThreePort(width=5.0, height=2.0)
-        layout.add(
-            ThreePortToEast(width=5.0, height=2.0), merged_waveguides=False)
+        layout.add(ThreePortToEast(width=5.0, height=2.0), merged_waveguides=False)
 
         elems += layout
         return elems
@@ -55,6 +53,7 @@ if __name__ == "__main__":
     layout.write_gdsii("example3.gds")
     # -------- verify the fabrication materials with a 2D visualization
     from ipkiss.plugins.vfabrication import *
+
     layout.visualize_2d()
     # -------- export a GDS file with the virtual fabrication
     layout.write_gdsii_vfabrication("example3_vfab.gds")

@@ -21,14 +21,15 @@
 
 from ipkiss.plugins.photonics.wg.basic import Wg2ElDefinition
 from ipkiss.plugins.photonics.wg.window import WindowWaveguideDefinition, PathWindow
-from ipkiss.plugins.photonics.wg.definition import BaseWaveguideDefinition, SingleShapeWaveguideElement, TwoShapeWaveguideElement
+from ipkiss.plugins.photonics.wg.definition import (
+    BaseWaveguideDefinition,
+    SingleShapeWaveguideElement,
+    TwoShapeWaveguideElement,
+)
 from ipkiss.all import *
 
 # Overrules slotted waveguides in ipkiss -> should replace them.
-__all__ = [
-    "WgElSlottedDefinition",
-    "Wg2ElSlottedDefinition",
-]
+__all__ = ["WgElSlottedDefinition", "Wg2ElSlottedDefinition"]
 
 
 class __SlotWgDefinition__(StrongPropertyInitializer):
@@ -53,6 +54,7 @@ class __SlotWgElement__(object):
 
 class WgElSlottedDefinition(__SlotWgDefinition__, WindowWaveguideDefinition):
     """wire-like waveguide definition with a slot in the middle with a trench"""
+
     # properties are here just to override defaults
     __name_prefix__ = "SLOTWG"
 
@@ -63,37 +65,48 @@ class WgElSlottedDefinition(__SlotWgDefinition__, WindowWaveguideDefinition):
             PathWindow(
                 layer=PPLayer(self.process, TECH.PURPOSE.LF.LINE),
                 start_offset=-0.5 * self.wg_width,
-                end_offset=0.5 * self.wg_width))
+                end_offset=0.5 * self.wg_width,
+            )
+        )
         windows.append(
             PathWindow(
                 layer=PPLayer(self.slot_process, TECH.PURPOSE.DF.TRENCH),
                 start_offset=-0.5 * self.slot_width,
-                end_offset=+0.5 * self.slot_width))
-        if (self.trench_width > 0.0):
+                end_offset=+0.5 * self.slot_width,
+            )
+        )
+        if self.trench_width > 0.0:
             windows.append(
                 PathWindow(
                     layer=PPLayer(self.process, TECH.PURPOSE.LF_AREA),
                     start_offset=-0.5 * self.wg_width - self.trench_width,
-                    end_offset=+0.5 * self.wg_width + self.trench_width))
+                    end_offset=+0.5 * self.wg_width + self.trench_width,
+                )
+            )
         return windows
 
     def __repr__(self):
-        return "%s w=%f, s=%f, t=%f, %s" % (self.__name_prefix__,
-                                            self.wg_width, self.slot_width,
-                                            self.trench_width,
-                                            self.process.extension)
+        return "%s w=%f, s=%f, t=%f, %s" % (
+            self.__name_prefix__,
+            self.wg_width,
+            self.slot_width,
+            self.trench_width,
+            self.process.extension,
+        )
 
 
-#__WgElSlottedDefinitionPathDefinition__ = WgElSlottedDefinition.__WgElSlottedDefinitionPathDefinition__  #to allow picke/unpickle
+# __WgElSlottedDefinitionPathDefinition__ = WgElSlottedDefinition.__WgElSlottedDefinitionPathDefinition__  #to allow picke/unpickle
 
 
 class Wg2ElSlottedDefinition(WgElSlottedDefinition):
     """slotted wire with a trench, defined with 2 shapes"""
+
     __name_prefix__ = "SLOT2WG"
 
     class __Wg2ElSlottedDefinitionPathDefinition__(
-            TwoShapeWaveguideElement, WindowWaveguideDefinition.
-            __WindowWaveguideDefinitionPathDefinition__):
+        TwoShapeWaveguideElement,
+        WindowWaveguideDefinition.__WindowWaveguideDefinitionPathDefinition__,
+    ):
         pass
 
     def define_windows(self):
@@ -102,19 +115,25 @@ class Wg2ElSlottedDefinition(WgElSlottedDefinition):
             PathWindow(
                 layer=PPLayer(self.process, TECH.PURPOSE.LF.LINE),
                 start_offset=-0.5 * self.wg_width,
-                end_offset=-0.5 * self.slot_width))
+                end_offset=-0.5 * self.slot_width,
+            )
+        )
         windows.append(
             PathWindow(
                 layer=PPLayer(self.process, TECH.PURPOSE.LF.LINE),
                 start_offset=+0.5 * self.slot_width,
-                end_offset=+0.5 * self.wg_width))
-        if (self.trench_width > 0.0):
+                end_offset=+0.5 * self.wg_width,
+            )
+        )
+        if self.trench_width > 0.0:
             windows.append(
                 PathWindow(
                     layer=PPLayer(self.process, TECH.PURPOSE.LF_AREA),
                     start_offset=-0.5 * self.wg_width - self.trench_width,
                     end_offset=+0.5 * self.wg_width + self.trench_width,
-                    shape_property_name="trench_shape"))
+                    shape_property_name="trench_shape",
+                )
+            )
         return windows
 
     def transform(self, transformation):
@@ -122,7 +141,9 @@ class Wg2ElSlottedDefinition(WgElSlottedDefinition):
         return super(__TrenchDefinition__, self).transform(transformation)
 
 
-__Wg2ElSlottedDefinitionPathDefinition__ = Wg2ElSlottedDefinition.__Wg2ElSlottedDefinitionPathDefinition__  #to allow pickle/unpickle
+__Wg2ElSlottedDefinitionPathDefinition__ = (
+    Wg2ElSlottedDefinition.__Wg2ElSlottedDefinitionPathDefinition__
+)  # to allow pickle/unpickle
 
 SlottedWaveguideElementDefinition = WgElSlottedDefinition
 Slotted2WaveguideElementDefinition = Wg2ElSlottedDefinition

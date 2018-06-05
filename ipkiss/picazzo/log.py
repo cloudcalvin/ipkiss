@@ -25,6 +25,6 @@ import logging
 import sys
 
 PICAZZO_LOGGING_HANDLER = logging.StreamHandler(sys.stderr)
-PICAZZO_LOG = logging.getLogger('PICAZZO')
+PICAZZO_LOG = logging.getLogger("PICAZZO")
 PICAZZO_LOG.setLevel(logging.ERROR)
 PICAZZO_LOG.addHandler(PICAZZO_LOGGING_HANDLER)

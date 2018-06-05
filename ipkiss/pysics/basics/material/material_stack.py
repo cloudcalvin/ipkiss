@@ -31,10 +31,11 @@ class __MaterialStack__(StrongPropertyInitializer):
 class MaterialStack(__MaterialStack__):
     name = StringProperty(required=True, doc="The name of the material stack")
     materials_heights = ListProperty(
-        required=True, doc="A list with (material, height) tuples")
+        required=True, doc="A list with (material, height) tuples"
+    )
     display_style = DisplayStyleProperty(
-        required=False,
-        doc="A display style for visualisation of the material stack")
+        required=False, doc="A display style for visualisation of the material stack"
+    )
     size_z = FloatProperty()
 
     def __eq__(self, other):
@@ -66,6 +67,7 @@ class MaterialStack(__MaterialStack__):
         """Make a numpy matrix with for each layer a row that contains:
         StackID | Layer Height | Layer epsilon | number of layers in stack"""
         from ipkiss.technology import get_technology
+
         TECH = get_technology()
         number_of_heights = self.get_number_of_layers()
 
@@ -80,7 +82,9 @@ class MaterialStack(__MaterialStack__):
         return nm
 
     def get_unique_id(self):
-        return self.unique_id  #FIXME : now set by the material stack factory, but should be done with a uniquely calculated hash
+        return (
+            self.unique_id
+        )  # FIXME : now set by the material stack factory, but should be done with a uniquely calculated hash
 
     def get_solid_size_z(self):
         """ returns the height of the stack from bottom to top until the forst non-solid material is encountered 
@@ -98,13 +102,13 @@ class MaterialStack(__MaterialStack__):
 
     def __add__(self, other):
         if not isinstance(other, MaterialStack):
-            raise Exception(
-                "Cannot add %s to an object of type MaterialStack.")
+            raise Exception("Cannot add %s to an object of type MaterialStack.")
         result_materials_heights = []
         result_materials_heights.extend(self.materials_heights)
         if (not result_materials_heights[-1][0].solid) and len(
-                other.materials_heights) > 0:
-            #result_materials_heights[-1] = (other.materials_heights[0][0], result_materials_heights[-1][1] + other.materials_heights[0][1])
+            other.materials_heights
+        ) > 0:
+            # result_materials_heights[-1] = (other.materials_heights[0][0], result_materials_heights[-1][1] + other.materials_heights[0][1])
             result_materials_heights[-1] = other.materials_heights[0]
             result_materials_heights.extend(other.materials_heights[1:])
         else:
@@ -113,17 +117,22 @@ class MaterialStack(__MaterialStack__):
         result_ms = MaterialStack(
             materials_heights=result_materials_heights,
             display_style=result_display_style,
-            name=self.name + " + " + other.name)
+            name=self.name + " + " + other.name,
+        )
         return result_ms
 
     def __repr__(self):
         return "<MaterialStack %s>" % self.name
 
     def __hash__(self):
-        return hash("".join([
-            "%s_%d" % (m.name, round(d * 100000))
-            for m, d in self.materials_heights
-        ]))
+        return hash(
+            "".join(
+                [
+                    "%s_%d" % (m.name, round(d * 100000))
+                    for m, d in self.materials_heights
+                ]
+            )
+        )
 
     def consolidate(self):
         """ generates a copy where all adjacent layers of identical materials are joined """
@@ -159,9 +168,8 @@ class MaterialStack(__MaterialStack__):
         mh += [(last_material, last_thickness)]
 
         ms = MaterialStack(
-            name=self.name,
-            materials_heights=mh,
-            display_style=self.display_style)
+            name=self.name, materials_heights=mh, display_style=self.display_style
+        )
         return ms
 
 
@@ -175,18 +183,21 @@ class MaterialStackFactory(object):
         else:
             raise Exception(
                 "Invalid type of key for accessing an item in MaterialFactory::__get_item__ expects an integer key and got: %s"
-                % str(key))
+                % str(key)
+            )
 
     def __setattr__(self, key, matstack):
-        if (key in self.__dict__):
+        if key in self.__dict__:
             current_value = self.__dict__[key]
-            if (current_value != matstack):
+            if current_value != matstack:
                 raise IpcoreAttributeException(
-                    "MaterialStack '%s' was already defined." %
-                    (matstack.name))
+                    "MaterialStack '%s' was already defined." % (matstack.name)
+                )
         self.__dict__[key] = matstack
         self.store_id[self.id_counter] = matstack
-        matstack.unique_id = self.id_counter  #FIXME: should be done with a uniquely calculated hash
+        matstack.unique_id = (
+            self.id_counter
+        )  # FIXME: should be done with a uniquely calculated hash
         self.__dict__["id_counter"] = self.id_counter + 1
 
     def get_key_from_material_stack(self, matstack):
@@ -204,22 +215,22 @@ class MaterialStackFactory(object):
 
         number_of_items = self.get_number_of_material_stacks_in_store()
 
-        #first iteration: find out how many rows should be included
+        # first iteration: find out how many rows should be included
         total_number_of_layers = 0
         for key in list(self.store_id.keys()):
             total_number_of_layers += self.store_id[key].get_number_of_layers()
 
-        #create numpy matrix
+        # create numpy matrix
         nm = numpy.zeros((total_number_of_layers, 4))
 
-        #second iteration: add contributions to final matrix
+        # second iteration: add contributions to final matrix
         current_row_index = 0
         for key in list(self.store_id.keys()):
             mat_stack = self.store_id[key]
             number_of_layers = mat_stack.get_number_of_layers()
-            nm[current_row_index:
-               (current_row_index + number_of_layers
-                ), :] = mat_stack.get_numpy_matrix_representation()
+            nm[
+                current_row_index : (current_row_index + number_of_layers), :
+            ] = mat_stack.get_numpy_matrix_representation()
             current_row_index += number_of_layers
 
         return nm
@@ -232,8 +243,7 @@ class MaterialStackFactory(object):
         for (i, mstack) in list(self.store_id.items()):
             if mstack == material_stack:
                 return i
-        raise Exception(
-            "Material stack with id = %i not found." % material_stack)
+        raise Exception("Material stack with id = %i not found." % material_stack)
 
     def __iter__(self):
         return iter(self.store_id.items())

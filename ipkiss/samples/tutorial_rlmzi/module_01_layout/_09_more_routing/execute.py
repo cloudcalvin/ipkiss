@@ -27,7 +27,8 @@ from dircoup import DirectionalCoupler, BentDirectionalCoupler
 
 my_dircoup_1 = DirectionalCoupler(coupler_length=10.0)
 my_dircoup_2 = BentDirectionalCoupler(
-    coupler_length=8.0, bend_angle=30.0, bend_radius=10.0)
+    coupler_length=8.0, bend_angle=30.0, bend_radius=10.0
+)
 
 # create a dumb structure to collect our different directional couplers
 my_group = Structure(name="Group")

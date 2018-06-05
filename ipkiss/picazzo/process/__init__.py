@@ -19,9 +19,17 @@
 #
 # Contact: ipkiss@intec.ugent.be
 
-from ipkiss.process.layer import PPLayer, ProcessPurposeLayer, ProcessProperty, PurposeProperty, ProcessLayer, PatternPurpose
+from ipkiss.process.layer import (
+    PPLayer,
+    ProcessPurposeLayer,
+    ProcessProperty,
+    PurposeProperty,
+    ProcessLayer,
+    PatternPurpose,
+)
 
 from picazzo.log import PICAZZO_LOG as LOG
+
 LOG.deprecation_warning(
     "picazzo.process should no longer be used - please import ipkiss.process instead."
 )

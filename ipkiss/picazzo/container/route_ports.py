@@ -31,39 +31,35 @@ __all__ = ["RoutePortsAroundCorner", "RoutePortsEastWest"]
 class RoutePortsAroundCorner(FanoutPorts):
     __name_prefix__ = "ROUTECORNER"
     first_step_direction = RestrictedProperty(
-        required=True,
-        restriction=RestrictValueList([NORTH, SOUTH, EAST, WEST]))
+        required=True, restriction=RestrictValueList([NORTH, SOUTH, EAST, WEST])
+    )
     reference_coordinate_first_step = NumberProperty(allow_none=True)
     first_step_spacing = PositiveNumberProperty(default=TECH.WG.SPACING)
 
     def define_routes(self):
         routes = []
-        SI = self.structure.size_info().transform(
-            self.structure_transformation)
+        SI = self.structure.size_info().transform(self.structure_transformation)
 
-        first_step_sign = -1.0 if self.output_direction in [NORTH,
-                                                            EAST] else 1.0
-        second_step_sign = 1.0 if self.first_step_direction in [NORTH,
-                                                                EAST] else -1.0
+        first_step_sign = -1.0 if self.output_direction in [NORTH, EAST] else 1.0
+        second_step_sign = 1.0 if self.first_step_direction in [NORTH, EAST] else -1.0
 
-        first_step_relation = '<' if self.output_direction in [NORTH,
-                                                               EAST] else '>'
-        second_step_relation = '>' if self.first_step_direction in [
-            NORTH, EAST
-        ] else '<'
+        first_step_relation = "<" if self.output_direction in [NORTH, EAST] else ">"
+        second_step_relation = (
+            ">" if self.first_step_direction in [NORTH, EAST] else "<"
+        )
 
         first_step = first_step_sign * self.first_step_spacing
 
         if self.reference_coordinate_first_step is None:
-            first_base = SI.get_border_on_one_side(
-                -self.output_direction) + first_step
+            first_base = SI.get_border_on_one_side(-self.output_direction) + first_step
         else:
             first_base = self.reference_coordinate_first_step
 
         second_step = self.spacing * second_step_sign
         if self.reference_coordinate is None:
-            second_base = SI.get_border_on_one_side(
-                self.first_step_direction) + second_step
+            second_base = (
+                SI.get_border_on_one_side(self.first_step_direction) + second_step
+            )
         else:
             second_base = self.reference_coordinate
 
@@ -83,9 +79,12 @@ class RoutePortsAroundCorner(FanoutPorts):
                 relation=first_step_relation,
                 end_straight=0.0,
                 bend_radius=self.bend_radius,
-                rounding_algorithm=self.rounding_algorithm)
-            first_base = -first_step_sign * R.out_ports[0].position.dot(
-                self.output_direction) + first_step
+                rounding_algorithm=self.rounding_algorithm,
+            )
+            first_base = (
+                -first_step_sign * R.out_ports[0].position.dot(self.output_direction)
+                + first_step
+            )
 
             R2 = RouteToManhattanRelativeToPosition(
                 input_port=R.out_ports[0],
@@ -94,24 +93,36 @@ class RoutePortsAroundCorner(FanoutPorts):
                 relation=second_step_relation,
                 rounding_algorithm=self.rounding_algorithm,
                 bend_radius=self.bend_radius,
-                end_straight=0.0)
-            R2.end_straight += max(0.0, -first_step_sign *
-                                   (target + first_step_sign * R2.out_ports[0].
-                                    position.dot(self.output_direction)))
-            second_base = second_step_sign * R2.out_ports[0].position.dot(
-                self.first_step_direction) + second_step
+                end_straight=0.0,
+            )
+            R2.end_straight += max(
+                0.0,
+                -first_step_sign
+                * (
+                    target
+                    + first_step_sign
+                    * R2.out_ports[0].position.dot(self.output_direction)
+                ),
+            )
+            second_base = (
+                second_step_sign
+                * R2.out_ports[0].position.dot(self.first_step_direction)
+                + second_step
+            )
 
             routes += [
                 Route(
                     input_port=R.input_port,
                     points=R + R2,
                     bend_radius=self.bend_radius,
-                    rounding_algorithm=self.rounding_algorithm)
+                    rounding_algorithm=self.rounding_algorithm,
+                )
             ]
         return routes
 
     def define_ports(self, prts):
         from copy import deepcopy
+
         for (P, R) in zip(self.__get_labeled_ports__(), self.routes):
             new_port = deepcopy(P)
             new_port.position = R.points[-1]
@@ -125,16 +136,17 @@ class RoutePortsEastWest(__StructureContainerWithRoutes__):
     """ routes the specified ports of a structure to the west, and the rest to the east.
         A lot of the stuff is automatic, so it might not be exactly what you want.
     """
+
     __name_prefix__ = "RPLR"
     spacing = PositiveNumberProperty(default=25.0)
-    ports_to_west = RestrictedProperty(
-        required=True, restriction=RestrictTypeList(str))
-    ports_to_east = RestrictedProperty(
-        required=True, restriction=RestrictTypeList(str))
+    ports_to_west = RestrictedProperty(required=True, restriction=RestrictTypeList(str))
+    ports_to_east = RestrictedProperty(required=True, restriction=RestrictTypeList(str))
     reference_east = StringProperty(
-        allow_none=True, doc="Port Label of port that serves as y reference")
+        allow_none=True, doc="Port Label of port that serves as y reference"
+    )
     reference_west = StringProperty(
-        allow_none=True, doc="Port Label of port that serves as y reference")
+        allow_none=True, doc="Port Label of port that serves as y reference"
+    )
 
     def __get_west_routes__(self):
         SPL = self.get_structure_port_list()
@@ -147,9 +159,11 @@ class RoutePortsEastWest(__StructureContainerWithRoutes__):
             R = RouteToWest(
                 input_port=SPL[ref_west],
                 bend_radius=self.bend_radius,
-                rounding_algorithm=self.rounding_algorithm)
+                rounding_algorithm=self.rounding_algorithm,
+            )
             y = R.out_ports[0].position.y - self.spacing * self.ports_to_west.index(
-                ref_west)
+                ref_west
+            )
             for p in self.ports_to_west:
                 port = SPL[p]
                 west_routes += [
@@ -157,7 +171,8 @@ class RoutePortsEastWest(__StructureContainerWithRoutes__):
                         input_port=port,
                         y_position=y,
                         bend_radius=self.bend_radius,
-                        rounding_algorithm=self.rounding_algorithm)
+                        rounding_algorithm=self.rounding_algorithm,
+                    )
                 ]
                 y += self.spacing
 
@@ -180,19 +195,23 @@ class RoutePortsEastWest(__StructureContainerWithRoutes__):
             R = RouteToEast(
                 input_port=SPL[ref_east],
                 bend_radius=self.bend_radius,
-                rounding_algorithm=self.rounding_algorithm)
+                rounding_algorithm=self.rounding_algorithm,
+            )
             y = R.out_ports[0].position.y - self.spacing * self.ports_to_east.index(
-                ref_east)
+                ref_east
+            )
             for p in self.ports_to_east:
                 port = SPL[p]
 
-                if y is None: y = port.position.y
+                if y is None:
+                    y = port.position.y
                 east_routes += [
                     RouteToEastAtY(
                         input_port=port,
                         y_position=y,
                         bend_radius=self.bend_radius,
-                        rounding_algorithm=self.rounding_algorithm)
+                        rounding_algorithm=self.rounding_algorithm,
+                    )
                 ]
                 y += self.spacing
 
@@ -204,8 +223,8 @@ class RoutePortsEastWest(__StructureContainerWithRoutes__):
                     r.end_straight = r.end_straight + LM - r.out_ports[0].position.x
         return east_routes
 
-    #def define_waveguides(self):
-    #return super(RoutePortsEastWest,self).define_waveguides()
+    # def define_waveguides(self):
+    # return super(RoutePortsEastWest,self).define_waveguides()
 
     def define_routes(self):
         west_routes = self.__get_west_routes__()
@@ -217,6 +236,7 @@ class RoutePortsEastWest(__StructureContainerWithRoutes__):
 
     def define_ports(self, port_list):
         from copy import deepcopy
+
         SPL = self.get_structure_port_list()
         west_routes = self.__get_west_routes__()
         for port_ref, R in zip(self.ports_to_west, west_routes):

@@ -29,13 +29,16 @@ class ExampleAsymmetricFibcoup(Structure):
         # define a column
         from picazzo.io.column import IoColumnGroup
         from picazzo.io.fibcoup import IoFibcoupAsymmetric
+
         my_column = IoColumnGroup(
             south_east=(2000.0, 0.0),  # column width = 2000um
             y_spacing=25.0,  # vertical spacing between waveguides
-            adapter=IoFibcoupAsymmetric)  # new default adapter
+            adapter=IoFibcoupAsymmetric,
+        )  # new default adapter
 
         # define a component
         from picazzo.filters.ring import RingRect180DropFilter
+
         my_ring = RingRect180DropFilter(name="My_Ring")
 
         # add the component to the column
@@ -61,13 +64,16 @@ class ExampleGenericFibcoup(Structure):
         # define a column
         from picazzo.io.column import IoColumnGroup
         from picazzo.io.fibcoup import IoFibcoupGeneric
+
         my_column = IoColumnGroup(
             south_east=(2000.0, 0.0),  # column width = 2000um
             y_spacing=25.0,  # vertical spacing between waveguides
-            adapter=IoFibcoupGeneric)  # new default adapter
+            adapter=IoFibcoupGeneric,
+        )  # new default adapter
 
         # define a component
         from picazzo.filters.ring import RingRect180DropFilter
+
         my_ring = RingRect180DropFilter(name="My_Ring")
 
         # add the component to the column
@@ -75,7 +81,7 @@ class ExampleGenericFibcoup(Structure):
             my_ring,
             west_fibcoups=[
                 TECH.IO.FIBCOUP.DEFAULT_GRATING_TE,
-                TECH.IO.FIBCOUP.DEFAULT_GRATING_TM
+                TECH.IO.FIBCOUP.DEFAULT_GRATING_TM,
             ],  # list
             east_fibcoup_taper_lengths=[50.0, 300.0, 500.0],  # list
         )  # each individual fiber coupler interface can now be set separately

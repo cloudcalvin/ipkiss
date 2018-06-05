@@ -31,14 +31,14 @@ class __VernierMarker__(StrongPropertyInitializer):
     outer_marks_width = PositiveNumberProperty(default=8.0)
     marks_length = PositiveNumberProperty(default=30.0)
     outer_pitch = PositiveNumberProperty(default=20.25)
-    inner_pitch = DefinitionProperty(fdef_name='define_inner_pitch')
+    inner_pitch = DefinitionProperty(fdef_name="define_inner_pitch")
     n_o_lines = PositiveNumberProperty(default=9)
     no_fill_clearing = NonNegativeNumberProperty(default=10.0)
 
     def define_inner_pitch(self):
-        return self.outer_pitch - (
-            self.outer_marks_width - self.inner_marks_width) / (
-                self.n_o_lines - 1)
+        return self.outer_pitch - (self.outer_marks_width - self.inner_marks_width) / (
+            self.n_o_lines - 1
+        )
 
 
 class VernierMarkerH(OverlayMarker, __VernierMarker__):
@@ -49,29 +49,44 @@ class VernierMarkerH(OverlayMarker, __VernierMarker__):
             HI1 = VernierMarkHI(
                 layer=PPLayer(self.overlay_process, self.overlay_purpose),
                 marks_width=self.inner_marks_width,
-                marks_length=self.marks_length)
-            elems += ARefX(HI1, (self.outer_pitch + self.outer_marks_width -
-                                 self.inner_marks_width, 0.0),
-                           self.inner_pitch, self.n_o_lines)
+                marks_length=self.marks_length,
+            )
+            elems += ARefX(
+                HI1,
+                (
+                    self.outer_pitch + self.outer_marks_width - self.inner_marks_width,
+                    0.0,
+                ),
+                self.inner_pitch,
+                self.n_o_lines,
+            )
 
         if self.master_process != TECH.PROCESS.NONE:
             HO1 = VernierMarkHO(
                 layer=PPLayer(self.master_process, self.master_purpose),
                 marks_width=self.outer_marks_width,
-                marks_length=self.marks_length)
-            elems += ARefX(HO1, (self.outer_pitch, 0.0), self.outer_pitch,
-                           self.n_o_lines)
+                marks_length=self.marks_length,
+            )
+            elems += ARefX(
+                HO1, (self.outer_pitch, 0.0), self.outer_pitch, self.n_o_lines
+            )
         si = elems.size_info()
         elems += Rectangle(
             layer=PPLayer(TECH.PROCESS.NONE, TECH.PURPOSE.NO_FILL),
             center=si.center,
-            box_size=(si.width + 2 * self.no_fill_clearing,
-                      si.height + 2 * self.no_fill_clearing))
+            box_size=(
+                si.width + 2 * self.no_fill_clearing,
+                si.height + 2 * self.no_fill_clearing,
+            ),
+        )
         elems += Rectangle(
             layer=PPLayer(TECH.PROCESS.NONE, TECH.PURPOSE.NO_FILL),
             center=si.center,
-            box_size=(si.width + 2 * self.no_fill_clearing,
-                      si.height + 2 * self.no_fill_clearing))
+            box_size=(
+                si.width + 2 * self.no_fill_clearing,
+                si.height + 2 * self.no_fill_clearing,
+            ),
+        )
 
         return elems
 
@@ -85,30 +100,44 @@ class VernierMarkerV(OverlayMarker, __VernierMarker__):
             VI1 = VernierMarkVI(
                 layer=PPLayer(self.overlay_process, self.overlay_purpose),
                 marks_width=self.inner_marks_width,
-                marks_length=self.marks_length)
-            elems += ARefY(VI1,
-                           (0.0, self.outer_pitch + self.outer_marks_width -
-                            self.inner_marks_width), self.inner_pitch,
-                           self.n_o_lines)
+                marks_length=self.marks_length,
+            )
+            elems += ARefY(
+                VI1,
+                (
+                    0.0,
+                    self.outer_pitch + self.outer_marks_width - self.inner_marks_width,
+                ),
+                self.inner_pitch,
+                self.n_o_lines,
+            )
 
         if self.master_process != TECH.PROCESS.NONE:
             VO1 = VernierMarkVO(
                 layer=PPLayer(self.master_process, self.master_purpose),
                 marks_width=self.outer_marks_width,
-                marks_length=self.marks_length)
-            elems += ARefY(VO1, (0.0, self.outer_pitch), self.outer_pitch,
-                           self.n_o_lines)
+                marks_length=self.marks_length,
+            )
+            elems += ARefY(
+                VO1, (0.0, self.outer_pitch), self.outer_pitch, self.n_o_lines
+            )
         si = elems.size_info()
         elems += Rectangle(
             layer=PPLayer(TECH.PROCESS.NONE, TECH.PURPOSE.NO_FILL),
             center=si.center,
-            box_size=(si.width + 2 * self.no_fill_clearing,
-                      si.height + 2 * self.no_fill_clearing))
+            box_size=(
+                si.width + 2 * self.no_fill_clearing,
+                si.height + 2 * self.no_fill_clearing,
+            ),
+        )
         elems += Rectangle(
             layer=PPLayer(TECH.PROCESS.NONE, TECH.PURPOSE.NO_FILL),
             center=si.center,
-            box_size=(si.width + 2 * self.no_fill_clearing,
-                      si.height + 2 * self.no_fill_clearing))
+            box_size=(
+                si.width + 2 * self.no_fill_clearing,
+                si.height + 2 * self.no_fill_clearing,
+            ),
+        )
         return elems
 
 
@@ -123,8 +152,10 @@ class VernierMarkHI(__SingleVernierMark__):
 
     def define_elements(self, elems):
         elems += Rectangle(
-            self.layer, (0.5 * self.marks_width, 0.5 * self.marks_length - 1),
-            (self.marks_width, self.marks_length))
+            self.layer,
+            (0.5 * self.marks_width, 0.5 * self.marks_length - 1),
+            (self.marks_width, self.marks_length),
+        )
         return elems
 
 
@@ -133,8 +164,10 @@ class VernierMarkHO(__SingleVernierMark__):
 
     def define_elements(self, elems):
         elems += Rectangle(
-            self.layer, (0.5 * self.marks_width, -0.5 * self.marks_length + 1),
-            (self.marks_width, self.marks_length))
+            self.layer,
+            (0.5 * self.marks_width, -0.5 * self.marks_length + 1),
+            (self.marks_width, self.marks_length),
+        )
         return elems
 
 
@@ -143,8 +176,10 @@ class VernierMarkVI(__SingleVernierMark__):
 
     def define_elements(self, elems):
         elems += Rectangle(
-            self.layer, (0.5 * self.marks_length - 1, 0.5 * self.marks_width),
-            (self.marks_length, self.marks_width))
+            self.layer,
+            (0.5 * self.marks_length - 1, 0.5 * self.marks_width),
+            (self.marks_length, self.marks_width),
+        )
         return elems
 
 
@@ -153,6 +188,8 @@ class VernierMarkVO(__SingleVernierMark__):
 
     def define_elements(self, elems):
         elems += Rectangle(
-            self.layer, (-0.5 * self.marks_length + 1, 0.5 * self.marks_width),
-            (self.marks_length, self.marks_width))
+            self.layer,
+            (-0.5 * self.marks_length + 1, 0.5 * self.marks_width),
+            (self.marks_length, self.marks_width),
+        )
         return elems

@@ -27,38 +27,42 @@ class Scaler(object):
     def __init__(self, box, canvas_size):
         self.box = box
         self.canvas_size = canvas_size
-        self.scale = float(
-            self.canvas_size[0]) / float(self.box[1] - self.box[0])
-        self.box_center = (0.5 * box[0] + 0.5 * box[1],
-                           0.5 * box[2] + 0.5 * box[3])
+        self.scale = float(self.canvas_size[0]) / float(self.box[1] - self.box[0])
+        self.box_center = (0.5 * box[0] + 0.5 * box[1], 0.5 * box[2] + 0.5 * box[3])
         self.box_south_west = (self.box[0], self.box[2])
         self.origin_offset = self.__calculate_origin_offset()
 
     def __get_scaled_points(self, shape):
-        sp = (shape.points - [self.origin_offset[0], self.origin_offset[1]] -
-              [self.box_south_west[0], self.box_south_west[1]]) * self.scale
+        sp = (
+            shape.points
+            - [self.origin_offset[0], self.origin_offset[1]]
+            - [self.box_south_west[0], self.box_south_west[1]]
+        ) * self.scale
         return sp
 
     def __calculate_origin_offset(self):
         scaled_origin = (
-            numpy.array([0.0, 0.0]) -
-            [self.box_south_west[0], self.box_south_west[1]]) * self.scale
+            numpy.array([0.0, 0.0]) - [self.box_south_west[0], self.box_south_west[1]]
+        ) * self.scale
         origin_offset = (
-            scaled_origin - [int(scaled_origin[0]),
-                             int(scaled_origin[1])]) / self.scale
+            scaled_origin - [int(scaled_origin[0]), int(scaled_origin[1])]
+        ) / self.scale
         return origin_offset
 
     def map_shape(self, shape):
         return Shape(
-            numpy.asarray(
-                self.__get_scaled_points(shape), dtype=numpy.integer))
+            numpy.asarray(self.__get_scaled_points(shape), dtype=numpy.integer)
+        )
 
     def map_shape_to_list(self, shape):
         return list(
             numpy.asarray(
                 numpy.reshape(
-                    self.__get_scaled_points(shape), numpy.size(shape.points)),
-                dtype=numpy.integer))
+                    self.__get_scaled_points(shape), numpy.size(shape.points)
+                ),
+                dtype=numpy.integer,
+            )
+        )
 
     def map_coordinate(self, coordinate):
         s = Shape(points=[coordinate])

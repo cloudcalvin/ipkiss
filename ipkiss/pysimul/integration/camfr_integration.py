@@ -23,22 +23,27 @@ from .component_integration import StructureSimulationVolume2D
 from pysimul.runtime.camfr_engine.camfr_engine import CamfrEngine
 from ipkiss.all import TECH
 
-CAMFR_ENGINE = CamfrEngine(
-)  #reference to engine must remain in memory, otherwise camfr segmentation fault (reference to slabs and materials get garbage collected)
+CAMFR_ENGINE = (
+    CamfrEngine()
+)  # reference to engine must remain in memory, otherwise camfr segmentation fault (reference to slabs and materials get garbage collected)
 
 
-def camfr_stack_expr_for_structure(structure,
-                                   discretisation_resolution,
-                                   window_size_info=None):
+def camfr_stack_expr_for_structure(
+    structure, discretisation_resolution, window_size_info=None
+):
     params = dict()
     params["structure"] = structure
     params[
-        "resolution"] = discretisation_resolution  #resolution for matrix discretization, used when calculating CAMFR slabs
+        "resolution"
+    ] = (
+        discretisation_resolution
+    )  # resolution for matrix discretization, used when calculating CAMFR slabs
     if window_size_info is not None:
         params["window_size_info"] = window_size_info
     params["vfabrication_process_flow"] = TECH.VFABRICATION.PROCESS_FLOW
     params["material_stack_factory"] = TECH.MATERIAL_STACKS
     simulation_volume = StructureSimulationVolume2D(simul_params=params)
     stack_expr = CAMFR_ENGINE.get_camfr_stack_expr_for_geometry(
-        geometry=simulation_volume)
+        geometry=simulation_volume
+    )
     return stack_expr

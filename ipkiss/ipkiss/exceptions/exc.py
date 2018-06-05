@@ -27,6 +27,7 @@ from ipcore.exceptions.exc import *
 
 class IpkissException(IpcoreException):
     """General exception type for use in Ipkiss"""
+
     pass
 
 

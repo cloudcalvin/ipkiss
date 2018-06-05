@@ -41,7 +41,8 @@ RESTRICT_NONNEGATIVE = restrictions.RestrictRange(lower=0, lower_inc=True)
 RESTRICT_NONPOSITIVE = restrictions.RestrictRange(upper=0, upper_inc=True)
 RESTRICT_BOOL = restrictions.RestrictType(bool)
 RESTRICT_FRACTION = restrictions.RestrictRange(
-    lower=0, upper=1, lower_inc=True, upper_inc=True)
+    lower=0, upper=1, lower_inc=True, upper_inc=True
+)
 RESTRICT_STRING = restrictions.RestrictType(str)
 RESTRICT_CHAR = restrictions.RestrictType(str) & restrictions.RestrictLen(1)
 RESTRICT_ID_STRING = RESTRICT_STRING & ~restrictions.RestrictContains(" \/+")
@@ -49,10 +50,14 @@ RESTRICT_DICT = restrictions.RestrictType(dict)
 RESTRICT_TUPLE = restrictions.RestrictType(tuple)
 RESTRICT_LIST = restrictions.RestrictType(list)
 RESTRICT_TUPLE2 = RESTRICT_TUPLE & restrictions.RestrictLen(2)
-RESTRICT_INT_TUPLE2 = RESTRICT_TUPLE & restrictions.RestrictLen(
-    2) & restrictions.RestrictTypeList(int)
-RESTRICT_NUMBER_TUPLE2 = RESTRICT_TUPLE & restrictions.RestrictLen(
-    2) & restrictions.RestrictTypeList((int, float))
+RESTRICT_INT_TUPLE2 = (
+    RESTRICT_TUPLE & restrictions.RestrictLen(2) & restrictions.RestrictTypeList(int)
+)
+RESTRICT_NUMBER_TUPLE2 = (
+    RESTRICT_TUPLE
+    & restrictions.RestrictLen(2)
+    & restrictions.RestrictTypeList((int, float))
+)
 RESTRICT_NUMPY_ARRAY = restrictions.RestrictType(numpy.ndarray)
 
 
@@ -70,9 +75,11 @@ class RestrictArrayDim(restrictions.__PropertyRestriction__):
 
 
 RESTRICT_NUMPY_MASKED2DARRAY = restrictions.RestrictType(
-    numpy.ma.MaskedArray) & RestrictArrayDim(2)
+    numpy.ma.MaskedArray
+) & RestrictArrayDim(2)
 RESTRICT_NUMPY_MASKED3DARRAY = restrictions.RestrictType(
-    numpy.ma.MaskedArray) & RestrictArrayDim(3)
+    numpy.ma.MaskedArray
+) & RestrictArrayDim(3)
 
 ######################################################
 # predefined properties
@@ -80,8 +87,10 @@ RESTRICT_NUMPY_MASKED3DARRAY = restrictions.RestrictType(
 
 
 def CallableProperty(internal_member_name=None, restriction=None, **kwargs):
-    R = (restrictions.RestrictFunction(inspect.isroutine)
-         | restrictions.RestrictFunction(inspect.isclass)) & restriction
+    R = (
+        restrictions.RestrictFunction(inspect.isroutine)
+        | restrictions.RestrictFunction(inspect.isclass)
+    ) & restriction
     P = RestrictedProperty(internal_member_name, restriction=R, **kwargs)
     P.__get_default__ = lambda: P.default
     return P
@@ -107,9 +116,7 @@ def NumberProperty(internal_member_name=None, restriction=None, **kwargs):
     return RestrictedProperty(internal_member_name, restriction=R, **kwargs)
 
 
-def ComplexNumberProperty(internal_member_name=None,
-                          restriction=None,
-                          **kwargs):
+def ComplexNumberProperty(internal_member_name=None, restriction=None, **kwargs):
     R = RESTRICT_COMPLEX & restriction
     return RestrictedProperty(internal_member_name, restriction=R, **kwargs)
 
@@ -134,9 +141,7 @@ def BoolProperty(internal_member_name=None, restriction=None, **kwargs):
     return RestrictedProperty(internal_member_name, restriction=R, **kwargs)
 
 
-def PositiveNumberProperty(internal_member_name=None,
-                           restriction=None,
-                           **kwargs):
+def PositiveNumberProperty(internal_member_name=None, restriction=None, **kwargs):
     R = RESTRICT_NUMBER & RESTRICT_POSITIVE & restriction
     return RestrictedProperty(internal_member_name, restriction=R, **kwargs)
 
@@ -146,16 +151,12 @@ def PositiveIntProperty(internal_member_name=None, restriction=None, **kwargs):
     return RestrictedProperty(internal_member_name, restriction=R, **kwargs)
 
 
-def NonNegativeNumberProperty(internal_member_name=None,
-                              restriction=None,
-                              **kwargs):
+def NonNegativeNumberProperty(internal_member_name=None, restriction=None, **kwargs):
     R = RESTRICT_NUMBER & RESTRICT_NONNEGATIVE & restriction
     return RestrictedProperty(internal_member_name, restriction=R, **kwargs)
 
 
-def NonNegativeIntProperty(internal_member_name=None,
-                           restriction=None,
-                           **kwargs):
+def NonNegativeIntProperty(internal_member_name=None, restriction=None, **kwargs):
     R = RESTRICT_INT & RESTRICT_NONNEGATIVE & restriction
     return RestrictedProperty(internal_member_name, restriction=R, **kwargs)
 
@@ -171,9 +172,10 @@ NormalizedAngleProperty = NumberProperty  # to be specified later
 
 def TimeProperty(internal_member_name=None, restriction=None, **kwargs):
     import time
+
     R = RESTRICT_NUMBER & restriction
-    if not 'default' in kwargs:
-        kwargs['default'] = time.time()
+    if not "default" in kwargs:
+        kwargs["default"] = time.time()
     return RestrictedProperty(internal_member_name, restriction=R, **kwargs)
 
 
@@ -197,15 +199,11 @@ def Tuple2Property(internal_member_name=None, restriction=None, **kwargs):
     return RestrictedProperty(internal_member_name, restriction=R, **kwargs)
 
 
-def NumpyMasked2DArrayProperty(internal_member_name=None,
-                               restriction=None,
-                               **kwargs):
+def NumpyMasked2DArrayProperty(internal_member_name=None, restriction=None, **kwargs):
     R = RESTRICT_NUMPY_MASKED2DARRAY & restriction
     return RestrictedProperty(internal_member_name, restriction=R, **kwargs)
 
 
-def NumpyMasked3DArrayProperty(internal_member_name=None,
-                               restriction=None,
-                               **kwargs):
+def NumpyMasked3DArrayProperty(internal_member_name=None, restriction=None, **kwargs):
     R = RESTRICT_NUMPY_MASKED3DARRAY & restriction
     return RestrictedProperty(internal_member_name, restriction=R, **kwargs)

@@ -41,14 +41,17 @@ class ElectroMagneticField(__CompoundField__):
     H = FunctionProperty(fget=lambda self: self.value[1], fset=None)
     S = FunctionProperty(
         fget=lambda self: PoyntingField(value=self.E.value.cross(self.H.value)),
-        fset=None)
+        fset=None,
+    )
 
     def overlap(self, other):
         # FIXME: Check this computation
         norm = self.S.value.dot(other.S.value)
-        if (norm):
-            return self.E.value.cross(other.H.value).dot(
-                other.E.value.cross(self.H.value)) / norm
+        if norm:
+            return (
+                self.E.value.cross(other.H.value).dot(other.E.value.cross(self.H.value))
+                / norm
+            )
         else:
             return 0
 

@@ -22,9 +22,7 @@
 from ipcore.all import *
 from ipkiss.visualisation.display_style import DisplayStyleProperty
 
-__all__ = [
-    "BlendedMaterial", "MaterialProperty", "RESTRICT_MATERIAL", "Material"
-]
+__all__ = ["BlendedMaterial", "MaterialProperty", "RESTRICT_MATERIAL", "Material"]
 
 
 ### Material classes
@@ -39,14 +37,14 @@ class __Material__(StrongPropertyInitializer):
 
 class Material(__Material__):
     """ Base material. all other materials should subclass from this """
+
     name = StringProperty(required=True, doc="The name of the material")
     display_style = DisplayStyleProperty(
-        required=False,
-        doc="A display style for visualisation of the material in plots")
+        required=False, doc="A display style for visualisation of the material in plots"
+    )
     solid = BoolProperty(
         default=True,
-        doc=
-        "Indicates if a material is solid, e.g. air is not solid and silicon is solid"
+        doc="Indicates if a material is solid, e.g. air is not solid and silicon is solid",
     )
 
     def __repr__(self):
@@ -62,7 +60,7 @@ class Material(__Material__):
 
 class MaterialFactory(object):
     id_counter = 1
-    store_id = dict()  #key = the binary id of the material
+    store_id = dict()  # key = the binary id of the material
 
     def get_number_of_materials_in_store(self):
         return len(list(self.store_id.keys()))
@@ -73,14 +71,16 @@ class MaterialFactory(object):
         else:
             raise Exception(
                 "Invalid type of key for accessing an item in MaterialFactory::__get_item__ expects an integer key and got: %s"
-                % str(key))
+                % str(key)
+            )
 
     def __setattr__(self, key, mat):
-        if (key in self.__dict__):
+        if key in self.__dict__:
             current_value = self.__dict__[key]
-            if (current_value != mat):
+            if current_value != mat:
                 raise IpcoreAttributeException(
-                    "Material '%s' was already defined." % (mat))
+                    "Material '%s' was already defined." % (mat)
+                )
         self.__dict__[key] = mat
         self.store_id[self.id_counter] = mat
         self.__dict__["id_counter"] = self.id_counter + 1
@@ -97,17 +97,17 @@ class MaterialFactory(object):
 RESTRICT_MATERIAL = RestrictType(Material)
 
 
-def MaterialProperty(internal_member_name=None,
-                     restriction=None,
-                     preprocess=None,
-                     **kwargs):
+def MaterialProperty(
+    internal_member_name=None, restriction=None, preprocess=None, **kwargs
+):
     """ Material property descriptor for a class """
     R = RESTRICT_MATERIAL & restriction
     return RestrictedProperty(
         internal_member_name=internal_member_name,
         restriction=R,
         preprocess=preprocess,
-        **kwargs)
+        **kwargs
+    )
 
 
 class BlendedMaterial(Material):

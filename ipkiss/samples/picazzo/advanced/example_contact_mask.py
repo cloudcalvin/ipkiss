@@ -50,66 +50,75 @@ MY_TECH.PURPOSE = TechnologyTree()
 MY_TECH.PURPOSE.DEFAULT = PatternPurpose(name="Default", extension="00")
 
 MY_OUTPUT_MAP = copy.deepcopy(TECH.GDSII.EXPORT_LAYER_MAP)
-MY_OUTPUT_MAP.layer_map[PPLayer(
-    process=MY_TECH.PROCESS.OL35_1,
-    purpose=MY_TECH.PURPOSE.DEFAULT)] = GdsiiLayer(
-        number=101, datatype=DT_LINE)  # disk
-MY_OUTPUT_MAP.layer_map[PPLayer(
-    process=MY_TECH.PROCESS.OL35_2,
-    purpose=MY_TECH.PURPOSE.DEFAULT)] = GdsiiLayer(
-        number=102, datatype=DT_LINE)  # island
-MY_OUTPUT_MAP.layer_map[PPLayer(
-    process=MY_TECH.PROCESS.BCB_1,
-    purpose=MY_TECH.PURPOSE.DEFAULT)] = GdsiiLayer(
-        number=104, datatype=DT_LINE)  # botvia
-MY_OUTPUT_MAP.layer_map[PPLayer(
-    process=MY_TECH.PROCESS.BCB_2,
-    purpose=MY_TECH.PURPOSE.DEFAULT)] = GdsiiLayer(
-        number=105, datatype=DT_LINE)  # topvia
-MY_OUTPUT_MAP.layer_map[PPLayer(
-    process=MY_TECH.PROCESS.MET_1,
-    purpose=MY_TECH.PURPOSE.DEFAULT)] = GdsiiLayer(
-        number=103, datatype=DT_LINE)  # botcont
-MY_OUTPUT_MAP.layer_map[PPLayer(
-    process=MY_TECH.PROCESS.MET_2,
-    purpose=MY_TECH.PURPOSE.DEFAULT)] = GdsiiLayer(
-        number=106, datatype=DT_LINE)  # topcont
-MY_OUTPUT_MAP.layer_map[PPLayer(
-    process=MY_TECH.PROCESS.MET_3,
-    purpose=MY_TECH.PURPOSE.DEFAULT)] = GdsiiLayer(
-        number=107, datatype=DT_LINE)  # pads
-MY_OUTPUT_MAP.layer_map[PPLayer(
-    process=MY_TECH.PROCESS.MET_4,
-    purpose=MY_TECH.PURPOSE.DEFAULT)] = GdsiiLayer(
-        number=108, datatype=DT_LINE)  # plating
+MY_OUTPUT_MAP.layer_map[
+    PPLayer(process=MY_TECH.PROCESS.OL35_1, purpose=MY_TECH.PURPOSE.DEFAULT)
+] = GdsiiLayer(
+    number=101, datatype=DT_LINE
+)  # disk
+MY_OUTPUT_MAP.layer_map[
+    PPLayer(process=MY_TECH.PROCESS.OL35_2, purpose=MY_TECH.PURPOSE.DEFAULT)
+] = GdsiiLayer(
+    number=102, datatype=DT_LINE
+)  # island
+MY_OUTPUT_MAP.layer_map[
+    PPLayer(process=MY_TECH.PROCESS.BCB_1, purpose=MY_TECH.PURPOSE.DEFAULT)
+] = GdsiiLayer(
+    number=104, datatype=DT_LINE
+)  # botvia
+MY_OUTPUT_MAP.layer_map[
+    PPLayer(process=MY_TECH.PROCESS.BCB_2, purpose=MY_TECH.PURPOSE.DEFAULT)
+] = GdsiiLayer(
+    number=105, datatype=DT_LINE
+)  # topvia
+MY_OUTPUT_MAP.layer_map[
+    PPLayer(process=MY_TECH.PROCESS.MET_1, purpose=MY_TECH.PURPOSE.DEFAULT)
+] = GdsiiLayer(
+    number=103, datatype=DT_LINE
+)  # botcont
+MY_OUTPUT_MAP.layer_map[
+    PPLayer(process=MY_TECH.PROCESS.MET_2, purpose=MY_TECH.PURPOSE.DEFAULT)
+] = GdsiiLayer(
+    number=106, datatype=DT_LINE
+)  # topcont
+MY_OUTPUT_MAP.layer_map[
+    PPLayer(process=MY_TECH.PROCESS.MET_3, purpose=MY_TECH.PURPOSE.DEFAULT)
+] = GdsiiLayer(
+    number=107, datatype=DT_LINE
+)  # pads
+MY_OUTPUT_MAP.layer_map[
+    PPLayer(process=MY_TECH.PROCESS.MET_4, purpose=MY_TECH.PURPOSE.DEFAULT)
+] = GdsiiLayer(
+    number=108, datatype=DT_LINE
+)  # plating
 
 
 class Layout(Structure):
     def define_elements(self, elems):
         layout = IoColumnGroup(y_spacing=25.0, south_east=(6000.0, 0.0))
 
-        #we first create a regular waveguide element
+        # we first create a regular waveguide element
         wg_def = WgElDefinition(
             wg_width=TECH.WG.WIRE_WIDTH,
             trench_width=TECH.WG.TRENCH_WIDTH,
-            process=TECH.PROCESS.WG)
+            process=TECH.PROCESS.WG,
+        )
         wg = wg_def(shape=[(0.0, 0.0), (500.0, 0.0)])
-        #on top of it, we add a rectangle element with III-V
+        # on top of it, we add a rectangle element with III-V
         rectangle_III_V = Rectangle(
             PPLayer(MY_TECH.PROCESS.OL35_1, MY_TECH.PURPOSE.DEFAULT),
             center=(250.0, 0.0),
-            box_size=(500.0, 20.0))
+            box_size=(500.0, 20.0),
+        )
 
-        #assemble both elemeents in a structure
+        # assemble both elemeents in a structure
         layout += Structure(
-            name="wg_with_III_V",
-            elements=[wg, rectangle_III_V],
-            ports=wg.ports)
+            name="wg_with_III_V", elements=[wg, rectangle_III_V], ports=wg.ports
+        )
 
         elems += layout
         return elems
 
 
-#when exporting the layout to GDS, specify MY_OUTPUT_MAP for the mapping of process/purpose-layer to GDS layer numbers
+# when exporting the layout to GDS, specify MY_OUTPUT_MAP for the mapping of process/purpose-layer to GDS layer numbers
 g = Layout()
 g.write_gdsii("example_contact_mask.gds", layer_map=MY_OUTPUT_MAP)

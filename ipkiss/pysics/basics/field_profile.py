@@ -30,9 +30,9 @@ import numpy
 # a field value for a list of coordinates
 class __FieldProfile__(Transformable, StrongPropertyInitializer):
     positions = RestrictedProperty(
-        required=True, restriction=RestrictList(RestrictType(Coord)))
-    fields = RestrictedProperty(
-        required=True, restriction=RestrictList(RESTRICT_FIELD))
+        required=True, restriction=RestrictList(RestrictType(Coord))
+    )
+    fields = RestrictedProperty(required=True, restriction=RestrictList(RESTRICT_FIELD))
 
     def transform(self, transformation):
         self.transform_positions(transformation)
@@ -51,12 +51,14 @@ class __FieldProfile__(Transformable, StrongPropertyInitializer):
 
     def fields_to_array(self):
         raise NotImplementedException(
-            "__FieldProfile__ subclass must implement fields_to_array method")
+            "__FieldProfile__ subclass must implement fields_to_array method"
+        )
 
 
 class FieldProfile2D(__FieldProfile__):
     positions = RestrictedProperty(
-        required=True, restriction=RestrictList(RestrictType(Coord2)))
+        required=True, restriction=RestrictList(RestrictType(Coord2))
+    )
 
     def positions_to_array(self):
         return numpy.array([[c[0], c[1]] for c in self.positions])
@@ -67,7 +69,8 @@ class FieldProfile2D(__FieldProfile__):
 
 class FieldProfile3D(__FieldProfile__):
     positions = RestrictedProperty(
-        required=True, restriction=RestrictList(RestrictType(Coord3)))
+        required=True, restriction=RestrictList(RestrictType(Coord3))
+    )
 
     def positions_to_array(self):
         return numpy.array([[c[0], c[1], c[3]] for c in self.positions])
@@ -113,7 +116,8 @@ class FieldProfile1D(__FieldProfile__):
         S2 = numpy.array[S2]
 
         return numpy.sum(S * dx) / (
-            numpy.sqrt(numpy.sum(S1 * dx)) * numpy.sqrt(numpy.sum(S2 * dx)))
+            numpy.sqrt(numpy.sum(S1 * dx)) * numpy.sqrt(numpy.sum(S2 * dx))
+        )
 
     def overlap_with(self, other):
         """ the overlap with another reference field profile (not normalized) """
@@ -133,8 +137,11 @@ class FieldProfile1D(__FieldProfile__):
         S1 = numpy.array(S1)
         S2 = numpy.array(S2)
 
-        return numpy.sqrt(numpy.sum(S1 * dx)) * numpy.sum(S * dx) / numpy.sqrt(
-            numpy.sum(S2 * dx))
+        return (
+            numpy.sqrt(numpy.sum(S1 * dx))
+            * numpy.sum(S * dx)
+            / numpy.sqrt(numpy.sum(S2 * dx))
+        )
 
     def integral(self):
         """ compute the integral (overlap with itself) """

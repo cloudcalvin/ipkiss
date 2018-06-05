@@ -28,8 +28,18 @@ from .group import Group
 from .. import structure as structure_module
 from ... import constants
 from ... import settings
-from ipcore.properties.descriptor import RestrictedProperty, DefinitionProperty, FunctionNameProperty
-from ipcore.properties.predefined import RESTRICT_INT_TUPLE2, RESTRICT_POSITIVE, RESTRICT_NONZERO, IntProperty, NumberProperty
+from ipcore.properties.descriptor import (
+    RestrictedProperty,
+    DefinitionProperty,
+    FunctionNameProperty,
+)
+from ipcore.properties.predefined import (
+    RESTRICT_INT_TUPLE2,
+    RESTRICT_POSITIVE,
+    RESTRICT_NONZERO,
+    IntProperty,
+    NumberProperty,
+)
 from ipcore.properties.initializer import SUPPRESSED
 from types import NoneType
 from copy import copy, deepcopy
@@ -38,8 +48,14 @@ from ipkiss.log import IPKISS_LOG as LOG
 from ipcore.mixin.mixin import MixinBowl
 
 __all__ = [
-    "ARef", "CompoundArefElement", "__RefElement__", "MRef",
-    "SoftRotationARef", "SoftARef", "SRef", "StackARef"
+    "ARef",
+    "CompoundArefElement",
+    "__RefElement__",
+    "MRef",
+    "SoftRotationARef",
+    "SoftARef",
+    "SRef",
+    "StackARef",
 ]
 
 ##########################################################
@@ -52,7 +68,8 @@ class __RefElement__(__Element__):
 
     def __init__(self, reference, transformation=None, **kwargs):
         super(__RefElement__, self).__init__(
-            reference=reference, transformation=transformation, **kwargs)
+            reference=reference, transformation=transformation, **kwargs
+        )
 
     def dependencies(self):
         d = structure_module.StructureList()
@@ -64,7 +81,8 @@ class __RefElement__(__Element__):
         if not self.transformation.is_identity():
             S = structure_module.Structure(
                 self.reference.name + self.transformation.id_string(),
-                deepcopy(self.reference.elements))
+                deepcopy(self.reference.elements),
+            )
             self.reference = S
             S.transform(self.transformation)
             self.transformation = None
@@ -87,12 +105,12 @@ class MRef(__RefElement__):
             reference=reference,
             transformation=transformation,
             positions=positions,
-            **kwargs)
+            **kwargs
+        )
 
     def move(self, position):
         self.positions = [
-            Coord2(p[0] + position[0], p[1] + position[1])
-            for p in self.positions
+            Coord2(p[0] + position[0], p[1] + position[1]) for p in self.positions
         ]
 
     def size_info(self):
@@ -117,13 +135,15 @@ class MRef(__RefElement__):
         return self.__untransformed_positions__()
 
     def __deepcopy__(
-            self, memo
-    ):  #cannot be removed ! self.reference should not be deepcopied !
-        return MRef(self.reference,
-                    deepcopy(self.positions), deepcopy(self.transformation))
+        self, memo
+    ):  # cannot be removed ! self.reference should not be deepcopied !
+        return MRef(
+            self.reference, deepcopy(self.positions), deepcopy(self.transformation)
+        )
 
     def flat_copy(self, level=-1):
-        if level == 0: return ElementList(self.__copy__())
+        if level == 0:
+            return ElementList(self.__copy__())
         el = self.reference.elements.flat_copy(level - 1)
         el_tot = ElementList()
         T = self.transformation
@@ -143,51 +163,51 @@ class __AutoRefPositions__(object):
     positions = FunctionNameProperty("__positions__")
 
     def __init__(self, **kwargs):
-        super(__AutoRefPositions__, self).__init__(
-            positions=SUPPRESSED, **kwargs)
+        super(__AutoRefPositions__, self).__init__(positions=SUPPRESSED, **kwargs)
 
 
 class SRef(__AutoRefPositions__, MRef, MixinBowl):
     position = Coord2Property(default=(0.0, 0.0))
 
-    def __init__(self,
-                 reference,
-                 position=(0.0, 0.0),
-                 transformation=None,
-                 **kwargs):
+    def __init__(self, reference, position=(0.0, 0.0), transformation=None, **kwargs):
         if isinstance(reference, SRef):
             from ipkiss.primitives.structure import Structure
+
             reference = Structure(elements=[reference], ports=reference.ports)
         super(SRef, self).__init__(
             reference=reference,
             position=position,
             transformation=transformation,
-            **kwargs)
+            **kwargs
+        )
 
     def size_info(self):
         ref_size_info = self.reference.size_info()
-        return ref_size_info.transform(self.transformation + Translation(
-            self.position))
+        return ref_size_info.transform(self.transformation + Translation(self.position))
 
     def convex_hull(self):
         return self.reference.convex_hull().transform(
-            self.transformation + Translation(self.position))
+            self.transformation + Translation(self.position)
+        )
 
     def __untransformed_positions__(self):
         return [self.position]
 
     def move(self, position):
-        self.position = Coord2(self.position[0] + position[0],
-                               self.position[1] + position[1])
+        self.position = Coord2(
+            self.position[0] + position[0], self.position[1] + position[1]
+        )
 
     def __deepcopy__(
-            self, memo
-    ):  #cannot be removed ! self.reference should not be deepcopied !
-        return SRef(self.reference,
-                    deepcopy(self.position), deepcopy(self.transformation))
+        self, memo
+    ):  # cannot be removed ! self.reference should not be deepcopied !
+        return SRef(
+            self.reference, deepcopy(self.position), deepcopy(self.transformation)
+        )
 
     def flat_copy(self, level=-1):
-        if level == 0: return ElementList(self.__copy__())
+        if level == 0:
+            return ElementList(self.__copy__())
         el = self.reference.elements.flat_copy(level - 1)
         el.transform(self.transformation + Translation(self.position))
         return el
@@ -198,9 +218,11 @@ class SRef(__AutoRefPositions__, MRef, MixinBowl):
     def __eq__(self, other):
         if not isinstance(other, SRef):
             return False
-        return (self.reference == other.reference) and (
-            self.position == other.position) and (
-                self.transformation == other.transformation)
+        return (
+            (self.reference == other.reference)
+            and (self.position == other.position)
+            and (self.transformation == other.transformation)
+        )
 
     def __ne__(self, other):
         return not self.__eq__(other)
@@ -209,50 +231,58 @@ class SRef(__AutoRefPositions__, MRef, MixinBowl):
 class ARef(__AutoRefPositions__, MRef, MixinBowl):
     origin = Coord2Property(default=(0.0, 0.0))
     period = Coord2Property(required=True)
-    n_o_periods = RestrictedProperty(
-        restriction=RESTRICT_INT_TUPLE2, required=True)
+    n_o_periods = RestrictedProperty(restriction=RESTRICT_INT_TUPLE2, required=True)
 
-    def __init__(self,
-                 reference,
-                 origin,
-                 period,
-                 n_o_periods,
-                 transformation=None,
-                 **kwargs):
+    def __init__(
+        self, reference, origin, period, n_o_periods, transformation=None, **kwargs
+    ):
         super(ARef, self).__init__(
             reference=reference,
             transformation=transformation,
             origin=origin,
             period=period,
             n_o_periods=n_o_periods,
-            **kwargs)
+            **kwargs
+        )
 
     def move(self, position):
-        self.origin = (self.origin[0] + position[0],
-                       self.origin[1] + position[1])
+        self.origin = (self.origin[0] + position[0], self.origin[1] + position[1])
 
     def size_info(self):
         S = self.reference.size_info()
-        S2 = (S + S.move_copy(((self.n_o_periods[0] - 1) * self.period[0],
-                               (self.n_o_periods[1] - 1) * self.period[1])))
+        S2 = S + S.move_copy(
+            (
+                (self.n_o_periods[0] - 1) * self.period[0],
+                (self.n_o_periods[1] - 1) * self.period[1],
+            )
+        )
         return S2.transform(self.transformation + Translation(self.origin))
 
     def convex_hull(self):
         S = self.reference.convex_hull()
-        S2 = (S + S.move_copy(((self.n_o_periods[0] - 1) * self.period[0],
-                               (self.n_o_periods[1] - 1) * self.period[1])))
-        return S2.convex_hull().transform(self.transformation + Translation(
-            self.origin))
+        S2 = S + S.move_copy(
+            (
+                (self.n_o_periods[0] - 1) * self.period[0],
+                (self.n_o_periods[1] - 1) * self.period[1],
+            )
+        )
+        return S2.convex_hull().transform(
+            self.transformation + Translation(self.origin)
+        )
 
     def __untransformed_positions__(self):
         p = shape.Shape(
             transpose(
                 reshape(
                     meshgrid(
-                        list(range(self.n_o_periods[0])), list(range(
-                            self.n_o_periods[1]))),
-                    (2, self.n_o_periods[0] * self.n_o_periods[1]))) * array(
-                        [self.period[0], self.period[1]]))
+                        list(range(self.n_o_periods[0])),
+                        list(range(self.n_o_periods[1])),
+                    ),
+                    (2, self.n_o_periods[0] * self.n_o_periods[1]),
+                )
+            )
+            * array([self.period[0], self.period[1]])
+        )
         return p
 
     def __positions__(self):
@@ -260,15 +290,19 @@ class ARef(__AutoRefPositions__, MRef, MixinBowl):
         return p.transform(self.transformation + Translation(self.origin))
 
     def __deepcopy__(
-            self, memo
-    ):  #cannot be removed ! self.reference should not be deepcopied !
-        return ARef(self.reference,
-                    deepcopy(self.origin),
-                    deepcopy(self.period),
-                    deepcopy(self.n_o_periods), deepcopy(self.transformation))
+        self, memo
+    ):  # cannot be removed ! self.reference should not be deepcopied !
+        return ARef(
+            self.reference,
+            deepcopy(self.origin),
+            deepcopy(self.period),
+            deepcopy(self.n_o_periods),
+            deepcopy(self.transformation),
+        )
 
     def flat_copy(self, level=-1):
-        if level == 0: return ElementList(self.__copy__())
+        if level == 0:
+            return ElementList(self.__copy__())
         el = self.reference.elements.flat_copy(level - 1)
         el_tot = ElementList()
         T = self.transformation - Translation(self.transformation.translation)
@@ -278,8 +312,11 @@ class ARef(__AutoRefPositions__, MRef, MixinBowl):
         return el_tot
 
     def is_empty(self):
-        return __RefElement__.is_empty(self) or (self.n_o_periods[0] == 0) or (
-            self.n_o_periods[1] == 0)
+        return (
+            __RefElement__.is_empty(self)
+            or (self.n_o_periods[0] == 0)
+            or (self.n_o_periods[1] == 0)
+        )
 
     def __repr__(self):
         return "<ARef of %s>" % self.reference.name
@@ -287,11 +324,13 @@ class ARef(__AutoRefPositions__, MRef, MixinBowl):
     def __eq__(self, other):
         if not isinstance(other, ARef):
             return False
-        return (self.reference == other.reference) and (
-            self.transformation == other.transformation) and (
-                self.origin == other.origin) and (
-                    self.period == other.period) and (
-                        self.n_o_periods == other.n_o_periods)
+        return (
+            (self.reference == other.reference)
+            and (self.transformation == other.transformation)
+            and (self.origin == other.origin)
+            and (self.period == other.period)
+            and (self.n_o_periods == other.n_o_periods)
+        )
 
     def __ne__(self, other):
         return not self.__eq__(other)
@@ -304,13 +343,15 @@ class __ARef1dElement__(ARef):
     period_1d = NumberProperty(default=1.0, restriction=RESTRICT_NONZERO)
     n_o_periods_1d = IntProperty(default=1, restriction=RESTRICT_POSITIVE)
 
-    def __init__(self,
-                 reference,
-                 origin,
-                 period_1d,
-                 n_o_periods_1d,
-                 transformation=None,
-                 **kwargs):
+    def __init__(
+        self,
+        reference,
+        origin,
+        period_1d,
+        n_o_periods_1d,
+        transformation=None,
+        **kwargs
+    ):
         kwargs["period"] = SUPPRESSED
         kwargs["n_o_periods"] = SUPPRESSED
         super(__ARef1dElement__, self).__init__(
@@ -319,7 +360,8 @@ class __ARef1dElement__(ARef):
             period_1d=period_1d,
             n_o_periods_1d=n_o_periods_1d,
             transformation=transformation,
-            **kwargs)
+            **kwargs
+        )
 
     def is_empty(self):
         return __RefElement__.is_empty(self) or (self.n_o_periods_1d == 0)
@@ -335,13 +377,15 @@ class ARefX(__ARef1dElement__):
         return nop
 
     def __deepcopy__(
-            self, memo
-    ):  #cannot be removed ! self.reference should not be deepcopied !
-        return ARefX(self.reference,
-                     deepcopy(self.origin),
-                     deepcopy(self.period_1d),
-                     deepcopy(self.n_o_periods_1d),
-                     deepcopy(self.transformation))
+        self, memo
+    ):  # cannot be removed ! self.reference should not be deepcopied !
+        return ARefX(
+            self.reference,
+            deepcopy(self.origin),
+            deepcopy(self.period_1d),
+            deepcopy(self.n_o_periods_1d),
+            deepcopy(self.transformation),
+        )
 
 
 class ARefY(__ARef1dElement__):
@@ -354,30 +398,29 @@ class ARefY(__ARef1dElement__):
         return nop
 
     def __deepcopy__(
-            self, memo
-    ):  #cannot be removed ! self.reference should not be deepcopied !
-        return ARefY(self.reference,
-                     deepcopy(self.origin),
-                     deepcopy(self.period_1d),
-                     deepcopy(self.n_o_periods_1d),
-                     deepcopy(self.transformation))
+        self, memo
+    ):  # cannot be removed ! self.reference should not be deepcopied !
+        return ARefY(
+            self.reference,
+            deepcopy(self.origin),
+            deepcopy(self.period_1d),
+            deepcopy(self.n_o_periods_1d),
+            deepcopy(self.transformation),
+        )
 
 
 class CompoundArefElement(Group, ARef):
-    def __init__(self,
-                 reference,
-                 origin,
-                 period,
-                 n_o_periods,
-                 transformation=None,
-                 **kwargs):
+    def __init__(
+        self, reference, origin, period, n_o_periods, transformation=None, **kwargs
+    ):
         super(CompoundArefElement, self).__init__(
             reference=reference,
             origin=origin,
             period=period,
             n_o_periods=n_o_periods,
             transformation=transformation,
-            **kwargs)
+            **kwargs
+        )
 
     def flat_copy(self, level=-1):
         return ARef.flat_copy(self, level)
@@ -386,13 +429,15 @@ class CompoundArefElement(Group, ARef):
         return ARef.is_empty(self)
 
     def __deepcopy__(
-            self, memo
-    ):  #cannot be removed ! self.reference should not be deepcopied !
-        return CompoundARef(self.reference,
-                            deepcopy(self.origin),
-                            deepcopy(self.period),
-                            deepcopy(self.n_o_periods),
-                            deepcopy(self.transformation))
+        self, memo
+    ):  # cannot be removed ! self.reference should not be deepcopied !
+        return CompoundARef(
+            self.reference,
+            deepcopy(self.origin),
+            deepcopy(self.period),
+            deepcopy(self.n_o_periods),
+            deepcopy(self.transformation),
+        )
 
 
 class SoftARef(CompoundArefElement):
@@ -400,8 +445,12 @@ class SoftARef(CompoundArefElement):
         if not self.reference.is_empty():
             P = self.__untransformed_positions__().translate(self.origin)
 
-            T = self.transformation + Translation(
-                self.origin) - self.transformation - Translation(self.origin)
+            T = (
+                self.transformation
+                + Translation(self.origin)
+                - self.transformation
+                - Translation(self.origin)
+            )
             for pos in P:
                 elems.append(SRef(self.reference, pos, T))
         return elems
@@ -413,13 +462,15 @@ class SoftARef(CompoundArefElement):
         return ARef.convex_hull(self)
 
     def __deepcopy__(
-            self, memo
-    ):  #cannot be removed ! self.reference should not be deepcopied !
-        return SoftARef(self.reference,
-                        deepcopy(self.origin),
-                        deepcopy(self.period),
-                        deepcopy(self.n_o_periods),
-                        deepcopy(self.transformation))
+        self, memo
+    ):  # cannot be removed ! self.reference should not be deepcopied !
+        return SoftARef(
+            self.reference,
+            deepcopy(self.origin),
+            deepcopy(self.period),
+            deepcopy(self.n_o_periods),
+            deepcopy(self.transformation),
+        )
 
 
 class SoftRotationARef(CompoundArefElement):
@@ -428,42 +479,58 @@ class SoftRotationARef(CompoundArefElement):
             if self.transformation.rotation == 0.0:
                 period = self.transformation.apply_to_coord(self.period)
                 elems.append(
-                    ARef(self.reference, self.origin, period, self.n_o_periods,
-                         self.transformation))
+                    ARef(
+                        self.reference,
+                        self.origin,
+                        period,
+                        self.n_o_periods,
+                        self.transformation,
+                    )
+                )
             elif (self.transformation.rotation % 360.0) == 90.0:
                 transform = deepcopy(self.transformation)
                 transform.rotation = 0.0
                 period = transform.apply_to_coord(self.period)
                 period = (period[1], period[0])
                 n_o_periods = (self.n_o_periods[1], self.n_o_periods[0])
-                zero = (self.origin[0] - (n_o_periods[0] - 1) * period[0],
-                        self.origin[1])
-                elems.append(
-                    ARef(self.reference, zero, period, n_o_periods, transform))
+                zero = (
+                    self.origin[0] - (n_o_periods[0] - 1) * period[0],
+                    self.origin[1],
+                )
+                elems.append(ARef(self.reference, zero, period, n_o_periods, transform))
             elif (self.transformation.rotation % 360.0) == 270.0:
                 transform = deepcopy(self.transformation)
                 transform.rotation = 0.0
                 period = transform.apply_to_coord(self.period)
                 period = (period[1], period[0])
                 n_o_periods = (self.n_o_periods[1], self.n_o_periods[0])
-                zero = (self.origin[0],
-                        self.origin[1] - (n_o_periods[1] - 1) * period[1])
-                elems.append(
-                    ARef(self.reference, zero, period, n_o_periods, transform))
+                zero = (
+                    self.origin[0],
+                    self.origin[1] - (n_o_periods[1] - 1) * period[1],
+                )
+                elems.append(ARef(self.reference, zero, period, n_o_periods, transform))
             else:
                 elems.append(
-                    SoftARef(self.reference, self.origin, period,
-                             self.n_o_periods, self.transformation))
+                    SoftARef(
+                        self.reference,
+                        self.origin,
+                        period,
+                        self.n_o_periods,
+                        self.transformation,
+                    )
+                )
         return elems
 
     def __deepcopy__(
-            self, memo
-    ):  #cannot be removed ! self.reference should not be deepcopied !
-        return SoftRotationARef(self.reference,
-                                deepcopy(self.origin),
-                                deepcopy(self.period),
-                                deepcopy(self.n_o_periods),
-                                deepcopy(self.transformation))
+        self, memo
+    ):  # cannot be removed ! self.reference should not be deepcopied !
+        return SoftRotationARef(
+            self.reference,
+            deepcopy(self.origin),
+            deepcopy(self.period),
+            deepcopy(self.n_o_periods),
+            deepcopy(self.transformation),
+        )
 
     def size_info(self):
         return ARef.size_info(self)
@@ -475,14 +542,16 @@ class SoftRotationARef(CompoundArefElement):
 class StackARef(CompoundArefElement):
     stack_size = IntProperty(restriction=RESTRICT_POSITIVE, default=20)
 
-    def __init__(self,
-                 reference,
-                 origin=(0.0, 0.0),
-                 period=(1.0, 1.0),
-                 n_o_periods=(1, 1),
-                 transformation=None,
-                 stack_size=20,
-                 **kwargs):
+    def __init__(
+        self,
+        reference,
+        origin=(0.0, 0.0),
+        period=(1.0, 1.0),
+        n_o_periods=(1, 1),
+        transformation=None,
+        stack_size=20,
+        **kwargs
+    ):
         super(StackARef, self).__init__(
             reference=reference,
             origin=origin,
@@ -490,7 +559,8 @@ class StackARef(CompoundArefElement):
             n_o_periods=n_o_periods,
             transformation=transformation,
             stack_size=stack_size,
-            **kwargs)
+            **kwargs
+        )
 
     def define_elements(self, elems):
         # X_periodicity: 1
@@ -501,23 +571,33 @@ class StackARef(CompoundArefElement):
         # X-periodicity: smaller than 2 * stack size:
         elif self.n_o_periods[0] < 2 * self.stack_size:
             # use soft_aref
-            x_cell_content = SoftARef(self.reference, (0.0, 0.0), self.period,
-                                      (self.n_o_periods, 1))
+            x_cell_content = SoftARef(
+                self.reference, (0.0, 0.0), self.period, (self.n_o_periods, 1)
+            )
         # X-periodicity: larger than 2 * stack size
         else:
             # should become autoname structure
             x_cell_stack = structure_module.Structure(
                 "R_" + self.reference.name + "_SX" + str(int(self.stack_size)),
-                SoftARef(self.reference, (0.0, 0.0), self.period,
-                         (self.stack_size, 1)))
+                SoftARef(self.reference, (0.0, 0.0), self.period, (self.stack_size, 1)),
+            )
             x_cell_content = SoftARef(
-                x_cell_stack, (0.0, 0.0),
+                x_cell_stack,
+                (0.0, 0.0),
                 (self.period[0] * self.stack_size, self.period[1]),
-                (self.n_o_periods[0] / self.stack_size, 1))
+                (self.n_o_periods[0] / self.stack_size, 1),
+            )
             x_cell_content += SoftARef(
-                self.reference, (self.period[0] * self.stack_size *
-                                 (self.n_o_periods[0] / self.stack_size), 0.0),
-                self.period, (self.n_o_periods[0] % self.stack_size, 1))
+                self.reference,
+                (
+                    self.period[0]
+                    * self.stack_size
+                    * (self.n_o_periods[0] / self.stack_size),
+                    0.0,
+                ),
+                self.period,
+                (self.n_o_periods[0] % self.stack_size, 1),
+            )
 
         # do not yet create the X-cell
 
@@ -532,28 +612,42 @@ class StackARef(CompoundArefElement):
         # create x_cell
         # this should become an autoname_structure
         x_cell = structure_module.Structure(
-            "R_" + self.reference + "_X" + str(int(n_o_periods[0])),
-            x_cell_content)
+            "R_" + self.reference + "_X" + str(int(n_o_periods[0])), x_cell_content
+        )
 
         if self.n_o_periods[1] < 2 * self.stack_size:
             # soft_aref of X_cell
-            elems += SoftARef(x_cell, self.origin, self.period,
-                              (1, self.n_o_periods[1]))
+            elems += SoftARef(
+                x_cell, self.origin, self.period, (1, self.n_o_periods[1])
+            )
         else:  # Y_periodicity < 2* stack_size:
             y_cell_stack = structure_module.Structure(
                 "R_" + x_cell.name + "_SY" + str(int(self.stack_size)),
-                SoftARef(x_cell, (0.0, 0.0),
-                         (self.period[0], self.stack_size * self.period[1]),
-                         (1, self.n_o_periods[1] / self.stack_size)))
+                SoftARef(
+                    x_cell,
+                    (0.0, 0.0),
+                    (self.period[0], self.stack_size * self.period[1]),
+                    (1, self.n_o_periods[1] / self.stack_size),
+                ),
+            )
             elems += SoftARef(
-                y_cell_stack, self.origin,
+                y_cell_stack,
+                self.origin,
                 (self.period[0], self.stack_size * self.period[1]),
-                (1, self.n_o_periods[1] / self.stack_size))
+                (1, self.n_o_periods[1] / self.stack_size),
+            )
             elems += SoftARef(
-                x_cell, (self.origin[0],
-                         self.origin[1] + self.period[1] * self.stack_size *
-                         (self.n_o_periods[1] / self.stack_size)), self.period,
-                (1, self.n_o_periods[1] % self.stack_size))
+                x_cell,
+                (
+                    self.origin[0],
+                    self.origin[1]
+                    + self.period[1]
+                    * self.stack_size
+                    * (self.n_o_periods[1] / self.stack_size),
+                ),
+                self.period,
+                (1, self.n_o_periods[1] % self.stack_size),
+            )
         return elems
 
     def size_info(self):
@@ -563,10 +657,12 @@ class StackARef(CompoundArefElement):
         return ARef.convex_hull(self)
 
     def __deepcopy__(
-            self, memo
-    ):  #cannot be removed ! self.reference should not be deepcopied !
-        return StackARef(self.reference,
-                         deepcopy(self.origin),
-                         deepcopy(self.period),
-                         deepcopy(self.n_o_periods),
-                         deepcopy(self.transformation))
+        self, memo
+    ):  # cannot be removed ! self.reference should not be deepcopied !
+        return StackARef(
+            self.reference,
+            deepcopy(self.origin),
+            deepcopy(self.period),
+            deepcopy(self.n_o_periods),
+            deepcopy(self.transformation),
+        )

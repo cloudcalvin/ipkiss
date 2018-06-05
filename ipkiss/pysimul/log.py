@@ -25,6 +25,6 @@ import logging
 import sys
 
 PYSIMUL_LOGGING_HANDLER = logging.StreamHandler(sys.stderr)
-PYSIMUL_LOG = logging.getLogger('PYSIMUL')
+PYSIMUL_LOG = logging.getLogger("PYSIMUL")
 PYSIMUL_LOG.setLevel(logging.ERROR)
 PYSIMUL_LOG.addHandler(PYSIMUL_LOGGING_HANDLER)

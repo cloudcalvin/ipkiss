@@ -27,11 +27,13 @@ from ipcore.config.tree import ConfigTree, DelayedInitConfigTree, FallbackConfig
 
 class TechnologyTree(ConfigTree):
     """A hierarchical tree for storing technology settings."""
+
     pass
 
 
 class DelayedInitTechnologyTree(DelayedInitConfigTree):
     """A hierarchical tree for storing technology settings, but with delayed initialisation : the initialize-function is called only at the moment a value is actually retrieved."""
+
     pass
 
 
@@ -56,10 +58,12 @@ def TechnologyProperty(internal_member_name=None, restriction=None, **kwargs):
 class TechAdminTree(DelayedInitTechnologyTree):
     def initialize(self):
         from ipkiss.primitives import name_generator
+
         self.NAME_GENERATOR = name_generator.CounterNameGenerator(
             prefix_attribute="__name_prefix__",
             counter_zero=0,
-            default_prefix="STRUCTURE")
+            default_prefix="STRUCTURE",
+        )
 
 
 class ProcessTechnologyTree(DelayedInitTechnologyTree):
@@ -68,6 +72,7 @@ class ProcessTechnologyTree(DelayedInitTechnologyTree):
 
     def get_process_layers(self):
         from ipkiss.process.layer import ProcessLayerList, ProcessLayer
+
         pl = ProcessLayerList()
         for k, v in list(self.__dict__.items()):
             if isinstance(v, ProcessLayer):
@@ -76,6 +81,7 @@ class ProcessTechnologyTree(DelayedInitTechnologyTree):
 
     def get_key_from_process_layer(self, layer):
         from ipkiss.process.layer import ProcessLayer
+
         for k, v in list(self.__dict__.items()):
             if isinstance(v, ProcessLayer) and v == layer:
                 return k

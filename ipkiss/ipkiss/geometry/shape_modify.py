@@ -37,12 +37,12 @@ __all__ = ["shapes_fit"]
 
 def shape_fit(coordinates, south_west, north_east):
     ret_coords = Shape()
-    #rescale
+    # rescale
     size = shape_size(coordinates)
     box_size = shape_size([south_west, north_east])
     scale_factor = min([box_size[0] / size[0], box_size[1] / size[1]])
     ret_coords = shape_scale(coordinates, (scale_factor, scale_factor))
-    #translate
+    # translate
     bl = shape_south_west(coordinates)
     translation = (south_west[0] - bl[0], south_west[1] - bl[1])
     ret_coords = shape_translate(ret_coords, translation)
@@ -52,7 +52,7 @@ def shape_fit(coordinates, south_west, north_east):
 # fit multiple shapes
 def shapes_fit(shapes, south_west, north_east):
     ret_shapes = []
-    #get the extent of all shapes
+    # get the extent of all shapes
     new_shapes = [Shape(s) for s in shapes]
 
     SI = SizeInfo()
@@ -61,14 +61,13 @@ def shapes_fit(shapes, south_west, north_east):
     bl = Coord2(SI.west, SI.south)
     tr = Coord2(SI.east, SI.north)
     new_size = SizeInfo(
-        west=south_west[0],
-        east=north_east[0],
-        south=south_west[1],
-        north=north_east[1])
-    scale_factor = min(
-        [new_size.width / SI.width, new_size.height / SI.height])
-    translation = (south_west[0] - scale_factor * new_size.west,
-                   south_west[1] - scale_factor * new_size.south)
+        west=south_west[0], east=north_east[0], south=south_west[1], north=north_east[1]
+    )
+    scale_factor = min([new_size.width / SI.width, new_size.height / SI.height])
+    translation = (
+        south_west[0] - scale_factor * new_size.west,
+        south_west[1] - scale_factor * new_size.south,
+    )
     T = Magnification((0.0, 0.0), scale_factor) + Translation(translation)
     for s in new_shapes:
         ret_shapes.append(s.transform_copy(T))
@@ -76,7 +75,7 @@ def shapes_fit(shapes, south_west, north_east):
 
 
 def shape_remove_identicals(shape):
-    #removes two subsequent identical points
+    # removes two subsequent identical points
     S = Shape(shape)
     return S.remove_identicals()
 

@@ -19,7 +19,10 @@
 #
 # Contact: ipkiss@intec.ugent.be
 
-from .container import __StructureContainerWithPortLabels__, __StructureContainerWithRoutes__
+from .container import (
+    __StructureContainerWithPortLabels__,
+    __StructureContainerWithRoutes__,
+)
 from ipkiss.plugins.photonics.routing.to_line import RouteToLine, RouteToAngle
 from ipkiss.plugins.photonics.routing.connect import RouteConnector
 from ipkiss.plugins.photonics.wg.connect import __RoundedWaveguide__
@@ -30,19 +33,23 @@ from ipkiss.all import *
 __all__ = ["FanoutPorts"]
 
 
-class FanoutPorts(__StructureContainerWithPortLabels__,
-                  __StructureContainerWithRoutes__):
+class FanoutPorts(
+    __StructureContainerWithPortLabels__, __StructureContainerWithRoutes__
+):
     """ Fanout Container"""
+
     __name_prefix__ = "FANOUT"
     spacing = PositiveNumberProperty(default=25.0)
     output_direction = RestrictedProperty(
-        required=True,
-        restriction=RestrictValueList([NORTH, SOUTH, EAST, WEST]))
+        required=True, restriction=RestrictValueList([NORTH, SOUTH, EAST, WEST])
+    )
     reference_coordinate = NumberProperty(allow_none=True)
     max_s_bend_angle = AngleProperty(
         default=60.0,
         restriction=RestrictRange(
-            lower=0.0, upper=90.0, lower_inc=False, upper_inc=True))
+            lower=0.0, upper=90.0, lower_inc=False, upper_inc=True
+        ),
+    )
     suppress_other_ports = BoolProperty(default=False)
     bundled = BoolProperty(default=False)
     target_coordinate = NumberProperty(allow_none=True)
@@ -122,16 +129,17 @@ class FanoutPorts(__StructureContainerWithPortLabels__,
 
     def define_ports(self, prts):
         from copy import deepcopy
+
         for (P, R) in zip(self.__get_labeled_ports__(), self.routes):
             new_port = deepcopy(P)
             new_port.position = R.points[-1]
-            if (self.output_direction == NORTH):
+            if self.output_direction == NORTH:
                 new_port.angle = 90.0
-            elif (self.output_direction == SOUTH):
+            elif self.output_direction == SOUTH:
                 new_port.angle = 270.0
-            elif (self.output_direction == EAST):
+            elif self.output_direction == EAST:
                 new_port.angle = 0.0
-            elif (self.output_direction == WEST):
+            elif self.output_direction == WEST:
                 new_port.angle = 180.0
             prts += new_port
         if not self.suppress_other_ports:

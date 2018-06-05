@@ -24,7 +24,7 @@ if __name__ == "__main__":
 from ipkiss.plugins.photonics.wg.basic import *  # basic waveguides
 from picazzo.io.column import *  # Standard io columns
 
-from .example4_grating_mmi import *  #our structure (in seperate file example4_grating_mmi.py)
+from .example4_grating_mmi import *  # our structure (in seperate file example4_grating_mmi.py)
 from picazzo.fibcoup.inverted_taper import *
 from picazzo.io.fibcoup import *
 
@@ -41,16 +41,13 @@ class PicazzoExample4(Structure):
         # alignment waveguide
         wg_def = WgElDefinition()
         align_wg = wg_def(shape=[(0.0, 0.0), (50.0, 0.0)])
-        align = Structure(
-            name="align", elements=[align_wg], ports=align_wg.ports)
+        align = Structure(name="align", elements=[align_wg], ports=align_wg.ports)
 
-        layout.add(align, fibcoup=NitrideInvertedTaper('it'))
+        layout.add(align, fibcoup=NitrideInvertedTaper("it"))
 
         layout += GratingMmi(
-            mmi_length=5,
-            mmi_width=2,
-            grating_pitch=0.6,
-            grating_trench_width=0.3)
+            mmi_length=5, mmi_width=2, grating_pitch=0.6, grating_trench_width=0.3
+        )
 
         elems += layout
         return elems
@@ -62,4 +59,5 @@ if __name__ == "__main__":
     layout.write_gdsii("example4.gds")
     # -------- verify the fabrication materials with a 2D visualization
     from ipkiss.plugins.vfabrication import *
+
     layout.visualize_2d()

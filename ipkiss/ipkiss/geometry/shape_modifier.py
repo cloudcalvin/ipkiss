@@ -29,8 +29,7 @@ class __ShapeModifier__(Shape):
     original_shape = ShapeProperty(required=True)
 
     def __init__(self, original_shape, **kwargs):
-        super(__ShapeModifier__, self).__init__(
-            original_shape=original_shape, **kwargs)
+        super(__ShapeModifier__, self).__init__(original_shape=original_shape, **kwargs)
 
     def move(self, position):
         self.original_shape = self.original_shape.move_copy(position)

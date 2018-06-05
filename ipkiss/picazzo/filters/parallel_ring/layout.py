@@ -22,7 +22,11 @@
 #####################################################
 # parallel ring filters and ring filter arrays
 #####################################################
-from ..multi_ring.multi_ring_base import MultiRing, MultiRingIdentical, MultiRingPeriodic
+from ..multi_ring.multi_ring_base import (
+    MultiRing,
+    MultiRingIdentical,
+    MultiRingPeriodic,
+)
 from ..ring import layout as ring
 from ipkiss.plugins.photonics.port.port_list import OpticalPortList
 from ipkiss.plugins.photonics.routing.manhattan import RouteManhattan
@@ -45,22 +49,26 @@ __all__ = [
 ####################################################################
 class ParallelRing(MultiRing):
     """ parallel rings: rings linked west-ro-east """
+
     __name_prefix__ = "PARRING"
     process = ProcessProperty(default=TECH.PROCESS.WG)
     suppress_intermediary_ports = BoolProperty(default=True)
 
     routes_intermediary_ports = DefinitionProperty(
-        fdef_name="define_routes_intermediary_ports")
+        fdef_name="define_routes_intermediary_ports"
+    )
     routes = DefinitionProperty(fdef_name="define_routes")
-    intermediary_ports = DefinitionProperty(
-        fdef_name="define_intermediary_ports")
+    intermediary_ports = DefinitionProperty(fdef_name="define_intermediary_ports")
 
     def define_routes_intermediary_ports(self):
         routes = []
         intermediary_ports = []
-        for (R1, T1, R2,
-             T2) in zip(self.rings[0:-1], self.ring_transformations[0:-1],
-                        self.rings[1:], self.ring_transformations[1:]):
+        for (R1, T1, R2, T2) in zip(
+            self.rings[0:-1],
+            self.ring_transformations[0:-1],
+            self.rings[1:],
+            self.ring_transformations[1:],
+        ):
             P1 = R1.ports.transform_copy(T1).east_ports.y_sorted()
             P2 = R2.ports.transform_copy(T2).west_ports.y_sorted()
             L = min(len(P1), len(P2))
@@ -79,18 +87,20 @@ class ParallelRing(MultiRing):
     def define_elements(self, elems):
         super(ParallelRing, self).define_elements(elems)
         for R in self.routes:
-            elems += RouteConnectorManhattanExpanded(
-                route=R, process=self.process)
+            elems += RouteConnectorManhattanExpanded(route=R, process=self.process)
         return elems
 
     def define_ports(self, ports):
         # only take west_ports from first and east_ports from last
-        P1 = self.rings[0].ports.transform_copy(
-            self.ring_transformations[0]).west_ports
-        P2 = self.rings[-1].ports.transform_copy(
-            self.ring_transformations[-1]).east_ports
+        P1 = self.rings[0].ports.transform_copy(self.ring_transformations[0]).west_ports
+        P2 = (
+            self.rings[-1]
+            .ports.transform_copy(self.ring_transformations[-1])
+            .east_ports
+        )
         ports = P1 + P2
-        if not self.suppress_intermediary_ports: P += self.intermediary_ports
+        if not self.suppress_intermediary_ports:
+            P += self.intermediary_ports
         return ports
 
 
@@ -100,12 +110,14 @@ class ParallelRingIdentical(MultiRingIdentical, ParallelRing):
 
 class ParallelRingPeriodic(MultiRingPeriodic, ParallelRing):
     """ ring periodically placed """
+
     pass
 
 
 class ParallelRingReturnBend(ParallelRing):
     simple_rings = RestrictedProperty(
-        restriction=RestrictTypeList(ring.__Ring__), required=True)
+        restriction=RestrictTypeList(ring.__Ring__), required=True
+    )
     rbend_radius = PositiveNumberProperty(default=TECH.WG.BEND_RADIUS)
     rbend_min_y = NumberProperty(allow_none=True)
     stub = StructureProperty(allow_none=True)
@@ -114,8 +126,12 @@ class ParallelRingReturnBend(ParallelRing):
     rings = DefinitionProperty(fdef_name="define_rings")
 
     def define_rings(self):
-        y_min = self.simple_rings[-1].west_ports.y_sorted()[-1].transform_copy(
-            self.transformations[-1]).position.y
+        y_min = (
+            self.simple_rings[-1]
+            .west_ports.y_sorted()[-1]
+            .transform_copy(self.transformations[-1])
+            .position.y
+        )
         y_min += 2 * self.rbend_radius + TECH.WG.SHORT_STRAIGHT
         if self.rbend_min_y is None:
             y = y_min
@@ -124,8 +140,12 @@ class ParallelRingReturnBend(ParallelRing):
 
         rings = []
 
-        x = self.simple_rings[-1].east_ports.y_sorted()[-1].transform_copy(
-            self.transformations[-1]).position.x
+        x = (
+            self.simple_rings[-1]
+            .east_ports.y_sorted()[-1]
+            .transform_copy(self.transformations[-1])
+            .position.x
+        )
 
         for (r, t) in reversed(list(zip(self.simple_rings, self.transformations))):
             y_r = r.west_ports.y_sorted()[-1].transform_copy(t).position.y
@@ -138,23 +158,27 @@ class ParallelRingReturnBend(ParallelRing):
                 rbend_radius=self.rbend_radius,
                 rbend_straight=s,
                 rbend_end_x=end_x,
-                stub=self.stub)  # specify end point
+                stub=self.stub,
+            )  # specify end point
             rings += [new_r]
 
-            y = new_r.east_ports.y_sorted()[-1].transform_copy(
-                t).position.y + self.rbend_spacing
+            y = (
+                new_r.east_ports.y_sorted()[-1].transform_copy(t).position.y
+                + self.rbend_spacing
+            )
 
         rings.reverse()
         return rings
 
 
 def ParallelRingRect180DropFilter(
-        positions,
-        coupler_wg_definitions=(TECH.WGDEF.WIRE, TECH.WGDEF.WIRE),
-        coupler_spacings=(TECH.WG.DC_SPACING, TECH.WG.DC_SPACING),
-        bend_radius=TECH.WG.BEND_RADIUS,
-        straights=(TECH.WG.SHORT_STRAIGHT, TECH.WG.SHORT_STRAIGHT),
-        ring_wg_definition=TECH.WGDEF.WIRE):
+    positions,
+    coupler_wg_definitions=(TECH.WGDEF.WIRE, TECH.WGDEF.WIRE),
+    coupler_spacings=(TECH.WG.DC_SPACING, TECH.WG.DC_SPACING),
+    bend_radius=TECH.WG.BEND_RADIUS,
+    straights=(TECH.WG.SHORT_STRAIGHT, TECH.WG.SHORT_STRAIGHT),
+    ring_wg_definition=TECH.WGDEF.WIRE,
+):
     R = ring.RingRect180DropFilter(
         ring_wg_definition=ring_wg_definition,
         coupler_wg_definitions=coupler_wg_definitions,
@@ -163,23 +187,21 @@ def ParallelRingRect180DropFilter(
         straights=straights,
     )
     T = [Translation(p) for p in positions]
-    return ParallelRingIdentical(
-        ring=R,
-        ring_transformations=T,
-    )
+    return ParallelRingIdentical(ring=R, ring_transformations=T)
 
 
-def ParallelRingRectNotchFilter(positions,
-                                coupler_wg_definition=TECH.WGDEF.WIRE,
-                                coupler_spacing=TECH.WG.DC_SPACING,
-                                bend_radius=TECH.WG.BEND_RADIUS,
-                                straights=(TECH.WG.SHORT_STRAIGHT,
-                                           TECH.WG.SHORT_STRAIGHT),
-                                ring_wg_definition=TECH.WGDEF.WIRE):
+def ParallelRingRectNotchFilter(
+    positions,
+    coupler_wg_definition=TECH.WGDEF.WIRE,
+    coupler_spacing=TECH.WG.DC_SPACING,
+    bend_radius=TECH.WG.BEND_RADIUS,
+    straights=(TECH.WG.SHORT_STRAIGHT, TECH.WG.SHORT_STRAIGHT),
+    ring_wg_definition=TECH.WGDEF.WIRE,
+):
     R = ring.RingRectNotchFilter(
         ring_wg_definition=ring_wg_definition,
-        coupler_wg_definitions=(coupler_wg_definition, ),
-        coupler_spacings=(coupler_spacing, ),
+        coupler_wg_definitions=(coupler_wg_definition,),
+        coupler_spacings=(coupler_spacing,),
         bend_radius=bend_radius,
         straights=straights,
     )

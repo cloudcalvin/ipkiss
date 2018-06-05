@@ -34,36 +34,39 @@ __all__ = ["ThinWgElToWgElPortTaper"]
 class ThinWgElToWgElPortTaper(__WgElPortTaper__):
     """ Linear taper between waveguide of type FCWgElDefinition and WgElDefinition
     It should be passed a start_port (with correct wg_def) and the end_wg_def. """
+
     length = PositiveNumberProperty(default=10.0)
     taper = DefinitionProperty(fdef_name="define_taper")
 
     def define_taper(self):
-        start_wg_def = self.start_port.wg_definition.get_wg_definition_cross_section(
-        )
+        start_wg_def = self.start_port.wg_definition.get_wg_definition_cross_section()
         end_wg_def = self.end_wg_def.get_wg_definition_cross_section()
         new_end_wg_def = WGFCWgElDefinition(
             trench_width=end_wg_def.trench_width,
             shallow_wg_width=end_wg_def.wg_width,
-            shallow_trench_width=0.5 *
-            (start_wg_def.thin_width - end_wg_def.wg_width),
+            shallow_trench_width=0.5 * (start_wg_def.thin_width - end_wg_def.wg_width),
             wg_width=end_wg_def.wg_width,
-            shallow_process=start_wg_def.thin_process)
+            shallow_process=start_wg_def.thin_process,
+        )
         new_start_wg_def = WGFCWgElDefinition(
             trench_width=start_wg_def.trench_width,
             shallow_wg_width=TECH.TECH.MINIMUM_LINE,
-            shallow_trench_width=0.5 *
-            (start_wg_def.thin_width - TECH.TECH.MINIMUM_LINE),
+            shallow_trench_width=0.5
+            * (start_wg_def.thin_width - TECH.TECH.MINIMUM_LINE),
             wg_width=start_wg_def.wg_width,
-            shallow_process=start_wg_def.thin_process)
+            shallow_process=start_wg_def.thin_process,
+        )
         new_start_port = OpticalPort(
             position=self.start_port.position,
             wg_definition=new_start_wg_def,
-            angle=self.start_port.angle)
+            angle=self.start_port.angle,
+        )
         taper = WgElPortTaperLinear(
             start_port=new_start_port,
             end_wg_def=new_end_wg_def,
             length=self.length,
-            straight_extension=self.straight_extension)
+            straight_extension=self.straight_extension,
+        )
         return taper
 
     def define_elements(self, elems):
@@ -75,5 +78,7 @@ class ThinWgElToWgElPortTaper(__WgElPortTaper__):
 
 
 from ipkiss.all import *
-TECH.WGDEF.AUTO_TAPER_DATA_BASE.add(ThinWgElDefinition, WgElDefinition,
-                                    ThinWgElToWgElPortTaper)
+
+TECH.WGDEF.AUTO_TAPER_DATA_BASE.add(
+    ThinWgElDefinition, WgElDefinition, ThinWgElToWgElPortTaper
+)

@@ -26,5 +26,7 @@ COPYRIGHT_INFO = "copyright Ghent University, INTEC Photonics Research Group, 20
 AUTHOR = "Wim Bogaerts, Emmanuel Lambert, Pieter Dumon and others"
 AUTHOR_EMAIL = "Wim.bogaerts@intec.ugent.be"
 
-START_MESSAGE = "________________________________________________________________________________________________________________________\n%s %s - %s" % (
-    LIB_NAME, VERSION, COPYRIGHT_INFO)
+START_MESSAGE = (
+    "________________________________________________________________________________________________________________________\n%s %s - %s"
+    % (LIB_NAME, VERSION, COPYRIGHT_INFO)
+)

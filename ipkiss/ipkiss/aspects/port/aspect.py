@@ -23,11 +23,15 @@ from ipcore.all import FloatProperty
 from ipkiss.geometry.transformable import StoredTransformable
 from .port_list import PortListProperty
 from ipkiss.aspects.aspect import __Aspect__
-#from pysics.basics.domain import *
+
+# from pysics.basics.domain import *
 
 __all__ = [
-    "PortAspect", "StructurePortAspect", "ElementPortAspect", "SRefPortAspect",
-    "ARefPortAspect"
+    "PortAspect",
+    "StructurePortAspect",
+    "ElementPortAspect",
+    "SRefPortAspect",
+    "ARefPortAspect",
 ]
 
 
@@ -36,7 +40,7 @@ class PortAspect(__Aspect__):
     ports = PortListProperty(fdef_name="__define_ports__")
     port_angle_decision = FloatProperty(
         default=90.0
-    )  #spreading angle to deterlmine west, east, north and south ports
+    )  # spreading angle to deterlmine west, east, north and south ports
 
     def __define_ports__(self, ports):
         return self.define_ports(ports)
@@ -61,27 +65,30 @@ class PortAspect(__Aspect__):
     def define_west_ports(self, ports):
         return self.get_ports_within_angles(
             180.0 - 0.5 * self.port_angle_decision,
-            180.0 + 0.5 * self.port_angle_decision)
+            180.0 + 0.5 * self.port_angle_decision,
+        )
 
     west_ports = PortListProperty(locked=True)
 
     def define_east_ports(self, ports):
-        return self.get_ports_within_angles(-0.5 * self.port_angle_decision,
-                                            +0.5 * self.port_angle_decision)
+        return self.get_ports_within_angles(
+            -0.5 * self.port_angle_decision, +0.5 * self.port_angle_decision
+        )
 
     east_ports = PortListProperty(locked=True)
 
     def define_north_ports(self, ports):
         return self.get_ports_within_angles(
-            90.0 - 0.5 * self.port_angle_decision,
-            90.0 + 0.5 * self.port_angle_decision)
+            90.0 - 0.5 * self.port_angle_decision, 90.0 + 0.5 * self.port_angle_decision
+        )
 
     north_ports = PortListProperty(locked=True)
 
     def define_south_ports(self, ports):
         return self.get_ports_within_angles(
             270.0 - 0.5 * self.port_angle_decision,
-            270.0 + 0.5 * self.port_angle_decision)
+            270.0 + 0.5 * self.port_angle_decision,
+        )
 
     south_ports = PortListProperty(locked=True)
 
@@ -107,30 +114,36 @@ class TransformablePortAspect(PortAspect, StoredTransformable):
         return self.define_ports(ports).transform_copy(self.transformation)
 
 
-#Structure.mixin_first(OpticalPortAspect)
-#__Element__.mixin_first(TransformableOpticalPortAspect)
+# Structure.mixin_first(OpticalPortAspect)
+# __Element__.mixin_first(TransformableOpticalPortAspect)
 
 
 class SRefPortAspect(TransformablePortAspect):
     def define_ports(self, ports):
-        ports = self.reference.ports.transform_copy(self.transformation).move(
-            self.position).transform(-self.transformation)
+        ports = (
+            self.reference.ports.transform_copy(self.transformation)
+            .move(self.position)
+            .transform(-self.transformation)
+        )
         return ports
 
 
-#SRef.mixin(__SRefOpticalPortMixin__)
+# SRef.mixin(__SRefOpticalPortMixin__)
 
 
 class ARefPortAspect(TransformablePortAspect):
     def define_ports(self, ports):
         for p in self.positions:
-            port_list = self.reference.ports.transform_copy(
-                self.transformation).move(p).transform(-self.transformation)
+            port_list = (
+                self.reference.ports.transform_copy(self.transformation)
+                .move(p)
+                .transform(-self.transformation)
+            )
             ports.extend(port_list)
         return ports
 
 
-#ARef.mixin(__ARefOpticalPortMixin__)
+# ARef.mixin(__ARefOpticalPortMixin__)
 
 StructurePortAspect = PortAspect
 ElementPortAspect = TransformablePortAspect

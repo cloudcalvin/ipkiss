@@ -28,17 +28,19 @@ from picazzo.filters.ring import RingRect180DropFilter
 my_ring = RingRect180DropFilter(name="My_Ring")
 
 from picazzo.container import SuppressPorts
+
 my_ring_suppressed = SuppressPorts(structure=my_ring, port_labels=["W1"])
 my_ring_suppressed.write_gdsii("suppress_ports_1.gds")
 # layout will not look any different
 
 from picazzo.wg.aperture import DeepWgAperture
 from ipkiss.plugins.photonics.wg import WgElDefinition
+
 # a stub to paste on the suppressed ports
 my_stub = DeepWgAperture(
     name="my_stub",
     aperture_wg_definition=WgElDefinition(wg_width=2.0),
-    taper_length=4.0)
-my_ring_stubbed = SuppressPorts(
-    structure=my_ring, port_labels=["W1"], stub=my_stub)
+    taper_length=4.0,
+)
+my_ring_stubbed = SuppressPorts(structure=my_ring, port_labels=["W1"], stub=my_stub)
 my_ring_stubbed.write_gdsii("suppress_ports_2.gds")

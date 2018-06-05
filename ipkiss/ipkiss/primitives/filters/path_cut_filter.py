@@ -20,7 +20,11 @@
 # Contact: ipkiss@intec.ugent.be
 
 from ..filter import Filter
-from ipcore.properties.predefined import IntProperty, RESTRICT_POSITIVE, RESTRICT_NONNEGATIVE
+from ipcore.properties.predefined import (
+    IntProperty,
+    RESTRICT_POSITIVE,
+    RESTRICT_NONNEGATIVE,
+)
 from ..elements.shape import Path
 from ...geometry.shape import Shape
 from ...geometry import shape_info
@@ -35,22 +39,27 @@ class ShapeCutFilter(Filter):
 
     def __filter_Shape__(self, shape):
         coordinates = Shape(shape)
-        coordinates.closed = False  # this one is open, but the original one can be closed
+        coordinates.closed = (
+            False
+        )  # this one is open, but the original one can be closed
         coordinates.remove_identicals()
         if shape.closed:
             min_sections = 2
-            if (coordinates[-1] == coordinates[0]):
+            if coordinates[-1] == coordinates[0]:
                 coordinates.append(coordinates[1])  # create overlap
-            elif ((coordinates[-2] != coordinates[0])
-                  or (coordinates[-1] != coordinates[1])):
+            elif (coordinates[-2] != coordinates[0]) or (
+                coordinates[-1] != coordinates[1]
+            ):
                 coordinates.append(coordinates[0])  # close
                 coordinates.append(coordinates[1])  # create overlap
             coordinates.end_face_angle = 0.5 * (
-                shape_info.angle_deg(coordinates[2], coordinates[1]) +
-                shape_info.angle_deg(coordinates[1], coordinates[0]))
+                shape_info.angle_deg(coordinates[2], coordinates[1])
+                + shape_info.angle_deg(coordinates[1], coordinates[0])
+            )
             coordinates.start_face_angle = 0.5 * (
-                shape_info.angle_deg(coordinates[-2], coordinates[-3]) +
-                shape_info.angle_deg(coordinates[-1], coordinates[-2]))
+                shape_info.angle_deg(coordinates[-2], coordinates[-3])
+                + shape_info.angle_deg(coordinates[-1], coordinates[-2])
+            )
         elif coordinates[-1] == coordinates[0]:
             # not closed, but ends will overlap:
             min_sections = 2
@@ -58,7 +67,8 @@ class ShapeCutFilter(Filter):
             min_sections = 1
 
         shapes = shape_cut.cut_open_shape_in_sections_with_overlap(
-            coordinates, self.max_path_length, self.overlap, min_sections)
+            coordinates, self.max_path_length, self.overlap, min_sections
+        )
         return shapes
 
     def __repr__(self):
@@ -81,7 +91,9 @@ class PathCutFilter(ShapeCutFilter):
                     sh,
                     line_width,
                     item.path_type,
-                    transformation=item.transformation) for sh in shapes
+                    transformation=item.transformation,
+                )
+                for sh in shapes
             ]
         else:
             LOG.debug("Path linewidth is zero: PathCutFilter not applied.")

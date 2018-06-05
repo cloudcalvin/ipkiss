@@ -20,19 +20,23 @@
 # Contact: ipkiss@intec.ugent.be
 
 from ipkiss.all import *
+
 #########################3
-#TaperPorts component
+# TaperPorts component
 from .taper_ports import TaperPorts
 from ..wg.tapers.auto_taper.auto_taper import WgElPortTaperAuto
+
 __all__ = ["AutoTaperPorts"]
 
 
 class AutoTaperPorts(TaperPorts):
     """ Structure containing another structure which will apply the WgElPortTaperAuto"""
+
     __name_prefix__ = "AUTOTP"
     taper_length = PositiveNumberProperty(allow_none=True)
     straight_extension = RestrictedProperty(
-        allow_none=True, restriction=RESTRICT_TUPLE2)
+        allow_none=True, restriction=RESTRICT_TUPLE2
+    )
 
     def define_tapers(self):
         kwargs = {"end_wg_def": self.end_wg_def}

@@ -30,8 +30,9 @@ from types import NoneType
 __all__ = ["IdentityTransform"]
 
 
-class IdentityTransform(Translation, Rotation, Magnification,
-                        __SpecialNoDistortTransform__):
+class IdentityTransform(
+    Translation, Rotation, Magnification, __SpecialNoDistortTransform__
+):
     """ transform that leaves an object unchanged """
 
     def __init__(self, **kwargs):
@@ -94,12 +95,15 @@ class IdentityTransform(Translation, Rotation, Magnification,
         elif isinstance(other, Translation):
             return Translation(other.translation)
         elif isinstance(other, Rotation):
-            return Rotation(other.rotation_center, other.rotation,
-                            other.absolute_rotation)
+            return Rotation(
+                other.rotation_center, other.rotation, other.absolute_rotation
+            )
         elif isinstance(other, Magnification):
-            return Magnification(other.magnification_center,
-                                 other.magnification,
-                                 other.absolute_magnfication)
+            return Magnification(
+                other.magnification_center,
+                other.magnification,
+                other.absolute_magnfication,
+            )
         else:
             return __SpecialNoDistortTransform__.__add__(self, other)
 

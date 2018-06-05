@@ -23,16 +23,19 @@ from technologies.si_photonics.ipkiss.default import *
 from ipkiss.all import *
 
 from dircoup import BentDirectionalCoupler
+
 my_splitter = BentDirectionalCoupler(coupler_length=10.0, bend_angle=30.0)
 my_combiner = BentDirectionalCoupler(coupler_length=8.0, bend_angle=30.0)
 
 from ring import RingResonator
+
 my_ring1 = RingResonator(ring_radius=6.0)
 my_ring2 = RingResonator(ring_radius=7.0)
 
 from rlmzi import RingLoadedMZI
 
 my_rlmzi = RingLoadedMZI(
-    ring1=my_ring1, ring2=my_ring2, splitter=my_splitter, combiner=my_combiner)
+    ring1=my_ring1, ring2=my_ring2, splitter=my_splitter, combiner=my_combiner
+)
 
 my_rlmzi.write_gdsii("rlmzi.gds")

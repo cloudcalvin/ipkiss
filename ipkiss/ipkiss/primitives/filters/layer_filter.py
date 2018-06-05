@@ -31,7 +31,8 @@ class __LayerFilter__(Filter):
     layers = RestrictedProperty(
         default=LayerList(),
         restriction=RestrictType(LayerList),
-        preprocess=ProcessorTypeCast(LayerList))
+        preprocess=ProcessorTypeCast(LayerList),
+    )
 
 
 class LayerFilterAllow(__LayerFilter__):

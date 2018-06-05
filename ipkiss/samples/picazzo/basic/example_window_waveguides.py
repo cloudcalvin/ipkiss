@@ -25,7 +25,11 @@ if __name__ == "__main__":
 from ipkiss.all import *
 from ipkiss.io.output_gdsii import FileOutputGdsii
 from ipkiss.plugins.photonics.wg import *
-from ipkiss.plugins.photonics.wg.window import WindowWaveguideDefinition, WindowsOnWaveguideDefinition, PathWindow
+from ipkiss.plugins.photonics.wg.window import (
+    WindowWaveguideDefinition,
+    WindowsOnWaveguideDefinition,
+    PathWindow,
+)
 
 #################################################################################################"
 # example: waveguide definition for shallow waveguide with p-n junction, contacts and silicides
@@ -33,7 +37,7 @@ from ipkiss.plugins.photonics.wg.window import WindowWaveguideDefinition, Window
 
 
 class JunctionWaveguideDefinition(WgElDefinition):
-    process = ProcessProperty(default=TECH.PROCESS.FC)  #shallow etched
+    process = ProcessProperty(default=TECH.PROCESS.FC)  # shallow etched
 
     p_process = ProcessProperty(default=TECH.PROCESS.P1)
     n_process = ProcessProperty(default=TECH.PROCESS.N1)
@@ -42,8 +46,7 @@ class JunctionWaveguideDefinition(WgElDefinition):
     sal_process = ProcessProperty(default=TECH.PROCESS.SAL)
 
     junction_offset = NumberProperty(default=0.0, doc="center of junction")
-    junction_overlap = NumberProperty(
-        default=0.0, doc="overlap of p and n region")
+    junction_overlap = NumberProperty(default=0.0, doc="overlap of p and n region")
 
     p_width = NonNegativeNumberProperty(default=5.0)
     n_width = NonNegativeNumberProperty(default=5.0)
@@ -68,30 +71,36 @@ class JunctionWaveguideDefinition(WgElDefinition):
         windows += [
             PathWindow(
                 layer=PPLayer(self.p_process, TECH.PURPOSE.DF.TRENCH),
-                start_offset=-sign * 0.5 * self.junction_overlap +
-                sign * self.junction_offset,
-                end_offset=sign * self.p_width),
+                start_offset=-sign * 0.5 * self.junction_overlap
+                + sign * self.junction_offset,
+                end_offset=sign * self.p_width,
+            ),
             PathWindow(
                 layer=PPLayer(self.n_process, TECH.PURPOSE.DF.TRENCH),
-                start_offset=sign * 0.5 * self.junction_overlap -
-                sign * self.junction_offset,
-                end_offset=-sign * self.n_width),
+                start_offset=sign * 0.5 * self.junction_overlap
+                - sign * self.junction_offset,
+                end_offset=-sign * self.n_width,
+            ),
             PathWindow(
                 layer=PPLayer(self.pp_process, TECH.PURPOSE.DF.TRENCH),
                 start_offset=sign * self.pp_offset,
-                end_offset=sign * (self.pp_offset + self.pp_width)),
+                end_offset=sign * (self.pp_offset + self.pp_width),
+            ),
             PathWindow(
                 layer=PPLayer(self.nn_process, TECH.PURPOSE.DF.TRENCH),
                 start_offset=-sign * self.nn_offset,
-                end_offset=-sign * (self.nn_offset + self.nn_width)),
+                end_offset=-sign * (self.nn_offset + self.nn_width),
+            ),
             PathWindow(
                 layer=PPLayer(self.sal_process, TECH.PURPOSE.DF.TRENCH),
                 start_offset=sign * self.salp_offset,
-                end_offset=sign * (self.salp_offset + self.salp_width)),
+                end_offset=sign * (self.salp_offset + self.salp_width),
+            ),
             PathWindow(
                 layer=PPLayer(self.sal_process, TECH.PURPOSE.DF.TRENCH),
                 start_offset=-sign * self.saln_offset,
-                end_offset=-sign * (self.saln_offset + self.saln_width)),
+                end_offset=-sign * (self.saln_offset + self.saln_width),
+            ),
         ]
         return windows
 
@@ -110,7 +119,8 @@ class DopedWaveguideDefinition(WindowsOnWaveguideDefinition):
             PathWindow(
                 layer=PPLayer(self.doping_process, TECH.PURPOSE.DF.TRENCH),
                 start_offset=-0.5 * self.doping_width,
-                end_offset=0.5 * self.doping_width)
+                end_offset=0.5 * self.doping_width,
+            )
         ]
 
 
@@ -118,44 +128,51 @@ class PicazzoExampleWindowWaveguide(Structure):
     def define_elements(self, elems):
         from picazzo.io.fibcoup import IoFibcoup
         from picazzo.io.column import IoColumn
+
         layout = IoColumn(
             name="EXAMPLE_WINDOW_WAVEGUIDE",
             y_spacing=35.0,
             south_west=(0.0, 0.0),
             south_east=(3500.0, 0.0),
-            adapter=IoFibcoup)
+            adapter=IoFibcoup,
+        )
 
         # define a shape
-        my_path_shape = Shape([(0.0, 0.0), (50.0, 0.0), (100.0, 30.0), (150.0,
-                                                                        5.0)])
+        my_path_shape = Shape([(0.0, 0.0), (50.0, 0.0), (100.0, 30.0), (150.0, 5.0)])
 
         # Example 1:
         # Make a standard wire waveguide by using the well-know regular class 'WgElDefinition'
         wire_wg_def = WgElDefinition(wg_width=0.6, trench_width=0.9)
         wire_wg = wire_wg_def(shape=my_path_shape)
-        layout += Structure(
-            name="wire", elements=[wire_wg], ports=wire_wg.ports)
+        layout += Structure(name="wire", elements=[wire_wg], ports=wire_wg.ports)
         layout.add_blocktitle("REGULAR_WIRE", center_clearout=(500.0, 0.0))
         layout.add_emptyline(2)
 
         # Example 2:
         # Make wire waveguide by directly using the raw base class 'WindowWaveguideDefinition'
-        from ipkiss.plugins.photonics.wg.window import WindowWaveguideDefinition, PathWindow
+        from ipkiss.plugins.photonics.wg.window import (
+            WindowWaveguideDefinition,
+            PathWindow,
+        )
+
         raw_wg_def = WindowWaveguideDefinition(
-            wg_width=0.45,  #no function except for ports
-            trench_width=2.0,  #no function except for ports
-            process=TECH.PROCESS.WG,  #no function except for ports
+            wg_width=0.45,  # no function except for ports
+            trench_width=2.0,  # no function except for ports
+            process=TECH.PROCESS.WG,  # no function except for ports
             windows=[
                 PathWindow(
                     layer=PPLayer(TECH.PROCESS.WG, TECH.PURPOSE.LF.LINE),
                     start_offset=-0.225,
-                    end_offset=0.225),  # waveguide
+                    end_offset=0.225,
+                ),  # waveguide
                 PathWindow(
                     layer=PPLayer(TECH.PROCESS.WG, TECH.PURPOSE.LF_AREA),
                     start_offset=-0.225 - 2.0,
-                    end_offset=0.225 + 2.0)
+                    end_offset=0.225 + 2.0,
+                )
                 # add additional layers if needed
-            ])
+            ],
+        )
         raw_wg = raw_wg_def(shape=my_path_shape)
         layout += Structure(name="raw", elements=[raw_wg], ports=raw_wg.ports)
         layout.add_blocktitle("RAW", center_clearout=(500.0, 0.0))
@@ -164,31 +181,30 @@ class PicazzoExampleWindowWaveguide(Structure):
         # Example 3:
         # implanted waveguide: doping window on top of other waveguide definition
         doped_wg_def = DopedWaveguideDefinition(
-            wg_definition=wire_wg_def,
-            doping_width=1.5,
-            doping_process=TECH.PROCESS.P1)
+            wg_definition=wire_wg_def, doping_width=1.5, doping_process=TECH.PROCESS.P1
+        )
 
         doped_wg = doped_wg_def(shape=my_path_shape)
-        layout += Structure(
-            name="doped", elements=[doped_wg], ports=doped_wg.ports)
+        layout += Structure(name="doped", elements=[doped_wg], ports=doped_wg.ports)
         layout.add_blocktitle("DOP", center_clearout=(500.0, 0.0))
         layout.add_emptyline(2)
 
         # Example 4:
         # Add new windows to another waveguide definition
         from ipkiss.plugins.photonics.wg.window import WindowsOnWaveguideDefinition
+
         win_wg_def = WindowsOnWaveguideDefinition(
             wg_definition=wire_wg_def,
             windows=[
                 PathWindow(
                     layer=PPLayer(TECH.PROCESS.FC, TECH.PURPOSE.DF.TRENCH),
                     start_offset=0.0,
-                    end_offset=1.0)
-            ]  # etch an FC window in one side of the waveguide
+                    end_offset=1.0,
+                )
+            ],  # etch an FC window in one side of the waveguide
         )
         win_wg = win_wg_def(shape=my_path_shape)
-        layout += Structure(
-            name="window", elements=[win_wg], ports=win_wg.ports)
+        layout += Structure(name="window", elements=[win_wg], ports=win_wg.ports)
 
         layout.add_blocktitle("WIN", center_clearout=(500.0, 0.0))
         layout.add_emptyline(2)
@@ -197,22 +213,24 @@ class PicazzoExampleWindowWaveguide(Structure):
         # Modulator : use of JunctionWaveguideDefinition
         mod_wg_def = JunctionWaveguideDefinition()
         mod_wg = mod_wg_def(shape=my_path_shape)
-        layout += Structure(
-            name="modulator", elements=[mod_wg], ports=mod_wg.ports)
+        layout += Structure(name="modulator", elements=[mod_wg], ports=mod_wg.ports)
         layout.add_blocktitle("MOD", center_clearout=(500.0, 0.0))
         layout.add_emptyline(2)
 
         # Example 6:
         # Use new waveguide in a rounded connector
-        from ipkiss.plugins.photonics.wg.connect import WaveguidePointRoundedConnectElementDefinition
+        from ipkiss.plugins.photonics.wg.connect import (
+            WaveguidePointRoundedConnectElementDefinition
+        )
+
         rounded_wg_def = WaveguidePointRoundedConnectElementDefinition(
             wg_definition=mod_wg_def,  # previous definition, with the junction
-            bend_radius=
-            20.0,  # needs to be sufficiently large with the broad windows
+            bend_radius=20.0,  # needs to be sufficiently large with the broad windows
         )
         rounded_wg = rounded_wg_def(shape=my_path_shape)
         layout += Structure(
-            name="rounded", elements=[rounded_wg], ports=rounded_wg.ports)
+            name="rounded", elements=[rounded_wg], ports=rounded_wg.ports
+        )
         layout.add_blocktitle("ROUND", center_clearout=(500.0, 0.0))
         layout.add_emptyline(2)
 
@@ -220,11 +238,13 @@ class PicazzoExampleWindowWaveguide(Structure):
         # Use new waveguide in a spiral
         from picazzo.wg.spiral import WaveguideDoubleSpiralWithIncoupling
         from picazzo.container.taper_ports import TaperShallowPorts
+
         spiral = WaveguideDoubleSpiralWithIncoupling(
             wg_definition=rounded_wg_def,
             spacing=12.0,
             n_o_loops=2,
-            inner_size=(100.0, 100.0))
+            inner_size=(100.0, 100.0),
+        )
         layout += TaperShallowPorts(structure=spiral)
         layout.add_blocktitle("SPIRAL", center_clearout=(500.0, 0.0))
 

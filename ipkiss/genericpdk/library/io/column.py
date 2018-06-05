@@ -25,14 +25,12 @@ from . import constants
 
 
 class StdIoColumnGroup(IoColumnGroup):
-    y_spacing = PositiveNumberProperty(
-        default=constants.STD_IOCOLUMN_Y_SPACING)
+    y_spacing = PositiveNumberProperty(default=constants.STD_IOCOLUMN_Y_SPACING)
     column_number = IntProperty(default=0)
 
 
 class StdIoColumn(IoColumn):
-    y_spacing = PositiveNumberProperty(
-        default=constants.STD_IOCOLUMN_Y_SPACING)
+    y_spacing = PositiveNumberProperty(default=constants.STD_IOCOLUMN_Y_SPACING)
 
 
 class Std1mmColumn(StdIoColumnGroup):
@@ -42,47 +40,51 @@ class Std1mmColumn(StdIoColumnGroup):
 
 class Std3mmColumn(StdIoColumnGroup):
     def define_south_east(self):
-        return (constants.STD3MM_Column_Bottom_Right(self.column_number)[0] -
-                constants.STD3MM_Column_Bottom_Left(self.column_number)[0],
-                constants.STD3MM_Column_Bottom_Right(self.column_number)[1] -
-                constants.STD3MM_Column_Bottom_Left(self.column_number)[1])
+        return (
+            constants.STD3MM_Column_Bottom_Right(self.column_number)[0]
+            - constants.STD3MM_Column_Bottom_Left(self.column_number)[0],
+            constants.STD3MM_Column_Bottom_Right(self.column_number)[1]
+            - constants.STD3MM_Column_Bottom_Left(self.column_number)[1],
+        )
 
     def define_n_o_lines(self):
-        return (constants.STD3MM_Column_N_Lines,
-                constants.STD3MM_Column_N_Lines)
+        return (constants.STD3MM_Column_N_Lines, constants.STD3MM_Column_N_Lines)
 
 
 class Std4mmColumn(StdIoColumnGroup):
     def define_south_east(self):
-        return (constants.STD4MM_Column_Bottom_Right(self.column_number)[0] -
-                constants.STD4MM_Column_Bottom_Left(self.column_number)[0],
-                constants.STD4MM_Column_Bottom_Right(self.column_number)[1] -
-                constants.STD4MM_Column_Bottom_Left(self.column_number)[1])
+        return (
+            constants.STD4MM_Column_Bottom_Right(self.column_number)[0]
+            - constants.STD4MM_Column_Bottom_Left(self.column_number)[0],
+            constants.STD4MM_Column_Bottom_Right(self.column_number)[1]
+            - constants.STD4MM_Column_Bottom_Left(self.column_number)[1],
+        )
 
     def define_n_o_lines(self):
-        return (constants.STD4MM_Column_N_Lines,
-                constants.STD4MM_Column_N_Lines)
+        return (constants.STD4MM_Column_N_Lines, constants.STD4MM_Column_N_Lines)
 
 
 class Std6mmColumn(StdIoColumnGroup):
     def define_south_east(self):
-        return (constants.STD6MM_Column_Bottom_Right(self.column_number)[0] -
-                constants.STD6MM_Column_Bottom_Left(self.column_number)[0],
-                constants.STD6MM_Column_Bottom_Right(self.column_number)[1] -
-                constants.STD6MM_Column_Bottom_Left(self.column_number)[1])
+        return (
+            constants.STD6MM_Column_Bottom_Right(self.column_number)[0]
+            - constants.STD6MM_Column_Bottom_Left(self.column_number)[0],
+            constants.STD6MM_Column_Bottom_Right(self.column_number)[1]
+            - constants.STD6MM_Column_Bottom_Left(self.column_number)[1],
+        )
 
     def define_n_o_lines(self):
-        return (constants.STD6MM_Column_N_Lines,
-                constants.STD6MM_Column_N_Lines)
+        return (constants.STD6MM_Column_N_Lines, constants.STD6MM_Column_N_Lines)
 
 
 class Std12mmColumn(StdIoColumnGroup):
     def define_south_east(self):
-        return (constants.STD12MM_Column_Bottom_Right(self.column_number)[0] -
-                constants.STD12MM_Column_Bottom_Left(self.column_number)[0],
-                constants.STD12MM_Column_Bottom_Right(self.column_number)[1] -
-                constants.STD12MM_Column_Bottom_Left(self.column_number)[1])
+        return (
+            constants.STD12MM_Column_Bottom_Right(self.column_number)[0]
+            - constants.STD12MM_Column_Bottom_Left(self.column_number)[0],
+            constants.STD12MM_Column_Bottom_Right(self.column_number)[1]
+            - constants.STD12MM_Column_Bottom_Left(self.column_number)[1],
+        )
 
     def define_n_o_lines(self):
-        return (constants.STD12MM_Column_N_Lines,
-                constants.STD12MM_Column_N_Lines)
+        return (constants.STD12MM_Column_N_Lines, constants.STD12MM_Column_N_Lines)

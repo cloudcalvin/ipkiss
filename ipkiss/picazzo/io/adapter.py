@@ -23,6 +23,7 @@ from .block import IoBlock
 from ipkiss.all import *
 from ..log import PICAZZO_LOG as LOG
 import sys
+
 __all__ = ["AdapterProperty"]
 
 #######################################################
@@ -37,34 +38,51 @@ class IoBlockAdapter(Structure, IoBlock):
     struct_transformation = TransformationProperty()
     y_west = DefinitionProperty(fdef_name="define_y_west")
     y_east = DefinitionProperty(fdef_name="define_y_east")
-    struct_east_ports = DefinitionProperty(
-        fdef_name="define_struct_east_ports")
-    struct_west_ports = DefinitionProperty(
-        fdef_name="define_struct_west_ports")
+    struct_east_ports = DefinitionProperty(fdef_name="define_struct_east_ports")
+    struct_west_ports = DefinitionProperty(fdef_name="define_struct_west_ports")
     position_west_east_ports = DefinitionProperty(
-        fdef_name="define_position_west_east_ports")
+        fdef_name="define_position_west_east_ports"
+    )
 
     def define_name(self):
         return "%s_%s_T%s_%d" % (
-            self.__name_prefix__, self.struct.name,
-            self.struct_transformation.id_string(), do_hash(
-                str((str(self.offset) + str(self.y_spacing) +
-                     str(self.south_west) + str(self.south_east)))))
+            self.__name_prefix__,
+            self.struct.name,
+            self.struct_transformation.id_string(),
+            do_hash(
+                str(
+                    (
+                        str(self.offset)
+                        + str(self.y_spacing)
+                        + str(self.south_west)
+                        + str(self.south_east)
+                    )
+                )
+            ),
+        )
 
     def define_position_west_east_ports(self):
         west_ports = self.struct.optical_ports.transform_copy(
-            self.struct_transformation).west_ports.y_sorted()
+            self.struct_transformation
+        ).west_ports.y_sorted()
         if len(west_ports) == 0:
-            LOG.warning("Structure " + self.struct.name +
-                        " has no west ports, so no adapters will be added.")
+            LOG.warning(
+                "Structure "
+                + self.struct.name
+                + " has no west ports, so no adapters will be added."
+            )
         S_in = west_ports.size_info()
         L = S_in.west
 
         east_ports = self.struct.optical_ports.transform_copy(
-            self.struct_transformation).east_ports.y_sorted()
+            self.struct_transformation
+        ).east_ports.y_sorted()
         if len(east_ports) == 0:
-            LOG.warning("Structure " + self.struct.name +
-                        " has no east ports, so no adapters will be added.")
+            LOG.warning(
+                "Structure "
+                + self.struct.name
+                + " has no east ports, so no adapters will be added."
+            )
         S_out = east_ports.size_info()
         R = S_out.east
 
@@ -89,15 +107,20 @@ class IoBlockAdapter(Structure, IoBlock):
         return (struct_position, struct_west_ports, struct_east_ports)
 
     def define_elements(self, elems):
-        (struct_position, struct_west_ports,
-         struct_east_ports) = self.position_west_east_ports
-        elems.append(
-            SRef(self.struct, struct_position, self.struct_transformation))
+        (
+            struct_position,
+            struct_west_ports,
+            struct_east_ports,
+        ) = self.position_west_east_ports
+        elems.append(SRef(self.struct, struct_position, self.struct_transformation))
         return elems
 
     def define_y_west(self):
-        (struct_position, struct_west_ports,
-         struct_east_ports) = self.position_west_east_ports
+        (
+            struct_position,
+            struct_west_ports,
+            struct_east_ports,
+        ) = self.position_west_east_ports
         y_west = [
             self.south_west[1] + i * self.y_spacing
             for i in range(len(struct_west_ports))
@@ -105,8 +128,11 @@ class IoBlockAdapter(Structure, IoBlock):
         return y_west
 
     def define_y_east(self):
-        (struct_position, struct_west_ports,
-         struct_east_ports) = self.position_west_east_ports
+        (
+            struct_position,
+            struct_west_ports,
+            struct_east_ports,
+        ) = self.position_west_east_ports
         y_east = [
             self.south_east[1] + i * self.y_spacing
             for i in range(len(struct_east_ports))
@@ -116,21 +142,31 @@ class IoBlockAdapter(Structure, IoBlock):
     def get_count_east(self):
         return len(
             self.struct.optical_ports.transform_copy(
-                self.struct_transformation).east_ports)
+                self.struct_transformation
+            ).east_ports
+        )
 
     def get_count_west(self):
         return len(
             self.struct.optical_ports.transform_copy(
-                self.struct_transformation).west_ports)
+                self.struct_transformation
+            ).west_ports
+        )
 
     def define_struct_west_ports(self):
-        (struct_position, struct_west_ports,
-         struct_east_ports) = self.position_west_east_ports
+        (
+            struct_position,
+            struct_west_ports,
+            struct_east_ports,
+        ) = self.position_west_east_ports
         return struct_west_ports
 
     def define_struct_east_ports(self):
-        (struct_position, struct_west_ports,
-         struct_east_ports) = self.position_west_east_ports
+        (
+            struct_position,
+            struct_west_ports,
+            struct_east_ports,
+        ) = self.position_west_east_ports
         return struct_east_ports
 
 

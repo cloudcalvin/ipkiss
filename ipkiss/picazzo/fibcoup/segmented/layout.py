@@ -39,7 +39,8 @@ class SegmentTrench(StrongPropertyInitializer):
 class Segmentation(Group):
     center_position = Coord2Property(default=(0.0, 0.0))
     trench_list = RestrictedProperty(
-        restriction=RestrictTypeList(SegmentTrench), required=True)
+        restriction=RestrictTypeList(SegmentTrench), required=True
+    )
     process = ProcessProperty(default=TECH.PROCESS.FC)
     purpose = PurposeProperty(default=TECH.PURPOSE.DF.TRENCH)
 
@@ -48,7 +49,8 @@ class Segmentation(Group):
             elems += Rectangle(
                 PPLayer(self.process, self.purpose),
                 (self.center[0] + t.x_offset, self.center[1] + t.y_offset),
-                (t.line_width, t.length))
+                (t.line_width, t.length),
+            )
         return elems
 
 
@@ -63,8 +65,7 @@ class SegmentedFiberCoupler(FiberCouplerGratingAuto):
 
 
 # equal segmentation
-def equal_segmented_trench(total_length, n_o_segments, fill_factor,
-                           trench_width):
+def equal_segmented_trench(total_length, n_o_segments, fill_factor, trench_width):
     tl = []
     if fill_factor == 0.0:
         return tl
@@ -74,26 +75,35 @@ def equal_segmented_trench(total_length, n_o_segments, fill_factor,
         segment_length = total_length / n_o_segments
         for i in range(n_o_segments):
             tl.append(
-                SegmentTrench(0.0,
-                              -0.5 * total_length + (i + 0.5) * segment_length,
-                              segment_length * fill_factor, trench_width))
+                SegmentTrench(
+                    0.0,
+                    -0.5 * total_length + (i + 0.5) * segment_length,
+                    segment_length * fill_factor,
+                    trench_width,
+                )
+            )
     return tl
 
 
-def equal_segmentation(center, total_length, n_o_segments, fill_factor,
-                       trench_width):
-    tl = equal_segmented_trench(total_length, n_o_segments, fill_factor,
-                                trench_width)
+def equal_segmentation(center, total_length, n_o_segments, fill_factor, trench_width):
+    tl = equal_segmented_trench(total_length, n_o_segments, fill_factor, trench_width)
     return segmentation(center, tl)
 
 
-def equal_segmented_trench_grating(name, period, fill_factors, n_o_segments,
-                                   grating_width, line_width):
+def equal_segmented_trench_grating(
+    name, period, fill_factors, n_o_segments, grating_width, line_width
+):
     n_o_periods = len(fill_factors)
     c_x = 0.5 * n_o_periods * period
     segmentations = []
     for i in range(n_o_periods):
         segmentations.append(
-            equal_segmentation((0.0 - c_x + i * period, 0.0), grating_width,
-                               n_o_segments, fill_factors[i], line_width))
+            equal_segmentation(
+                (0.0 - c_x + i * period, 0.0),
+                grating_width,
+                n_o_segments,
+                fill_factors[i],
+                line_width,
+            )
+        )
     return segmented_trench_grating(name, segmentations)

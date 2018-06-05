@@ -65,7 +65,14 @@ from .io.output_xml import *
 from .io.file_io import *
 from .io.gds_layer import *
 
-from .process import ProcessProperty, PurposeProperty, PPLayer, ProcessPurposeLayer, ProcessLayer, PatternPurpose
+from .process import (
+    ProcessProperty,
+    PurposeProperty,
+    PPLayer,
+    ProcessPurposeLayer,
+    ProcessLayer,
+    PatternPurpose,
+)
 
 from .technology.settings import get_technology
 
@@ -73,6 +80,6 @@ TECH = get_technology()
 
 from .exceptions import *
 
-#from settings import *
+# from settings import *
 
 from .boolean_ops import *

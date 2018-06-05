@@ -20,7 +20,12 @@
 # Contact: ipkiss@intec.ugent.be
 
 from ipcore.all import *
-from dependencies.matplotlib_wrapper import Figure, Tk, NavigationToolbar2TkAgg, FigureCanvasTkAgg
+from dependencies.matplotlib_wrapper import (
+    Figure,
+    Tk,
+    NavigationToolbar2TkAgg,
+    FigureCanvasTkAgg,
+)
 from .basic import __VisualisationManager__
 
 __all__ = ["FigureVisualisationManager"]
@@ -29,10 +34,12 @@ __all__ = ["FigureVisualisationManager"]
 class FigureVisualisationManager(__VisualisationManager__):
     """ Object that manages visualization of a matplotlib figure: on screen, saving to image ...
     """
+
     item = RestrictedProperty(
         required=True,
         restriction=RestrictType(Figure),
-        doc="matplotlib Figure to be visualized")
+        doc="matplotlib Figure to be visualized",
+    )
 
     def show(self, title="Visualisation", hold_for_user=True):
         fig = self.item

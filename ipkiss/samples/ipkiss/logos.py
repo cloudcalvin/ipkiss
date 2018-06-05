@@ -30,23 +30,25 @@ import sys
 
 class LogosExample(Structure):
     def define_elements(self, elems):
-        #-------------------------------------------------------------------
+        # -------------------------------------------------------------------
         # INTEC Logo
         logo_size = (150.0, 150.0)
         intec = IntecLogo(
-            PPLayer(process=TECH.PROCESS.WG, purpose=TECH.PURPOSE.DF.TRENCH),
-            logo_size)
-        #-------------------------------------------------------------------
+            PPLayer(process=TECH.PROCESS.WG, purpose=TECH.PURPOSE.DF.TRENCH), logo_size
+        )
+        # -------------------------------------------------------------------
         # UGent Logo
         ugent = UGentLogo(
             PPLayer(process=TECH.PROCESS.WG, purpose=TECH.PURPOSE.DF.TRENCH),
-            size=logo_size)
-        #-------------------------------------------------------------------
+            size=logo_size,
+        )
+        # -------------------------------------------------------------------
         # IMEC Logo
         imec = ImecLogo(
             PPLayer(process=TECH.PROCESS.WG, purpose=TECH.PURPOSE.DF.TRENCH),
-            size=logo_size)
-        #-------------------------------------------------------------------
+            size=logo_size,
+        )
+        # -------------------------------------------------------------------
         # Layout with references to all other structures
         ypos = 200
         xpos = 0
@@ -68,6 +70,6 @@ if __name__ == "__main__":
     # Write library
     OP.write(my_lib)
     print("Done : GDS2 file written to %s" % fileName)
-    #remark : instead of manually creating a Library and exporting it to GDS2, it is also possible to use
-    #the convenient shortcut function "write_gdsii" directly on the Structure, i.e.:
-    #layout.write_gdsii("example_logos.gds")
+    # remark : instead of manually creating a Library and exporting it to GDS2, it is also possible to use
+    # the convenient shortcut function "write_gdsii" directly on the Structure, i.e.:
+    # layout.write_gdsii("example_logos.gds")

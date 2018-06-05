@@ -33,10 +33,11 @@ __all__ = ["WgDirectCrossing", "WgParabolicCrossing"]
 
 class __WgCrossing__(Structure):
     """ abstract base class for crossing """
+
     length = PositiveNumberProperty(required=True)
     wg_definition = WaveguideDefProperty(
-        default=TECH.WGDEF.WIRE,
-        doc="waveguide definition used to define the crossing")
+        default=TECH.WGDEF.WIRE, doc="waveguide definition used to define the crossing"
+    )
     straight_stub = PositiveNumberProperty(default=TECH.WG.SHORT_STRAIGHT)
 
     def define_ports(self, ports):
@@ -45,25 +46,30 @@ class __WgCrossing__(Structure):
             OpticalPort(
                 wg_definition=self.wg_definition,
                 position=(-0.5 * self.length - self.straight_stub, 0.0),
-                angle=180),
+                angle=180,
+            ),
             OpticalPort(
                 wg_definition=self.wg_definition,
                 position=(0.5 * self.length + self.straight_stub, 0.0),
-                angle=0),
+                angle=0,
+            ),
             OpticalPort(
                 wg_definition=self.wg_definition,
                 position=(0.0, 0.5 * self.length + self.straight_stub),
-                angle=90),
+                angle=90,
+            ),
             OpticalPort(
                 wg_definition=self.wg_definition,
                 position=(0.0, -0.5 * self.length - self.straight_stub),
-                angle=-90)
+                angle=-90,
+            ),
         ]
         return ports
 
 
 class WgDirectCrossing(__WgCrossing__):
     """ direct waveguide crossing """
+
     __name_prefix__ = "DXING"
     length = DefinitionProperty(fdef_name="define_length")
 
@@ -73,16 +79,23 @@ class WgDirectCrossing(__WgCrossing__):
 
     def define_elements(self, elems):
         elems += self.wg_definition(
-            shape=[(-0.5 * self.length - self.straight_stub, 0.0), (
-                +0.5 * self.length + self.straight_stub, 0.0)])
+            shape=[
+                (-0.5 * self.length - self.straight_stub, 0.0),
+                (+0.5 * self.length + self.straight_stub, 0.0),
+            ]
+        )
         elems += self.wg_definition(
-            shape=[(0.0, -0.5 * self.length - self.straight_stub), (
-                0.0, +0.5 * self.length + self.straight_stub)])
+            shape=[
+                (0.0, -0.5 * self.length - self.straight_stub),
+                (0.0, +0.5 * self.length + self.straight_stub),
+            ]
+        )
         return elems
 
 
 class WgParabolicCrossing(__WgCrossing__):
     """ Parabolic, double-etch crossing """
+
     __name_prefix__ = "PXING"
     length = PositiveNumberProperty(default=5.7)
     deep_width = PositiveNumberProperty(default=2.6)
@@ -101,120 +114,180 @@ class WgParabolicCrossing(__WgCrossing__):
             begin_coord=(-0.5 * length, 0.0),
             end_coord=(0.0, 0.0),
             begin_width=wg_width,
-            end_width=self.deep_width)
+            end_width=self.deep_width,
+        )
         elems += ParabolicWedge(
             layer=PPLayer(self.deep_process, TECH.PURPOSE.LF.LINE),
             begin_coord=(0.0, 0.0),
             end_coord=(0.5 * length, 0.0),
             begin_width=self.deep_width,
-            end_width=wg_width)
+            end_width=wg_width,
+        )
         elems += ParabolicWedge(
             layer=PPLayer(self.deep_process, TECH.PURPOSE.LF.LINE),
             begin_coord=(0.0, 0.5 * length),
             end_coord=(0.0, 0.0),
             begin_width=wg_width,
-            end_width=self.deep_width)
+            end_width=self.deep_width,
+        )
         elems += ParabolicWedge(
             layer=PPLayer(self.deep_process, TECH.PURPOSE.LF.LINE),
             begin_coord=(0.0, 0.0),
             end_coord=(0.0, -0.5 * length),
             begin_width=self.deep_width,
-            end_width=wg_width)
+            end_width=wg_width,
+        )
         if self.straight_stub > 0.0:
             elems += Line(
                 layer=PPLayer(self.deep_process, TECH.PURPOSE.LF.LINE),
                 begin_coord=(-self.straight_stub - 0.5 * length, 0.0),
                 end_coord=(0.5 * self.length, 0.0),
-                line_width=wg_width)
+                line_width=wg_width,
+            )
             elems += Line(
                 layer=PPLayer(self.deep_process, TECH.PURPOSE.LF.LINE),
                 begin_coord=(0.0, -0.5 * length - self.straight_stub),
                 end_coord=(0.0, -0.5 * length),
-                line_width=wg_width)
+                line_width=wg_width,
+            )
             elems += Line(
                 layer=PPLayer(self.deep_process, TECH.PURPOSE.LF.LINE),
                 begin_coord=(0.5 * length, 0.0),
                 end_coord=(0.5 * length + self.straight_stub, 0.0),
-                line_width=wg_width)
+                line_width=wg_width,
+            )
             elems += Line(
                 layer=PPLayer(self.deep_process, TECH.PURPOSE.LF.LINE),
                 begin_coord=(0.0, 0.5 * length + self.straight_stub),
                 end_coord=(0.0 * length, 0.5 * length),
-                line_width=wg_width)
+                line_width=wg_width,
+            )
         if self.length > (wg_width + 2 * trench_width):
             elems += Rectangle(
                 layer=PPLayer(self.deep_process, TECH.PURPOSE.LF_AREA),
                 center=(0.0, 0.0),
-                box_size=(length, length))
+                box_size=(length, length),
+            )
         elems += Line(
             layer=PPLayer(self.deep_process, TECH.PURPOSE.LF_AREA),
             begin_coord=(-0.5 * length - self.straight_stub, 0.0),
             end_coord=(0.5 * length + self.straight_stub, 0.0),
-            line_width=2 * trench_width + wg_width)
+            line_width=2 * trench_width + wg_width,
+        )
         elems += Line(
             layer=PPLayer(self.deep_process, TECH.PURPOSE.LF_AREA),
             begin_coord=(0.0, -0.5 * length - self.straight_stub),
             end_coord=(0.0, 0.5 * length + self.straight_stub),
-            line_width=2 * trench_width + wg_width)
+            line_width=2 * trench_width + wg_width,
+        )
 
         # FC
         elems += ParabolicWedge(
             PPLayer(self.shallow_process, TECH.PURPOSE.LF.LINE),
-            (-0.5 * length, 0.0), (0.0, 0.0), wg_width, self.shallow_width)
-        elems += ParabolicWedge(
-            PPLayer(self.shallow_process, TECH.PURPOSE.LF.LINE), (0.0, 0.0),
-            (0.5 * length, 0.0), self.shallow_width, wg_width)
+            (-0.5 * length, 0.0),
+            (0.0, 0.0),
+            wg_width,
+            self.shallow_width,
+        )
         elems += ParabolicWedge(
             PPLayer(self.shallow_process, TECH.PURPOSE.LF.LINE),
-            (0.0, 0.5 * length), (0.0, 0.0), wg_width, self.shallow_width)
+            (0.0, 0.0),
+            (0.5 * length, 0.0),
+            self.shallow_width,
+            wg_width,
+        )
         elems += ParabolicWedge(
-            PPLayer(self.shallow_process, TECH.PURPOSE.LF.LINE), (0.0, 0.0),
-            (0.0, -0.5 * length), self.shallow_width, wg_width)
+            PPLayer(self.shallow_process, TECH.PURPOSE.LF.LINE),
+            (0.0, 0.5 * length),
+            (0.0, 0.0),
+            wg_width,
+            self.shallow_width,
+        )
+        elems += ParabolicWedge(
+            PPLayer(self.shallow_process, TECH.PURPOSE.LF.LINE),
+            (0.0, 0.0),
+            (0.0, -0.5 * length),
+            self.shallow_width,
+            wg_width,
+        )
         W1 = min(wg_width + 2 * self.shallow_trench_width, self.length)
         W2 = min(self.deep_width + 2 * self.shallow_trench_width, self.length)
         elems += ParabolicWedge(
             PPLayer(self.shallow_process, TECH.PURPOSE.LF_AREA),
-            (-0.5 * length, 0.0), (0.0, 0.0), W1, W2)
-        elems += ParabolicWedge(
-            PPLayer(self.shallow_process, TECH.PURPOSE.LF_AREA), (0.0, 0.0),
-            (0.5 * length, 0.0), W2, W1)
+            (-0.5 * length, 0.0),
+            (0.0, 0.0),
+            W1,
+            W2,
+        )
         elems += ParabolicWedge(
             PPLayer(self.shallow_process, TECH.PURPOSE.LF_AREA),
-            (0.0, 0.5 * length), (0.0, 0.0), W1, W2)
+            (0.0, 0.0),
+            (0.5 * length, 0.0),
+            W2,
+            W1,
+        )
         elems += ParabolicWedge(
-            PPLayer(self.shallow_process, TECH.PURPOSE.LF_AREA), (0.0, 0.0),
-            (0.0, -0.5 * length), W2, W1)
+            PPLayer(self.shallow_process, TECH.PURPOSE.LF_AREA),
+            (0.0, 0.5 * length),
+            (0.0, 0.0),
+            W1,
+            W2,
+        )
+        elems += ParabolicWedge(
+            PPLayer(self.shallow_process, TECH.PURPOSE.LF_AREA),
+            (0.0, 0.0),
+            (0.0, -0.5 * length),
+            W2,
+            W1,
+        )
 
         elems += Line(
             PPLayer(self.shallow_process, TECH.PURPOSE.LF.LINE),
             (-self.straight_stub - 0.5 * length, 0.0),
-            (-0.5 * self.length, 0.0), wg_width)
+            (-0.5 * self.length, 0.0),
+            wg_width,
+        )
         elems += Line(
             PPLayer(self.shallow_process, TECH.PURPOSE.LF.LINE),
-            (0.0, -0.5 * length - self.straight_stub), (0.0, -0.5 * length),
-            wg_width)
+            (0.0, -0.5 * length - self.straight_stub),
+            (0.0, -0.5 * length),
+            wg_width,
+        )
         elems += Line(
-            PPLayer(self.shallow_process,
-                    TECH.PURPOSE.LF.LINE), (0.5 * length, 0.0),
-            (0.5 * length + self.straight_stub, 0.0), wg_width)
+            PPLayer(self.shallow_process, TECH.PURPOSE.LF.LINE),
+            (0.5 * length, 0.0),
+            (0.5 * length + self.straight_stub, 0.0),
+            wg_width,
+        )
         elems += Line(
             PPLayer(self.shallow_process, TECH.PURPOSE.LF.LINE),
             (0.0, 0.5 * length + self.straight_stub),
-            (0.0 * length, 0.5 * length), wg_width)
+            (0.0 * length, 0.5 * length),
+            wg_width,
+        )
 
         elems += Line(
             PPLayer(self.shallow_process, TECH.PURPOSE.LF_AREA),
             (-self.straight_stub - 0.5 * length, 0.0),
-            (-0.5 * self.length, 0.0), W1)
+            (-0.5 * self.length, 0.0),
+            W1,
+        )
         elems += Line(
             PPLayer(self.shallow_process, TECH.PURPOSE.LF_AREA),
-            (0.0, -0.5 * length - self.straight_stub), (0.0, -0.5 * length),
-            W1)
+            (0.0, -0.5 * length - self.straight_stub),
+            (0.0, -0.5 * length),
+            W1,
+        )
         elems += Line(
             PPLayer(self.shallow_process, TECH.PURPOSE.LF_AREA),
-            (0.5 * length, 0.0), (0.5 * length + self.straight_stub, 0.0), W1)
+            (0.5 * length, 0.0),
+            (0.5 * length + self.straight_stub, 0.0),
+            W1,
+        )
         elems += Line(
             PPLayer(self.shallow_process, TECH.PURPOSE.LF_AREA),
             (0.0, 0.5 * length + self.straight_stub),
-            (0.0 * length, 0.5 * length), W1)
+            (0.0 * length, 0.5 * length),
+            W1,
+        )
         return elems

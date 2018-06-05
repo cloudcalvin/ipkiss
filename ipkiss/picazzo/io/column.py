@@ -20,7 +20,11 @@
 # Contact: ipkiss@intec.ugent.be
 
 from .block import IoBlock
-from .block_structure import IoCompoundBlockStructure, IoCompoundBlockGroup, IoTitleBlock
+from .block_structure import (
+    IoCompoundBlockStructure,
+    IoCompoundBlockGroup,
+    IoTitleBlock,
+)
 from .block_structure.layout import __IoCompoundBlockGroup__
 from .adapter import AdapterProperty
 from ipkiss.plugins.photonics.port.port import OpticalPort
@@ -47,17 +51,20 @@ class __IoColumn__(__IoCompoundBlockGroup__):
             self.__n_o_lines_west__ = value[0]
             self.__n_o_lines_east__ = value[1]
         else:
-            raise TypeError("Wrong type " + str(type(value)) +
-                            " for IoColumn.n_o_lines.")
+            raise TypeError(
+                "Wrong type " + str(type(value)) + " for IoColumn.n_o_lines."
+            )
 
     n_o_lines = FunctionProperty(get_n_o_lines, set_n_o_lines)
 
-    def add(self,
-            struct,
-            offset=(0.0, 0.0),
-            adapter=None,
-            transformation=None,
-            **adapter_kwargs):
+    def add(
+        self,
+        struct,
+        offset=(0.0, 0.0),
+        adapter=None,
+        transformation=None,
+        **adapter_kwargs
+    ):
         # Calculate structure position
         if adapter is None:
             adapter = self.adapter
@@ -73,7 +80,8 @@ class __IoColumn__(__IoCompoundBlockGroup__):
             south_west=(0.0, 0.0),
             south_east=br,
             struct_transformation=transformation,
-            **adapter_kwargs)
+            **adapter_kwargs
+        )
         # add it to the list
         self.add_block(block)
         return block
@@ -88,10 +96,9 @@ class __IoColumn__(__IoCompoundBlockGroup__):
         else:
             return __IoCompoundBlockGroup__.__iadd__(self, something)
 
-    def add_blocktitle(self,
-                       text,
-                       center_clearout=(0.0, 0.0),
-                       edge_clearout=(0.0, 0.0)):
+    def add_blocktitle(
+        self, text, center_clearout=(0.0, 0.0), edge_clearout=(0.0, 0.0)
+    ):
         self.add_block(
             IoTitleBlock(
                 text=text,
@@ -99,36 +106,37 @@ class __IoColumn__(__IoCompoundBlockGroup__):
                 south_west=(0.0, 0.0),
                 south_east=(self.width, self.count_offset * self.y_spacing),
                 center_clearout=center_clearout,
-                edge_clearout=edge_clearout))
+                edge_clearout=edge_clearout,
+            )
+        )
 
-    def add_align(self,
-                  west_east_offset=0.0,
-                  wg_definition=TECH.WGDEF.WIRE,
-                  adapter=None):
+    def add_align(
+        self, west_east_offset=0.0, wg_definition=TECH.WGDEF.WIRE, adapter=None
+    ):
         struct = Structure(
             name="Empty_align_WG",
             elements=[],
             ports=[
                 OpticalPort(
-                    position=(0.0, 0.0),
-                    angle=0.0,
-                    wg_definition=wg_definition),
+                    position=(0.0, 0.0), angle=0.0, wg_definition=wg_definition
+                ),
                 OpticalPort(
-                    position=(0.0, 0.0),
-                    angle=180.0,
-                    wg_definition=wg_definition)
-            ])
+                    position=(0.0, 0.0), angle=180.0, wg_definition=wg_definition
+                ),
+            ],
+        )
         self.add(struct, offset=(west_east_offset, 0.0), adapter=adapter)
 
     def is_full(self):
-        return (self.count_west >= self.n_o_lines[0]) or (self.count_east >=
-                                                          self.n_o_lines[1])
+        return (self.count_west >= self.n_o_lines[0]) or (
+            self.count_east >= self.n_o_lines[1]
+        )
 
     def get_block_and_pos_by_name(self, name):
         for i in range(len(self.blocks)):
             B = self.blocks[i]
             p = self.blocks_pos[i]
-            if hasattr(B, 'name') and B.name == name:
+            if hasattr(B, "name") and B.name == name:
                 return [B, p]
         return None
 
@@ -138,7 +146,7 @@ class IoColumn(IoCompoundBlockStructure, __IoColumn__):
         for i in range(len(self.blocks)):
             B = self.blocks[i]
             pos = self.blocks_pos[i]
-            if hasattr(B, 'vertical_optical_ports'):
+            if hasattr(B, "vertical_optical_ports"):
                 for p in B.vertical_optical_ports:
                     ports += p.move_copy(pos)
         return ports

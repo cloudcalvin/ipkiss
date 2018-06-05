@@ -29,27 +29,36 @@ class WgElTaperLinear(__WgElTaper__):
     """ This class generates a linear taper between waveguide definitions to make tapers for more complex waveguide structures.
     The waveguide definitions should be of the same type """
 
-    def __get_taper_shape__(self, start_position, end_position, start_window,
-                            end_window, straight_extension):
+    def __get_taper_shape__(
+        self, start_position, end_position, start_window, end_window, straight_extension
+    ):
         angle = angle_deg(end_position, start_position)
         dist = distance(start_position, end_position)
 
-        var_poly = Shape([(start_position[0],
-                           start_window.start_offset + start_position[1]),
-                          (start_position[0] - straight_extension[0],
-                           start_window.start_offset + start_position[1]),
-                          (start_position[0] - straight_extension[0],
-                           start_window.end_offset + start_position[1]),
-                          (start_position[0],
-                           start_window.end_offset + start_position[1]),
-                          (start_position[0] + dist,
-                           end_window.end_offset + start_position[1]),
-                          (start_position[0] + dist + straight_extension[1],
-                           end_window.end_offset + start_position[1]),
-                          (start_position[0] + dist + straight_extension[1],
-                           end_window.start_offset + start_position[1]),
-                          (start_position[0] + dist,
-                           end_window.start_offset + start_position[1])])
+        var_poly = Shape(
+            [
+                (start_position[0], start_window.start_offset + start_position[1]),
+                (
+                    start_position[0] - straight_extension[0],
+                    start_window.start_offset + start_position[1],
+                ),
+                (
+                    start_position[0] - straight_extension[0],
+                    start_window.end_offset + start_position[1],
+                ),
+                (start_position[0], start_window.end_offset + start_position[1]),
+                (start_position[0] + dist, end_window.end_offset + start_position[1]),
+                (
+                    start_position[0] + dist + straight_extension[1],
+                    end_window.end_offset + start_position[1],
+                ),
+                (
+                    start_position[0] + dist + straight_extension[1],
+                    end_window.start_offset + start_position[1],
+                ),
+                (start_position[0] + dist, end_window.start_offset + start_position[1]),
+            ]
+        )
         var_poly_trans = var_poly.rotate(start_position, angle)
         return var_poly_trans
 
@@ -59,8 +68,7 @@ class WgElPortTaperLinear(WgElTaperLinear, __WgElPortTaper__):
 
     start_process = ProcessProperty(
         allow_none=True,
-        doc=
-        "To overrule the start process, if the processes of the windows of the waveguide definition at the start port should not be used"
+        doc="To overrule the start process, if the processes of the windows of the waveguide definition at the start port should not be used",
     )
 
     def define_elements(self, elems):
@@ -69,20 +77,26 @@ class WgElPortTaperLinear(WgElTaperLinear, __WgElPortTaper__):
         if len(start_windows_list) != len(end_windows_list):
             raise Exception(
                 "Start and end waveguide definitions have a different number of windows (%i vs %i)."
-                % (len(start_windows_list), len(end_windows_list)))
+                % (len(start_windows_list), len(end_windows_list))
+            )
         # Then we iterate over all the windows and get the corresponding taper shape
-        for start_window, end_window in zip(start_windows_list,
-                                            end_windows_list):
+        for start_window, end_window in zip(start_windows_list, end_windows_list):
             taper_window = self.__get_taper_shape__(
-                self.start_position, self.end_position, start_window,
-                end_window, self.straight_extension)
+                self.start_position,
+                self.end_position,
+                start_window,
+                end_window,
+                self.straight_extension,
+            )
             if self.start_process is None:
                 elems += Boundary(start_window.layer, taper_window)
             else:
                 elems += Boundary(
                     PPLayer(
-                        process=self.start_process,
-                        purpose=start_window.layer.purpose), taper_window)
+                        process=self.start_process, purpose=start_window.layer.purpose
+                    ),
+                    taper_window,
+                )
         return elems
 
     def validate_properties(self):

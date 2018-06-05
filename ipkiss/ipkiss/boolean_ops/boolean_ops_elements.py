@@ -22,34 +22,50 @@
 from ipkiss.aspects.aspect import __Aspect__
 from ipkiss.primitives.elements.basic import ElementList, ElementListProperty
 from ipkiss.all import Layer, Boundary, Path, Structure, get_technology
-from ipkiss.primitives.layer import __GeneratedLayerAnd__, __GeneratedLayerNot__, __GeneratedLayerOr__, __GeneratedLayerXor__, __GeneratedLayer_2Layer__, __GeneratedLayer__
+from ipkiss.primitives.layer import (
+    __GeneratedLayerAnd__,
+    __GeneratedLayerNot__,
+    __GeneratedLayerOr__,
+    __GeneratedLayerXor__,
+    __GeneratedLayer_2Layer__,
+    __GeneratedLayer__,
+)
 from ipkiss.boolean_ops.boolean_ops_elements import *
-from dependencies.shapely_wrapper import shapely_geom_to_shape, flatten_shapely_geom, Polygon, cascaded_union, MultiPolygon
+from dependencies.shapely_wrapper import (
+    shapely_geom_to_shape,
+    flatten_shapely_geom,
+    Polygon,
+    cascaded_union,
+    MultiPolygon,
+)
 from ipkiss.process import PPLayer
 from ipkiss.primitives.filters.path_cut_filter import PathCutFilter
 from ipkiss.primitives.filters.path_to_boundary_filter import PathToBoundaryFilter
 from ipkiss.primitives.filters.boundary_cut_filter import BoundaryCutFilter
-#from ipkiss.constants import GDSII_MAX_COORDINATES
+
+# from ipkiss.constants import GDSII_MAX_COORDINATES
 from ipkiss.primitives.elements.basic import __LayerElement__
 
 TECH = get_technology()
 
 
 def __get_composite_shapely_polygon_for_elements_on_generated_layer__(
-        elements, generated_layer):
+    elements, generated_layer
+):
     """
     Recursive algorithm : 
     -give a Generated Layer, apply the corresponding Shapely boolean operations, then recursively call the function.
     -lowest level : given a Layer, create a Shapely Multipolygon spanning all the elements.
     """
     if isinstance(generated_layer, Layer):
-        #lowest level of the recursion
+        # lowest level of the recursion
         boundaries = []
         elements_flattened = elements.flat_copy()
         fp = PathCutFilter(
             max_path_length=TECH.GDSII.MAX_PATH_LENGTH,
             grids_per_unit=int(1.0 / TECH.METRICS.GRID),
-            overlap=1)
+            overlap=1,
+        )
         fp += PathToBoundaryFilter()
         fb = BoundaryCutFilter()
         for elem in elements_flattened:
@@ -57,14 +73,13 @@ def __get_composite_shapely_polygon_for_elements_on_generated_layer__(
                 for e in fp(elem):
                     if isinstance(e, __LayerElement__):
                         boundaries.append(e)
-            elif (isinstance(elem,
-                             Boundary)) and (elem.layer == generated_layer):
+            elif (isinstance(elem, Boundary)) and (elem.layer == generated_layer):
                 boundaries.extend(fb(elem.flat_copy()))
         shapely_polygons = []
         for b in boundaries:
             if b.transformation is not None:
                 tr_sh = b.shape.transform_copy(b.transformation)
-                tr_sh.snap_to_grid()  #otherwise Shapely numerical errors occur
+                tr_sh.snap_to_grid()  # otherwise Shapely numerical errors occur
                 p = Polygon(tr_sh.points)
             else:
                 sh = Shape(b.shape.points)
@@ -83,9 +98,11 @@ def __get_composite_shapely_polygon_for_elements_on_generated_layer__(
         return shapely_polygon
     elif isinstance(generated_layer, __GeneratedLayer_2Layer__):
         p1 = __get_composite_shapely_polygon_for_elements_on_generated_layer__(
-            elements, generated_layer.layer1)
+            elements, generated_layer.layer1
+        )
         p2 = __get_composite_shapely_polygon_for_elements_on_generated_layer__(
-            elements, generated_layer.layer2)
+            elements, generated_layer.layer2
+        )
         if isinstance(generated_layer, __GeneratedLayerAnd__):
             result_p = p1.intersection(p2)
         elif isinstance(generated_layer, __GeneratedLayerOr__):
@@ -94,8 +111,10 @@ def __get_composite_shapely_polygon_for_elements_on_generated_layer__(
             result_p = p1.symmetric_difference(p2)
         return result_p
     else:
-        raise Exception("Unexpected type for parameter 'generated_layer' : %s"
-                        % str(type(generated_layer)))
+        raise Exception(
+            "Unexpected type for parameter 'generated_layer' : %s"
+            % str(type(generated_layer))
+        )
 
 
 def get_elements_for_generated_layers(elements, mapping):
@@ -109,7 +128,8 @@ def get_elements_for_generated_layers(elements, mapping):
     process_processelems_dict = dict()
     for generated_layer, export_layer in zip(generated_layers, export_layers):
         shapely_geom = __get_composite_shapely_polygon_for_elements_on_generated_layer__(
-            elements=elements, generated_layer=generated_layer)
+            elements=elements, generated_layer=generated_layer
+        )
         for geom in flatten_shapely_geom(shapely_geom):
             shape = shapely_geom_to_shape(geom)
             elems += Boundary(layer=export_layer, shape=shape)

@@ -33,9 +33,9 @@ def vfabrication_for_gds(gds_file):
     L.visualize_structures_2d()
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     if len(sys.argv) > 1:
-        #To use of this script from command line: view_2d.py gds_file.gds
+        # To use of this script from command line: view_2d.py gds_file.gds
         vfabrication_for_gds(sys.argv[1])
     else:
         vfabrication_for_gds("my_file.gds")

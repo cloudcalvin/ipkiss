@@ -28,11 +28,13 @@ __all__ = ["ShapeBezier"]
 
 class ShapeBezier(__ShapeModifier__):
     """ polynomial bezier curve based on a shape with control points """
+
     steps = IntProperty(restriction=RESTRICT_POSITIVE, default=100)
 
     def __init__(self, original_shape, steps=100, **kwargs):
         super(ShapeBezier, self).__init__(
-            original_shape=original_shape, steps=steps, **kwargs)
+            original_shape=original_shape, steps=steps, **kwargs
+        )
 
     def define_points(self, pts):
         # perform decasteljau iteration

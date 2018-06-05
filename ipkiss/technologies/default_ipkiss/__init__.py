@@ -33,10 +33,12 @@ class TechAdminTree(DelayedInitTechnologyTree):
 
     def initialize(self):
         from ipkiss.primitives import name_generator
+
         self.NAME_GENERATOR = name_generator.CounterNameGenerator(
             prefix_attribute="__name_prefix__",
             counter_zero=0,
-            default_prefix="STRUCTURE")
+            default_prefix="STRUCTURE",
+        )
 
 
 TECH.ADMIN = TechAdminTree()
@@ -63,20 +65,24 @@ class TechGdsiiTree(DelayedInitTechnologyTree):
         from ipkiss.io.gds_layer import AutoGdsiiLayerOutputMap, AutoGdsiiLayerInputMap
         from ipkiss.io.gds_layer import AutoGdsiiLayerOutputMap
 
-        #if not hasattr(self, "EXPORT_LAYER_MAP"):
+        # if not hasattr(self, "EXPORT_LAYER_MAP"):
         if not "EXPORT_LAYER_MAP" in list(self.keys()):
             self.EXPORT_LAYER_MAP = AutoGdsiiLayerOutputMap()
-            self.overwrite_allowed.append('EXPORT_LAYER_MAP')
+            self.overwrite_allowed.append("EXPORT_LAYER_MAP")
         if not "IMPORT_LAYER_MAP" in list(self.keys()):
             self.IMPORT_LAYER_MAP = AutoGdsiiLayerInputMap()
-            self.overwrite_allowed.append('IMPORT_LAYER_MAP')
+            self.overwrite_allowed.append("IMPORT_LAYER_MAP")
 
         if not "FILTER" in list(self.keys()):
             from ipkiss.primitives.filters.path_cut_filter import PathCutFilter
             from ipkiss.primitives.filters.empty_filter import EmptyFilter
-            from ipkiss.primitives.filters.path_to_boundary_filter import PathToBoundaryFilter
+            from ipkiss.primitives.filters.path_to_boundary_filter import (
+                PathToBoundaryFilter
+            )
             from ipkiss.primitives.filters.boundary_cut_filter import BoundaryCutFilter
-            from ipkiss.primitives.filters.name_scramble_filter import NameScrambleFilter
+            from ipkiss.primitives.filters.name_scramble_filter import (
+                NameScrambleFilter
+            )
             from ipkiss.primitives.filters.layer_filter import LayerFilterDelete
             from ipkiss.primitives.filter import ToggledCompoundFilter
 
@@ -85,24 +91,26 @@ class TechGdsiiTree(DelayedInitTechnologyTree):
                 name="cut_path",
                 max_path_length=TECH.GDSII.MAX_COORDINATES,
                 grids_per_unit=int(TECH.METRICS.UNIT / TECH.METRICS.GRID),
-                overlap=1)
+                overlap=1,
+            )
             f += PathToBoundaryFilter(name="path_to_boundary")
             f += BoundaryCutFilter(
-                name="cut_boundary",
-                max_vertex_count=TECH.GDSII.MAX_VERTEX_COUNT)
+                name="cut_boundary", max_vertex_count=TECH.GDSII.MAX_VERTEX_COUNT
+            )
             f += EmptyFilter(name="write_empty")
             f["write_empty"] = False
             self.FILTER = f
 
-            self.overwrite_allowed.append('FILTER')
+            self.overwrite_allowed.append("FILTER")
 
             self.NAME_FILTER = NameScrambleFilter(
-                max_name_length=TECH.GDSII.MAX_NAME_LENGTH, scramble_all=False)
-            self.overwrite_allowed.append('NAME_FILTER')
+                max_name_length=TECH.GDSII.MAX_NAME_LENGTH, scramble_all=False
+            )
+            self.overwrite_allowed.append("NAME_FILTER")
 
 
 TECH.GDSII = TechGdsiiTree()
-#TECH.GDSII.FILTERS = TechGdsiiFilterTree()
+# TECH.GDSII.FILTERS = TechGdsiiFilterTree()
 TECH.GDSII.MAX_COORDINATES = 200
 TECH.GDSII.MAX_PATH_LENGTH = 100
 TECH.GDSII.MAX_VERTEX_COUNT = 4000
@@ -112,7 +120,7 @@ TECH.GDSII.MAX_NAME_LENGTH = 255
 # GDSII EXPORT FLAGS
 ####################################################################
 
-#TECH.GDSII.PATHS_TO_BOUNDARIES_FILTER = True
-#TECH.GDSII.CUT_PATHS_FILTER = True
-#TECH.GDSII.CUT_BOUNDARIES_FILTER = True
-#TECH.GDSII.WRITE_EMPTY = False
+# TECH.GDSII.PATHS_TO_BOUNDARIES_FILTER = True
+# TECH.GDSII.CUT_PATHS_FILTER = True
+# TECH.GDSII.CUT_BOUNDARIES_FILTER = True
+# TECH.GDSII.WRITE_EMPTY = False

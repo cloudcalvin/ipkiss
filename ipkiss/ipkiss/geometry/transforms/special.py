@@ -38,10 +38,10 @@ class __SpecialNoDistortTransform__(BASE):
     rotation = ConvertProperty(BASE, "rotation", __make_simple__)
     magnification = ConvertProperty(BASE, "magnification", __make_simple__)
     v_mirror = ConvertProperty(BASE, "v_mirror", __make_simple__)
-    absolute_magnification = ConvertProperty(BASE, "absolute_magnification",
-                                             __make_simple__)
-    absolute_rotation = ConvertProperty(BASE, "absolute_rotation",
-                                        __make_simple__)
+    absolute_magnification = ConvertProperty(
+        BASE, "absolute_magnification", __make_simple__
+    )
+    absolute_rotation = ConvertProperty(BASE, "absolute_rotation", __make_simple__)
 
     def __isub__(self, other):
         """ concatenates reverse of other to this transformation """

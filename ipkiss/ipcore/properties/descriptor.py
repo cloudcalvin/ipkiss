@@ -46,13 +46,14 @@ __all__ = [
     "IndirectProperty",
     "ReadOnlyIndirectProperty",
     "ConvertProperty",
-    "LockedProperty"
+    "LockedProperty",
 ]
 
 
-#---------------------------------- BASE CLASS ---------------------------------------
+# ---------------------------------- BASE CLASS ---------------------------------------
 class __BasePropertyDescriptor__(object):
     """ base class for property descriptors """
+
     __allowed_keyword_arguments__ = ["required"]
 
     def __init__(self, **kwargs):
@@ -69,7 +70,8 @@ class __BasePropertyDescriptor__(object):
                 object.__setattr__(self, k, v)
             else:
                 raise IpcorePropertyDescriptorException(
-                    "Argument '%s' is not valid for %s" % (k, self))
+                    "Argument '%s' is not valid for %s" % (k, self)
+                )
 
     def bind_to_class(self, cls, name):
         pass
@@ -78,7 +80,7 @@ class __BasePropertyDescriptor__(object):
         return True
 
 
-#------------------------------------------ CATEGORY 1 : RESTRICTED PROPERTIES --------------------
+# ------------------------------------------ CATEGORY 1 : RESTRICTED PROPERTIES --------------------
 
 SET_EXTERNALLY = 0
 CACHED = 1
@@ -86,8 +88,13 @@ CACHED = 1
 
 class DefinitionProperty(__BasePropertyDescriptor__):
     __allowed_keyword_arguments__ = [
-        "required", "default", "locked", "preprocess", "allow_none",
-        "fdef_name", "restriction"
+        "required",
+        "default",
+        "locked",
+        "preprocess",
+        "allow_none",
+        "fdef_name",
+        "restriction",
     ]
 
     def __init__(self, internal_member_name=None, **kwargs):
@@ -99,23 +106,24 @@ class DefinitionProperty(__BasePropertyDescriptor__):
         self.preprocess = PropertyProcessor()
         self.restriction = RestrictNothing()
         __BasePropertyDescriptor__.__init__(
-            self, **kwargs)  #FIXME: why set the arguments before valiate it?
-        if ("fdef_name" not in kwargs):
-            if ("default" not in kwargs):
-                if ((("allow_none" not in kwargs) or
-                     (not kwargs["allow_none"])) and
-                    (("required" in kwargs) and (not kwargs["required"]))):
+            self, **kwargs
+        )  # FIXME: why set the arguments before valiate it?
+        if "fdef_name" not in kwargs:
+            if "default" not in kwargs:
+                if (("allow_none" not in kwargs) or (not kwargs["allow_none"])) and (
+                    ("required" in kwargs) and (not kwargs["required"])
+                ):
                     raise IpcorePropertyDescriptorException(
                         "Property is specified as required='False', but should then have either a 'default' OR an 'fdef_name' OR be set to 'allow_none'"
                     )
             else:
-                if (("required" in kwargs) and (kwargs["required"])):
+                if ("required" in kwargs) and (kwargs["required"]):
                     raise IpcorePropertyDescriptorException(
                         "Property is specified as both required='True' and having a default : this is not allowed !"
                     )
             self.fdef_name = None
         else:
-            if ("default" in kwargs):
+            if "default" in kwargs:
                 raise IpcorePropertyDescriptorException(
                     "Property has both a 'default' specified and an 'fdef_name' : this is not allowed !"
                 )
@@ -126,29 +134,30 @@ class DefinitionProperty(__BasePropertyDescriptor__):
 
     def __get_default__(self):
         import inspect
+
         if inspect.isroutine(self.default):
             return self.default()
         else:
             return self.default
 
     def __externally_set_property_value_on_object__(
-            self, obj,
-            value):  # FIXME : add subscribe new value / unsubscribe old value
+        self, obj, value
+    ):  # FIXME : add subscribe new value / unsubscribe old value
         clear_cached_values_in_store = True
         if self.__value_was_stored__(obj):
             old_value = obj.__store__[self.__name__][0]
             try:
-                clear_cached_values_in_store = (
-                    type(old_value) != type(value)) or (old_value != value)
+                clear_cached_values_in_store = (type(old_value) != type(value)) or (
+                    old_value != value
+                )
                 if type(clear_cached_values_in_store) == ndarray:
-                    clear_cached_values_in_store = clear_cached_values_in_store.all(
-                    )
+                    clear_cached_values_in_store = clear_cached_values_in_store.all()
             except ValueError as e:  # precaution... if exceptionally this would occur because the comparison between old_value and value cannot be done, then clear caches anyway...
                 clear_cached_values_in_store = True
         obj.__store__[self.__name__] = (value, SET_EXTERNALLY)
         if not (obj.flag_busy_initializing):
             obj.__do_validation__()
-            if (clear_cached_values_in_store):
+            if clear_cached_values_in_store:
                 obj.__clear_cached_values_in_store__()
 
     def __get_property_value_origin__(self, obj):
@@ -159,39 +168,45 @@ class DefinitionProperty(__BasePropertyDescriptor__):
         return obj.__store__[self.__name__][0]
 
     def __value_was_stored__(self, obj):
-        return (self.__name__ in obj.__store__)
+        return self.__name__ in obj.__store__
 
     def __get__(self, obj, type=None):
-        '''Check if a value was set by the user : in that case, return the value, otherwise invoke the getter function to retrieve the value'''
+        """Check if a value was set by the user : in that case, return the value, otherwise invoke the getter function to retrieve the value"""
         if obj is None:
             return self
-        #check if a value was set by the user
+        # check if a value was set by the user
         if not self.__value_was_stored__(obj):
-            #no value was set in the store by the user, return the value calculated by the getter-function
-            #if there a getter-method ?
+            # no value was set in the store by the user, return the value calculated by the getter-function
+            # if there a getter-method ?
             f = self.__get_getter_function__(obj)
             if f is None:
-                #is there a default ?
+                # is there a default ?
                 if hasattr(self, "default"):
                     value = self.preprocess(self.__get_default__(), obj)
                 else:
-                    #no default and no getter method
+                    # no default and no getter method
                     value = None
             else:
-                #there is a getter method and no locally stored value
-                value = self.__call_getter_function__(obj)  #FIXME: use f
-            #check if the value is compatible with the property's restriction
+                # there is a getter method and no locally stored value
+                value = self.__call_getter_function__(obj)  # FIXME: use f
+            # check if the value is compatible with the property's restriction
             if not self.restriction(value, obj):
                 if value is None:
                     if not self.allow_none:
                         raise IpcorePropertyDescriptorException(
-                            "Cannot set property '%s' of '%s' to None." %
-                            (self.name, obj.__class__.__name__))
+                            "Cannot set property '%s' of '%s' to None."
+                            % (self.name, obj.__class__.__name__)
+                        )
                 else:
                     raise IpcorePropertyDescriptorException(
                         "Cannot set value '%s' to property '%s' of '%s' because it is incompatible with the restriction %s of the property."
-                        % (str(value), self.name, obj.__class__.__name__,
-                           str(self.restriction)))
+                        % (
+                            str(value),
+                            self.name,
+                            obj.__class__.__name__,
+                            str(self.restriction),
+                        )
+                    )
             return value
         else:
             stored_value = self.__get_property_value_of_object__(obj)
@@ -200,7 +215,8 @@ class DefinitionProperty(__BasePropertyDescriptor__):
     def __get_getter_function__(self, obj):
         if self.fdef_name is None:
             if hasattr(self, "autogenerated_fdef_name") and hasattr(
-                    obj, self.autogenerated_fdef_name):
+                obj, self.autogenerated_fdef_name
+            ):
                 result = getattr(obj, self.autogenerated_fdef_name)
                 return result
             else:
@@ -215,11 +231,11 @@ class DefinitionProperty(__BasePropertyDescriptor__):
         else:
             raise IpcorePropertyDescriptorException(
                 "Invalid assignment for Property '%s' of '%s' with value %s: not compatible with restriction %s."
-                % (self.name, obj.__class__.__name__, str(value),
-                   str(self.restriction)))
+                % (self.name, obj.__class__.__name__, str(value), str(self.restriction))
+            )
 
     def __cache_property_value_on_object__(self, obj, value):
-        if type(obj) != NoneType:  #FIXME: ???
+        if type(obj) != NoneType:  # FIXME: ???
             new_value = self.preprocess(value, obj)
             self.__check_restriction__(obj, new_value)
             obj.__store__[self.__name__] = (new_value, CACHED)
@@ -236,19 +252,22 @@ class DefinitionProperty(__BasePropertyDescriptor__):
     def __set__(self, obj, value):
         if self.locked:
             raise IpcorePropertyDescriptorException(
-                "Cannot assign to locked property '%s' of '%s'" %
-                (self.name, type(obj).__name__))
+                "Cannot assign to locked property '%s' of '%s'"
+                % (self.name, type(obj).__name__)
+            )
         if self.preprocess is not None:
             try:
                 new_value = self.preprocess(value, obj)
             except ProcessorException as e:
                 LOG.info(
                     "RestrictedProperty::__set__ : an error was raised on self.preprocess : %s"
-                    % str(e))
+                    % str(e)
+                )
                 if (value is None) and not self.allow_none:
                     raise IpcorePropertyDescriptorException(
                         "Invalid assignment for property '%s' of '%s' with value %s"
-                        % (self.name, type(obj).__name__, str(value)))
+                        % (self.name, type(obj).__name__, str(value))
+                    )
                 new_value = value
         else:
             new_value = value
@@ -264,26 +283,30 @@ class DefinitionProperty(__BasePropertyDescriptor__):
         # autogenerate the name of the fdef-function if it was not set
         if self.fdef_name is None:
             self.autogenerated_fdef_name = "define_" + name
-        #derive "required" automatically
+        # derive "required" automatically
         if (not hasattr(self, "default")) and (
-            (self.fdef_name is None) and
-            (not hasattr(host_cls, self.autogenerated_fdef_name))):
+            (self.fdef_name is None)
+            and (not hasattr(host_cls, self.autogenerated_fdef_name))
+        ):
             if (not hasattr(self, "allow_none")) or (not self.allow_none):
-                if (not self.locked):
+                if not self.locked:
                     self.required = True
-        if hasattr(self, "default") and (self.default is None) and (
-                not hasattr(self, "allow_none") or not self.allow_none):
+        if (
+            hasattr(self, "default")
+            and (self.default is None)
+            and (not hasattr(self, "allow_none") or not self.allow_none)
+        ):
             self.allow_none = True
 
 
 class ListDefinitionProperty(DefinitionProperty):
-    def __init__(self,
-                 internal_member_name=None,
-                 allowed_types=(object, ),
-                 **kwargs):
+    def __init__(self, internal_member_name=None, allowed_types=(object,), **kwargs):
         self.restriction = RestrictTypeList(allowed_types=allowed_types)
-        if not ("required" in kwargs) and not ("fdef_name" in kwargs) and not (
-                "default" in kwargs):
+        if (
+            not ("required" in kwargs)
+            and not ("fdef_name" in kwargs)
+            and not ("default" in kwargs)
+        ):
             kwargs["default"] = []
         if internal_member_name is not None:
             kwargs["internal_member_name"] = internal_member_name
@@ -292,7 +315,7 @@ class ListDefinitionProperty(DefinitionProperty):
     def __get__(self, obj, type=None):
         if obj is None:
             return self
-        if (self.__value_was_stored__(obj)):
+        if self.__value_was_stored__(obj):
             value = self.__get_property_value_of_object__(obj)
         else:
             value = self.__call_getter_function__(obj)
@@ -306,20 +329,20 @@ class PropertyDescriptor(DefinitionProperty):
 
 class RestrictedProperty(PropertyDescriptor):
     pass
-    #now just a placeholder for backwards compatibility
+    # now just a placeholder for backwards compatibility
 
 
 class RestrictedListProperty(ListDefinitionProperty):
     pass
-    #now just a placeholder for backwards compatibility
+    # now just a placeholder for backwards compatibility
 
 
 class ListPropertyDescriptor(ListDefinitionProperty):
     pass
-    #now just a placeholder for backwards compatibility
+    # now just a placeholder for backwards compatibility
 
 
-#---------------------------------- CATEGORY 2 : FUNCTION-PROPERTIES ---------------------------------------
+# ---------------------------------- CATEGORY 2 : FUNCTION-PROPERTIES ---------------------------------------
 
 
 class FunctionProperty(__BasePropertyDescriptor__):
@@ -348,8 +371,9 @@ class FunctionProperty(__BasePropertyDescriptor__):
             return self.fset(obj, value)
         else:
             raise IpcorePropertyDescriptorException(
-                "Cannot assign to readonly FunctionProperty %s of '%s'" %
-                (self.__name__, type(obj).__name__))
+                "Cannot assign to readonly FunctionProperty %s of '%s'"
+                % (self.__name__, type(obj).__name__)
+            )
 
 
 class FunctionNameProperty(__BasePropertyDescriptor__):
@@ -379,8 +403,9 @@ class FunctionNameProperty(__BasePropertyDescriptor__):
             return getattr(obj, self.fset_name)(value)
         else:
             raise IpcorePropertyDescriptorException(
-                "Cannot assign to readonly FunctionProperty %s of '%s'" %
-                (self.__name__, type(obj).__name__))
+                "Cannot assign to readonly FunctionProperty %s of '%s'"
+                % (self.__name__, type(obj).__name__)
+            )
 
 
 class SetFunctionProperty(__BasePropertyDescriptor__):
@@ -388,9 +413,7 @@ class SetFunctionProperty(__BasePropertyDescriptor__):
     but it is stored in a known attribute, so a get method
     need not be specified. A restriction can be specified."""
 
-    __allowed_keyword_arguments__ = [
-        "required", "default", "preprocess", "restriction"
-    ]
+    __allowed_keyword_arguments__ = ["required", "default", "preprocess", "restriction"]
 
     def __init__(self, internal_member_name, fset, **kwargs):
         self.fset = fset
@@ -407,6 +430,7 @@ class SetFunctionProperty(__BasePropertyDescriptor__):
 
     def __get_default__(self):
         import inspect
+
         if inspect.isroutine(self.default):
             return self.default()
         else:
@@ -415,7 +439,7 @@ class SetFunctionProperty(__BasePropertyDescriptor__):
     def __get__(self, obj, type=None):
         if obj is None:
             return self
-        if (self.__name__ in obj.__dict__):
+        if self.__name__ in obj.__dict__:
             return obj.__dict__[self.__name__]
         else:
             if hasattr(self, "default"):
@@ -428,8 +452,10 @@ class SetFunctionProperty(__BasePropertyDescriptor__):
                 return None
             else:
                 raise IpcorePropertyDescriptorException(
-                    "Attribute '%s' of '%s' is not set, and no default value is specified" (
-                        self.name, obj))
+                    "Attribute '%s' of '%s' is not set, and no default value is specified"(
+                        self.name, obj
+                    )
+                )
 
     def __set__(self, obj, value):
         new_value = self.preprocess(value, obj)
@@ -437,8 +463,9 @@ class SetFunctionProperty(__BasePropertyDescriptor__):
             return self.fset(obj, self.preprocess(value, obj))
         else:
             raise IpcoreRestrictionException(
-                "%s does not match restriction %s in property %s" %
-                (value, self.restriction, self.__name__))
+                "%s does not match restriction %s in property %s"
+                % (value, self.restriction, self.__name__)
+            )
 
     def bind_to_class(self, cls, name):
         self.name = name
@@ -446,7 +473,7 @@ class SetFunctionProperty(__BasePropertyDescriptor__):
             self.__name__ = "__prop_%s__" % name
 
 
-#---------------------------------- CATEGORY 3 : INDIRECT PROPERTIES ---------------------------------------
+# ---------------------------------- CATEGORY 3 : INDIRECT PROPERTIES ---------------------------------------
 
 
 class IndirectProperty(__BasePropertyDescriptor__):
@@ -465,8 +492,7 @@ class IndirectProperty(__BasePropertyDescriptor__):
         return eval("obj.%s.%s" % (self.attribute_name, self.property_name))
 
     def __set__(self, obj, value):
-        return getattr(obj, self.attribute_name).__setattr__(
-            self.property_name, value)
+        return getattr(obj, self.attribute_name).__setattr__(self.property_name, value)
 
     def bind_to_class(self, cls, name):
         self.name = name
@@ -475,23 +501,23 @@ class IndirectProperty(__BasePropertyDescriptor__):
 
 class ReadOnlyIndirectProperty(IndirectProperty):
     """ property that gives access to properties of an attribute of the object """
+
     __allowed_keyword_arguments__ = ["preprocess"]
 
     def __init__(self, attribute_name, property_name=None, **kwargs):
         IndirectProperty.__init__(
-            self,
-            attribute_name=attribute_name,
-            property_name=property_name,
-            **kwargs)
+            self, attribute_name=attribute_name, property_name=property_name, **kwargs
+        )
         self.locked = True
 
     def __set__(self, obj, value):
         raise IpcorePropertyDescriptorException(
-            "Cannot assign to a read_only IndirectProperty of '%s'" %
-            (type(obj).__name__))
+            "Cannot assign to a read_only IndirectProperty of '%s'"
+            % (type(obj).__name__)
+        )
 
 
-#----------------------------------- CATEGORY 4 : CONVERT PROPERTY-----------------------------------
+# ----------------------------------- CATEGORY 4 : CONVERT PROPERTY-----------------------------------
 
 
 class ConvertProperty(__BasePropertyDescriptor__):
@@ -517,6 +543,7 @@ class ConvertProperty(__BasePropertyDescriptor__):
 
     def bind_to_class(self, cls, name):
         import inspect
+
         self.name = name
         if None == self.parent_property_name:
             self.parent_property_name = name
@@ -533,12 +560,14 @@ class ConvertProperty(__BasePropertyDescriptor__):
             if not found:
                 raise IpcorePropertyDescriptorException(
                     "DefinitionProperty '%s' of '%s' should have a matching property in a parent class."
-                    % (name, cls))
+                    % (name, cls)
+                )
         self.parent_property = object.__getattribute__(
-            self.parent_class, self.parent_property_name)
+            self.parent_class, self.parent_property_name
+        )
 
 
-#---------------------------------------- CATEGORY 5 : LOCKED PROPERTY --------------------------------------
+# ---------------------------------------- CATEGORY 5 : LOCKED PROPERTY --------------------------------------
 
 
 class LockedProperty(DefinitionProperty):
@@ -552,5 +581,6 @@ class LockedProperty(DefinitionProperty):
 
     def __set__(self, obj, value):
         raise IpcorePropertyDescriptorException(
-            "Cannot assign to locked property '%s' of '%s'" %
-            (self.name, type(obj).__name__))
+            "Cannot assign to locked property '%s' of '%s'"
+            % (self.name, type(obj).__name__)
+        )

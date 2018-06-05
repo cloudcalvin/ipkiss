@@ -29,12 +29,13 @@ TECHNOLOGY = TechnologyLibrary("EMPTY_TECHNOLOGY")
 
 def get_technology():
     global TECHNOLOGY
-    if (TECHNOLOGY.name == "EMPTY_TECHNOLOGY"):
+    if TECHNOLOGY.name == "EMPTY_TECHNOLOGY":
         initialize_default()
     return TECHNOLOGY
 
 
 def initialize_default():
     from technologies import default_ipkiss
+
     # this loads the default technology
     return

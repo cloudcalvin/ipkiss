@@ -45,14 +45,10 @@ class RingLoadedMZI(Structure):
         # simplified here: placement should be done based on their
 
         # size_info objects: information about the footprint of the object
-        si_splitter = self.splitter.size_info(
-        )  # object with contours of the component
-        si_combiner = self.combiner.size_info(
-        )  # object with contours of the component
-        si_ring1 = self.ring1.size_info(
-        )  # object with contours of the component
-        si_ring2 = self.ring2.size_info(
-        )  # object with contours of the component
+        si_splitter = self.splitter.size_info()  # object with contours of the component
+        si_combiner = self.combiner.size_info()  # object with contours of the component
+        si_ring1 = self.ring1.size_info()  # object with contours of the component
+        si_ring2 = self.ring2.size_info()  # object with contours of the component
 
         si_dircoups = si_splitter + si_combiner  # union of contours
 
@@ -63,19 +59,25 @@ class RingLoadedMZI(Structure):
         t_splitter = IdentityTransform()  # place the splitter in (0,0)
 
         # ring1
-        t_ring1 = Translation((si_splitter.east - si_ring1.west + spacing,
-                               si_dircoups.north - si_ring1.south + spacing))
+        t_ring1 = Translation(
+            (
+                si_splitter.east - si_ring1.west + spacing,
+                si_dircoups.north - si_ring1.south + spacing,
+            )
+        )
 
         # ring2
         t_ring2 = VMirror() + Translation(
-            (si_splitter.east - si_ring2.west + spacing,
-             si_dircoups.south + si_ring2.south - spacing))
+            (
+                si_splitter.east - si_ring2.west + spacing,
+                si_dircoups.south + si_ring2.south - spacing,
+            )
+        )
 
         si_rings = si_ring1.transform(t_ring1) + si_ring2.transform(t_ring2)
 
         # combiner
-        t_combiner = Translation((si_rings.east - si_combiner.west + spacing,
-                                  0.0))
+        t_combiner = Translation((si_rings.east - si_combiner.west + spacing, 0.0))
 
         return (t_ring1, t_ring2, t_splitter, t_combiner)
 
@@ -84,18 +86,23 @@ class RingLoadedMZI(Structure):
         # using automatic routing functions
         t_ring1, t_ring2, t_splitter, t_combiner = self.get_transformations()
         from ipkiss.plugins.photonics.routing.manhattan import RouteManhattan
+
         r1 = RouteManhattan(
             input_port=self.splitter.ports.transform_copy(t_splitter)["E1"],
-            output_port=self.ring1.ports.transform_copy(t_ring1)["W0"])
+            output_port=self.ring1.ports.transform_copy(t_ring1)["W0"],
+        )
         r2 = RouteManhattan(
             input_port=self.splitter.ports.transform_copy(t_splitter)["E0"],
-            output_port=self.ring2.ports.transform_copy(t_ring2)["W0"])
+            output_port=self.ring2.ports.transform_copy(t_ring2)["W0"],
+        )
         r3 = RouteManhattan(
             input_port=self.ring1.ports.transform_copy(t_ring1)["E0"],
-            output_port=self.combiner.ports.transform_copy(t_combiner)["W1"])
+            output_port=self.combiner.ports.transform_copy(t_combiner)["W1"],
+        )
         r4 = RouteManhattan(
             input_port=self.ring2.ports.transform_copy(t_ring2)["E0"],
-            output_port=self.combiner.ports.transform_copy(t_combiner)["W0"])
+            output_port=self.combiner.ports.transform_copy(t_combiner)["W0"],
+        )
 
         return [r1, r2, r3, r4]
 
@@ -111,6 +118,7 @@ class RingLoadedMZI(Structure):
 
         # add the routes
         from ipkiss.plugins.photonics.routing.connect import RouteConnectorRounded
+
         for r in self.get_routes():
             elems += RouteConnectorRounded(route=r)
         return elems

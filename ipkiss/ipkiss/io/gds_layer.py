@@ -30,8 +30,11 @@ from ipkiss.exceptions.exc import IpkissException
 GDSII_LAYER_CONVERSION_RADIX = 256
 
 __all__ = [
-    "GdsiiLayer", "GdsiiLayerInputMap", "GdsiiLayerOutputMap",
-    "AutoGdsiiLayerOutputMap", "AutoGdsiiLayerInputMap"
+    "GdsiiLayer",
+    "GdsiiLayerInputMap",
+    "GdsiiLayerOutputMap",
+    "AutoGdsiiLayerOutputMap",
+    "AutoGdsiiLayerInputMap",
 ]
 
 
@@ -40,14 +43,13 @@ class GdsiiLayer(StrongPropertyInitializer):
     datatype = IntProperty(default=0, restriction=RESTRICT_NONNEGATIVE)
 
     def __init__(self, number, datatype=0, **kwargs):
-        super(GdsiiLayer, self).__init__(
-            number=number, datatype=datatype, **kwargs)
+        super(GdsiiLayer, self).__init__(number=number, datatype=datatype, **kwargs)
 
     def __eq__(self, other):
         return self.number == other.number and self.datatype == other.datatype
 
     def __ne__(self, other):
-        return (not self.__eq__(other))
+        return not self.__eq__(other)
 
     def __repr__(self):
         return "GdsiiLayer %i/%i" % (self.number, self.datatype)
@@ -60,8 +62,7 @@ class GdsiiLayerOutputMap(StrongPropertyInitializer):
     )  # map with keys of type "Layer" and values of type "GdsiiLayer"
 
     def __init__(self, layer_map, **kwargs):
-        super(GdsiiLayerOutputMap, self).__init__(
-            layer_map=layer_map, **kwargs)
+        super(GdsiiLayerOutputMap, self).__init__(layer_map=layer_map, **kwargs)
         # check if the input map doesn't contain any duplicates on the "source side" (duplicates may exist on the target size)
         ln = []
         for L in list(self.layer_map.keys()):
@@ -73,10 +74,11 @@ class GdsiiLayerOutputMap(StrongPropertyInitializer):
 
     def __getitem__(self, layer):
         for key, value in list(self.layer_map.items()):
-            if (layer == key):
+            if layer == key:
                 return value
         raise IpkissException(
-            "GdsiiLayerOutputMap::No valid mapping found for layer %s" % layer)
+            "GdsiiLayerOutputMap::No valid mapping found for layer %s" % layer
+        )
 
     def get(self, key, default):
         return self[key]
@@ -86,13 +88,16 @@ class AutoGdsiiLayerOutputMap(StrongPropertyInitializer):
     def __getitem__(self, key):
         return GdsiiLayer(
             number=key.number % GDSII_LAYER_CONVERSION_RADIX,
-            datatype=key.number / GDSII_LAYER_CONVERSION_RADIX)
+            datatype=key.number / GDSII_LAYER_CONVERSION_RADIX,
+        )
 
     def get(self, key, default):
         return self[key]
 
 
-__AutoGdsiiLayerOutputMap__ = AutoGdsiiLayerOutputMap  #DEPRECATED - for backwards compatibility
+__AutoGdsiiLayerOutputMap__ = (
+    AutoGdsiiLayerOutputMap
+)  # DEPRECATED - for backwards compatibility
 
 
 class AutoGdsiiLayerInputMap(StrongPropertyInitializer):
@@ -103,7 +108,8 @@ class AutoGdsiiLayerInputMap(StrongPropertyInitializer):
     def __getitem__(self, key):
         return Layer(
             name=self.__make_layer_name__(key),
-            number=key.number + GDSII_LAYER_CONVERSION_RADIX * key.datatype)
+            number=key.number + GDSII_LAYER_CONVERSION_RADIX * key.datatype,
+        )
 
     def get(self, key, default):
         try:
@@ -112,9 +118,11 @@ class AutoGdsiiLayerInputMap(StrongPropertyInitializer):
             return default
 
 
-__AutoGdsiiLayerInputMap__ = AutoGdsiiLayerInputMap  # DEPRECATED - for backwards compatibility
+__AutoGdsiiLayerInputMap__ = (
+    AutoGdsiiLayerInputMap
+)  # DEPRECATED - for backwards compatibility
 
-#---------------------------------------------------------------------------------
+# ---------------------------------------------------------------------------------
 
 
 class GdsiiLayerInputMap(StrongPropertyInitializer):

@@ -24,7 +24,7 @@ import inspect
 from pysimul.exc import *
 import hashlib
 
-__all__ = ['SimulationParameterContainer']
+__all__ = ["SimulationParameterContainer"]
 
 
 class SimulationParameterContainer(StrongPropertyInitializer):
@@ -37,20 +37,23 @@ class SimulationParameterContainer(StrongPropertyInitializer):
         obj.__assign_properties__(kwargs_to_assign)
 
     def __init__(self, **kwargs):
-        #if a keyword argument 'simul_params' is provided, then expand it into a list of keyword arguments and join it with the current keyword arguments
-        if 'simul_params' in kwargs:
-            p = kwargs['simul_params']
+        # if a keyword argument 'simul_params' is provided, then expand it into a list of keyword arguments and join it with the current keyword arguments
+        if "simul_params" in kwargs:
+            p = kwargs["simul_params"]
             if "component" in p:
                 p["structure"] = p["component"]
                 del p["component"]
                 from pysimul.log import PYSIMUL_LOG as LOG
+
                 LOG.deprecation_warning(
                     "Please switch the name of simulation parameter 'component' to 'structure'.",
-                    3)
-            if (not isinstance(p, dict)):
+                    3,
+                )
+            if not isinstance(p, dict):
                 raise PythonSimulateException(
                     "Keyword argument 'simul_params' must be of type 'dict'. Current type is : '%'"
-                    % type(p))
+                    % type(p)
+                )
             props = self.__unlocked_properties__()
             for name, val in list(p.items()):
                 if isinstance(val, SimulationParameterContainer):
@@ -61,5 +64,5 @@ class SimulationParameterContainer(StrongPropertyInitializer):
                             self.__set_properties__(v, p)
                 if name in props:
                     kwargs[name] = val
-            del kwargs['simul_params']
+            del kwargs["simul_params"]
         super(SimulationParameterContainer, self).__init__(**kwargs)

@@ -38,7 +38,7 @@ class Translation(__SpecialNoDistortTransform__):
     def __init__(self, translation=(0.0, 0.0), **kwargs):
         super(Translation, self).__init__(translation=translation, **kwargs)
 
-    translation = getattr(NoDistortTransform, 'translation')
+    translation = getattr(NoDistortTransform, "translation")
 
     # overloading for efficiency
     def apply_to_coord(self, coord):
@@ -59,20 +59,27 @@ class Translation(__SpecialNoDistortTransform__):
 
     def __add__(self, other):
         """ returns the concatenation of this transform and other """
-        if other is None: return copy.deepcopy(self)
+        if other is None:
+            return copy.deepcopy(self)
         if isinstance(other, Translation):
             return Translation(
-                Coord2(self.translation.x + other.translation.x,
-                       self.translation[1] + other.translation[1]))
+                Coord2(
+                    self.translation.x + other.translation.x,
+                    self.translation[1] + other.translation[1],
+                )
+            )
         else:
             return __SpecialNoDistortTransform__.__add__(self, other)
 
     def __iadd__(self, other):
         """ concatenates other to this transform """
-        if other is None: return self
+        if other is None:
+            return self
         if isinstance(other, Translation):
-            self.translation = Coord2(self.translation.x + other.translation.x,
-                                      self.translation.y + other.translation.y)
+            self.translation = Coord2(
+                self.translation.x + other.translation.x,
+                self.translation.y + other.translation.y,
+            )
             return self
         else:
             return NoDistortTransform.__iadd__(self, other)
@@ -83,7 +90,7 @@ class Translation(__SpecialNoDistortTransform__):
 
     def is_identity(self):
         """ returns True if the transformation does nothing """
-        return ((self.translation.x == 0.0) and (self.translation.y == 0.0))
+        return (self.translation.x == 0.0) and (self.translation.y == 0.0)
 
 
 def shape_translate(shape, translation_vector=(1.0, 0.0)):
@@ -101,13 +108,21 @@ class __TranslationMixin__(object):
         return self.transform_copy(Translation(position))
 
     def move_polar(self, distance, angle):
-        return self.move((distance * math.cos(constants.DEG2RAD * angle),
-                          distance * math.sin(constants.DEG2RAD * angle)))
+        return self.move(
+            (
+                distance * math.cos(constants.DEG2RAD * angle),
+                distance * math.sin(constants.DEG2RAD * angle),
+            )
+        )
 
     def move_polar_copy(self, distance, angle):
         """moves copy of this object """
-        return self.move_copy((distance * math.cos(constants.DEG2RAD * angle),
-                               distance * math.sin(constants.DEG2RAD * angle)))
+        return self.move_copy(
+            (
+                distance * math.cos(constants.DEG2RAD * angle),
+                distance * math.sin(constants.DEG2RAD * angle),
+            )
+        )
 
     def translate(self, translation=(0.0, 0.0)):
         """translates this object """

@@ -28,10 +28,18 @@ import math
 import numpy
 
 __all__ = [
-    "Coord2", "Coord2Property", "Size2Property", "coord2_match_position",
-    "RESTRICT_COORD2", "RESTRICT_SIZE2", "Coord3", "Coord3Property",
-    "Size3Property", "coord3_match_position", "RESTRICT_COORD3",
-    "RESTRICT_SIZE3"
+    "Coord2",
+    "Coord2Property",
+    "Size2Property",
+    "coord2_match_position",
+    "RESTRICT_COORD2",
+    "RESTRICT_SIZE2",
+    "Coord3",
+    "Coord3Property",
+    "Size3Property",
+    "coord3_match_position",
+    "RESTRICT_COORD3",
+    "RESTRICT_SIZE3",
 ]
 
 
@@ -57,8 +65,10 @@ class Coord2(Coord):
             self.x, self.y = args[0][0], args[0][1]
 
     def __getitem__(self, index):
-        if index == 0: return self.x
-        if index == 1: return self.y
+        if index == 0:
+            return self.x
+        if index == 1:
+            return self.y
         raise IndexError("Coord2 type only supports index 0 and 1")
 
     def __setitem__(self, index, value):
@@ -92,10 +102,8 @@ class Coord2(Coord):
                :param position: displacement
                :type position: Coord2 or tuple
         """
-        self.x += position[
-            0]  # compatibility with tuples used for quick notation
-        self.y += position[
-            1]  # compatibility with tuples used for quick notation
+        self.x += position[0]  # compatibility with tuples used for quick notation
+        self.y += position[1]  # compatibility with tuples used for quick notation
         return self
 
     def move_copy(self, position):
@@ -109,6 +117,7 @@ class Coord2(Coord):
                 :type grids_per_unit: float
         """
         from .. import settings
+
         if grids_per_unit is None:
             grids_per_unit = settings.get_grids_per_unit()
         self.x = round(self.x * grids_per_unit) / grids_per_unit
@@ -119,16 +128,22 @@ class Coord2(Coord):
         return "(" + str(self.x) + "," + str(self.y) + ")"
 
     def __eq__(self, other):
-        return (other != None) and (abs(self[0] - other[0]) < 10e-10) and (
-            abs(self[1] - other[1]) < 10e-10)
+        return (
+            (other != None)
+            and (abs(self[0] - other[0]) < 10e-10)
+            and (abs(self[1] - other[1]) < 10e-10)
+        )
 
     def __ne__(self, other):
-        return (other == None) or (abs(self[0] - other[0]) > 10e-10) or (
-            abs(self[1] - other[1]) > 10e-10)
+        return (
+            (other == None)
+            or (abs(self[0] - other[0]) > 10e-10)
+            or (abs(self[1] - other[1]) > 10e-10)
+        )
 
     def distance(self, other):
         """  the distance to another coordinate """
-        return math.sqrt((other[0] - self.x)**2 + (other[1] - self.y)**2)
+        return math.sqrt((other[0] - self.x) ** 2 + (other[1] - self.y) ** 2)
 
     def angle_deg(self, other=(0.0, 0.0)):
         """ the angle with respect to another coordinate, in degrees """
@@ -175,7 +190,7 @@ class Coord2(Coord):
         return numpy.conj(self.x) * other[0] + numpy.conj(self.y) * other[1]
 
     def __abs__(self):
-        return math.sqrt(abs(self.x)**2 + abs(self.y)**2)
+        return math.sqrt(abs(self.x) ** 2 + abs(self.y) ** 2)
 
     def id_string(self):
         return "%d_%d" % (self.x * 1000, self.y * 1000)
@@ -188,32 +203,26 @@ RESTRICT_COORD2 = RestrictType(Coord2)
 RESTRICT_SIZE2 = RESTRICT_COORD2 & RestrictList(RESTRICT_NONNEGATIVE)
 
 
-def Coord2Property(internal_member_name=None,
-                   restriction=None,
-                   preprocess=None,
-                   **kwargs):
+def Coord2Property(
+    internal_member_name=None, restriction=None, preprocess=None, **kwargs
+):
     """ Coord2 property descriptor for a class """
     R = RESTRICT_COORD2 & restriction
     P = ProcessorTypeCast(Coord2) + preprocess
     return RestrictedProperty(
-        internal_member_name=internal_member_name,
-        restriction=R,
-        preprocess=P,
-        **kwargs)
+        internal_member_name=internal_member_name, restriction=R, preprocess=P, **kwargs
+    )
 
 
-def Size2Property(internal_member_name=None,
-                  restriction=None,
-                  preprocess=None,
-                  **kwargs):
+def Size2Property(
+    internal_member_name=None, restriction=None, preprocess=None, **kwargs
+):
     """ Coord2 based size descriptor for a class (non-negative values in both dimensions) """
     R = RESTRICT_SIZE2 & restriction
     P = ProcessorTypeCast(Coord2) + preprocess
     return RestrictedProperty(
-        internal_member_name=internal_member_name,
-        restriction=R,
-        preprocess=P,
-        **kwargs)
+        internal_member_name=internal_member_name, restriction=R, preprocess=P, **kwargs
+    )
 
 
 def coord2_match_position(P1, P2):
@@ -252,9 +261,12 @@ class Coord3(Coord):
                         self.z = 0
 
     def __getitem__(self, index):
-        if index == 0: return self.x
-        if index == 1: return self.y
-        if index == 2: return self.z
+        if index == 0:
+            return self.x
+        if index == 1:
+            return self.y
+        if index == 2:
+            return self.z
         raise IndexError("Coord3 type only supports index 0, 1 and 2")
 
     def __setitem__(self, index, value):
@@ -291,18 +303,14 @@ class Coord3(Coord):
                :param position: displacement
                :type position: Coord2 or tuple
         """
-        self.x += position[
-            0]  # compatibility with tuples used for quick notation
-        self.y += position[
-            1]  # compatibility with tuples used for quick notation
-        self.z += position[
-            2]  # compatibility with tuples used for quick notation
+        self.x += position[0]  # compatibility with tuples used for quick notation
+        self.y += position[1]  # compatibility with tuples used for quick notation
+        self.z += position[2]  # compatibility with tuples used for quick notation
         return self
 
     def move_copy(self, position):
         """ return a moved copy of the coordinate """
-        return Coord3(self.x + position[0], self.y + position[1],
-                      self.z + position[2])
+        return Coord3(self.x + position[0], self.y + position[1], self.z + position[2])
 
     def snap_to_grid(self, grids_per_unit=None):
         """ snap the coordinate to the given or current grid
@@ -311,6 +319,7 @@ class Coord3(Coord):
                 :type grids_per_unit: float
         """
         from .. import settings
+
         if grids_per_unit is None:
             grids_per_unit = settings.get_grids_per_unit()
         self.x = round(self.x * grids_per_unit) / grids_per_unit
@@ -322,19 +331,22 @@ class Coord3(Coord):
         return "(%f, %f, %f)" % (self.x, self.y, self.z)
 
     def __eq__(self, other):
-        return not (other is None) and ((self[0] == other[0]) and
-                                        (self[1] == other[1]) and
-                                        (self[2] == other[2]))
+        return not (other is None) and (
+            (self[0] == other[0]) and (self[1] == other[1]) and (self[2] == other[2])
+        )
 
     def __ne__(self, other):
-        return (other is None) or ((self[0] != other[0]) or
-                                   (self[1] != other[1]) or
-                                   (self[2] != other[2]))
+        return (other is None) or (
+            (self[0] != other[0]) or (self[1] != other[1]) or (self[2] != other[2])
+        )
 
     def distance(self, other):
         """ the distance to another coordinate """
-        return math.sqrt((other[0] - self.x)**2 + (other[1] - self.y)**2 +
-                         (other[2] - self.z)**2)
+        return math.sqrt(
+            (other[0] - self.x) ** 2
+            + (other[1] - self.y) ** 2
+            + (other[2] - self.z) ** 2
+        )
 
     def __iadd__(self, other):
         self.x += other[0]
@@ -371,17 +383,22 @@ class Coord3(Coord):
 
     def dot(self, other):
         """ dot product of two coordinates """
-        return numpy.conj(self.x) * other[0] + numpy.conj(
-            self.y) * other[1] + numpy.conj(self.z) * other[2]
+        return (
+            numpy.conj(self.x) * other[0]
+            + numpy.conj(self.y) * other[1]
+            + numpy.conj(self.z) * other[2]
+        )
 
     def __abs__(self):
-        return math.sqrt(abs(self.x)**2 + abs(self.y)**2 + abs(self.z)**2)
+        return math.sqrt(abs(self.x) ** 2 + abs(self.y) ** 2 + abs(self.z) ** 2)
 
     def cross(self, other):
         """ cross product of two coordinates """
-        return Coord3(self.y * other[2] - self.z * other[1],
-                      self.z * other[0] - self.x * other[2],
-                      self.x * other[1] - self.y * other[0])
+        return Coord3(
+            self.y * other[2] - self.z * other[1],
+            self.z * other[0] - self.x * other[2],
+            self.x * other[1] - self.y * other[0],
+        )
 
     def __repr__(self):
         return "C3(%f, %f, %f)" % (self.x, self.y, self.z)
@@ -397,32 +414,26 @@ RESTRICT_COORD3 = RestrictType(Coord3)
 RESTRICT_SIZE3 = RESTRICT_COORD3 & RestrictList(RESTRICT_NONNEGATIVE)
 
 
-def Coord3Property(internal_member_name=None,
-                   restriction=None,
-                   preprocess=None,
-                   **kwargs):
+def Coord3Property(
+    internal_member_name=None, restriction=None, preprocess=None, **kwargs
+):
     """ Coord3 property descriptor for a class """
     R = RESTRICT_COORD3 & restriction
     P = ProcessorTypeCast(Coord3) + preprocess
     return RestrictedProperty(
-        internal_member_name=internal_member_name,
-        restriction=R,
-        preprocess=P,
-        **kwargs)
+        internal_member_name=internal_member_name, restriction=R, preprocess=P, **kwargs
+    )
 
 
-def Size3Property(internal_member_name=None,
-                  restriction=None,
-                  preprocess=None,
-                  **kwargs):
+def Size3Property(
+    internal_member_name=None, restriction=None, preprocess=None, **kwargs
+):
     """ Coord2 based size descriptor for a class (non-negative values in both dimensions) """
     R = RESTRICT_SIZE3 & restriction
     P = ProcessorTypeCast(Coord3) + preprocess
     return RestrictedProperty(
-        internal_member_name=internal_member_name,
-        restriction=R,
-        preprocess=P,
-        **kwargs)
+        internal_member_name=internal_member_name, restriction=R, preprocess=P, **kwargs
+    )
 
 
 def coord3_match_position(P1, P2):

@@ -27,8 +27,9 @@ import math
 from .shape import Shape
 
 __all__ = [
-    "cut_open_shape_with_overlap", "cut_open_shape_in_sections_with_overlap",
-    "cut_open_shape_in_n_sections_with_overlap"
+    "cut_open_shape_with_overlap",
+    "cut_open_shape_in_sections_with_overlap",
+    "cut_open_shape_in_n_sections_with_overlap",
 ]
 
 ###################################################
@@ -83,22 +84,22 @@ def cut_open_shape_in_n_sections_with_overlap(shape, n_o_sections, overlap=1):
     l = len(shape)
     section_length = int(math.ceil(l / n_o_sections))
     return cut_open_shape_with_overlap(
-        shape,
-        list(range(section_length - 1, l - overlap - 1, section_length)), overlap)
+        shape, list(range(section_length - 1, l - overlap - 1, section_length)), overlap
+    )
 
 
-def cut_open_shape_in_sections_with_overlap(shape,
-                                            max_section_length,
-                                            overlap=1,
-                                            min_n_o_sections=1):
+def cut_open_shape_in_sections_with_overlap(
+    shape, max_section_length, overlap=1, min_n_o_sections=1
+):
     l = len(shape)
     if l > max_section_length or min_n_o_sections > 1:
         no_paths = int(
-            max(min_n_o_sections,
-                math.ceil(
-                    (l - overlap + 0.0) / (max_section_length - overlap))))
-        return cut_open_shape_in_n_sections_with_overlap(
-            shape, no_paths, overlap)
+            max(
+                min_n_o_sections,
+                math.ceil((l - overlap + 0.0) / (max_section_length - overlap)),
+            )
+        )
+        return cut_open_shape_in_n_sections_with_overlap(shape, no_paths, overlap)
     else:
         return [shape]
 
@@ -107,8 +108,7 @@ def cut_open_shape_in_sections_with_overlap(shape,
 
 
 def __triangle_area(P1, P2, P3):
-    return (P3[1] - P1[1]) * (P2[0] - P1[0]) - (P3[0] - P1[0]) * (
-        P2[1] - P1[1])
+    return (P3[1] - P1[1]) * (P2[0] - P1[0]) - (P3[0] - P1[0]) * (P2[1] - P1[1])
 
 
 def ___triangle_counter_clockwise(P1, P2, P3):
@@ -158,10 +158,14 @@ def __edges_cross_line(P1, P2, points):
     B2 = -end2[:, 0] + begin2[:, 0]
     C2 = -(begin2[:, 1] * B2 + begin2[:, 0] * A2)
 
-    return (((A1 * begin2[:, 0] + B1 * begin2[:, 1] + C1) *
-             (A1 * end2[:, 0] + B1 * end2[:, 1] + C1) < 0) *
-            ((A2 * P1[0] + B2 * P1[1] + C2) *
-             (A2 * P2[0] + B2 * P2[1] + C2) < 0)).any()
+    return (
+        (
+            (A1 * begin2[:, 0] + B1 * begin2[:, 1] + C1)
+            * (A1 * end2[:, 0] + B1 * end2[:, 1] + C1)
+            < 0
+        )
+        * ((A2 * P1[0] + B2 * P1[1] + C2) * (A2 * P2[0] + B2 * P2[1] + C2) < 0)
+    ).any()
 
 
 def find_opposite_diagonal(shape):
@@ -174,13 +178,15 @@ def find_opposite_diagonal(shape):
             q = (L / 2 + offset) % L
             Pq = P[q]  # hopeful target point
             if not __edges_cross_line(Pp, Pq, P) and shape.encloses(
-                (0.5 * (Pp[0] + Pq[0]), 0.5 * (Pp[1] + Pq[1]))):
+                (0.5 * (Pp[0] + Pq[0]), 0.5 * (Pp[1] + Pq[1]))
+            ):
                 return (roll_index, (q + roll_index) % L)
             if not offset == 0:
                 q = (L / 2 + offset) % L
                 Pq = P[q]  # hopeful target point
                 if not __edges_cross_line(Pp, Pq, P) and P.encloses(
-                    (0.5 * (Pp[0] + Pq[0]), 0.5 * (Pp[1] + Pq[1]))):
+                    (0.5 * (Pp[0] + Pq[0]), 0.5 * (Pp[1] + Pq[1]))
+                ):
                     return (roll_index, (q + roll_index) % L)
             P = roll(P, -1, 0)
 
@@ -194,5 +200,6 @@ def cut_closed_shape_in_sections(shape, max_n_o_points):
     # find a valid diagonal
     diagonal = find_opposite_diagonal(shape)
     shapes = S.cut_in_two(diagonal[0], diagonal[1])
-    return (cut_closed_shape_in_sections(shapes[0], max_n_o_points) +
-            cut_closed_shape_in_sections(shapes[0], max_n_o_points))
+    return cut_closed_shape_in_sections(
+        shapes[0], max_n_o_points
+    ) + cut_closed_shape_in_sections(shapes[0], max_n_o_points)

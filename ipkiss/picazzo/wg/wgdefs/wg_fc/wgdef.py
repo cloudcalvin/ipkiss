@@ -35,6 +35,7 @@ class ShallowWgElDefinition(WgElDefinition):
           ___________________________________________________
     
     """
+
     process = ProcessProperty(default=TECH.PROCESS.FC)
 
 
@@ -50,20 +51,20 @@ class WGFCWgElDefinition(WgElDefinition):
             
     
     """
+
     ## FIXME. Ambiguity between trench width and shallow trench width.
     ## Reduce this to a single class of waveguide (two etch). The other class in is wgdefs.fc
 
     trench_width = NonNegativeNumberProperty(default=0.0)
     shallow_wg_width = PositiveNumberProperty(default=TECH.WG.WIRE_WIDTH)
-    shallow_trench_width = NonNegativeNumberProperty(
-        default=TECH.WG.TRENCH_WIDTH)
+    shallow_trench_width = NonNegativeNumberProperty(default=TECH.WG.TRENCH_WIDTH)
     wg_width = DefinitionProperty(fdef_name="define_wg_width")
     shallow_process = ProcessProperty(default=TECH.PROCESS.FC)
 
     def define_wg_width(self):
         # The WG LINE window is put over the shallow etched waveguide (core+trench).
         # If the WG LF_AREA is bigger than this window, a trench to the BOX will be etched around the waveguide.
-        return (self.shallow_trench_width * 2 + self.shallow_wg_width)
+        return self.shallow_trench_width * 2 + self.shallow_wg_width
 
     def define_windows(self):
         windows = super(WGFCWgElDefinition, self).define_windows()
@@ -71,17 +72,20 @@ class WGFCWgElDefinition(WgElDefinition):
         windows += [
             PathWindow(
                 layer=PPLayer(self.shallow_process, TECH.PURPOSE.LF_AREA),
-                start_offset=-0.5 * self.shallow_wg_width -
-                self.shallow_trench_width,
-                end_offset=+0.5 * self.shallow_wg_width +
-                self.shallow_trench_width),
+                start_offset=-0.5 * self.shallow_wg_width - self.shallow_trench_width,
+                end_offset=+0.5 * self.shallow_wg_width + self.shallow_trench_width,
+            ),
             PathWindow(
                 layer=PPLayer(self.shallow_process, TECH.PURPOSE.LF.LINE),
                 start_offset=-0.5 * self.shallow_wg_width,
-                end_offset=+0.5 * self.shallow_wg_width)
+                end_offset=+0.5 * self.shallow_wg_width,
+            ),
         ]
         return windows
 
     def __repr__(self):
-        return "%s w=%f, t=%f" % ("WGFC WIRE", self.shallow_wg_width,
-                                  self.shallow_trench_width)
+        return "%s w=%f, t=%f" % (
+            "WGFC WIRE",
+            self.shallow_wg_width,
+            self.shallow_trench_width,
+        )

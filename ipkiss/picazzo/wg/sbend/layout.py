@@ -34,9 +34,15 @@ class WgElSBend(__WgElBend__):
     def get_control_shape(self):
         bs1, bs2 = self.get_bend_size(self.angle)
         cs = Shape(
-            [(-bs1, 0.0), (0.0, 0.0),
-             ((bs1 + bs2 + self.straight) * math.cos(self.angle * DEG2RAD),
-              (bs1 + bs2 + self.straight) * math.sin(self.angle * DEG2RAD))])
+            [
+                (-bs1, 0.0),
+                (0.0, 0.0),
+                (
+                    (bs1 + bs2 + self.straight) * math.cos(self.angle * DEG2RAD),
+                    (bs1 + bs2 + self.straight) * math.sin(self.angle * DEG2RAD),
+                ),
+            ]
+        )
 
         cs.add_polar(bs2, 0.0)
         cs.move(-cs[0])

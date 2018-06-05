@@ -21,10 +21,14 @@
 
 from ..geometry import size_info
 import copy
-from ipcore.properties.initializer import StrongPropertyInitializer, MetaPropertyInitializer
+from ipcore.properties.initializer import (
+    StrongPropertyInitializer,
+    MetaPropertyInitializer,
+)
 from ipcore.properties.descriptor import FunctionProperty
 from .elements.basic import __Element__, ElementList, ElementListProperty
 from ipcore.caching.cache import cache
+
 __all__ = []
 
 
@@ -44,14 +48,15 @@ class __Group__(StrongPropertyInitializer):
         return self.elements.dependencies()
 
     def append(self, element):
-        '''append 1 item to the list of elements'''
+        """append 1 item to the list of elements"""
         myElems = self.elements
         myElems.append(element)
         self.elements = myElems
 
     def extend(self, elems):
-        '''extend the list of elements with a list of elements'''
+        """extend the list of elements with a list of elements"""
         from ..primitives.elements.group import Group
+
         myElems = self.elements
         if isinstance(elems, Group):
             myElems.extend(elems.elements)
@@ -60,7 +65,7 @@ class __Group__(StrongPropertyInitializer):
         self.elements = myElems
 
     def __iadd__(self, element):
-        ''' for external additions: add element and reduce the class to a simple compound element'''
+        """ for external additions: add element and reduce the class to a simple compound element"""
         if isinstance(element, list):
             self.extend(element)
         elif isinstance(element, __Element__):
@@ -68,8 +73,9 @@ class __Group__(StrongPropertyInitializer):
         elif element is None:
             return self
         else:
-            raise TypeError("Invalid type " + str(type(element)) +
-                            " in __Group__.__iadd__().")
+            raise TypeError(
+                "Invalid type " + str(type(element)) + " in __Group__.__iadd__()."
+            )
         return self
 
     def add_el(self, elems):
@@ -101,10 +107,10 @@ class __Group__(StrongPropertyInitializer):
         otherElements = other.elements
         myLen = len(myElements)
         otherLen = len(otherElements)
-        if (myLen != otherLen):
+        if myLen != otherLen:
             return False
         for myElem, otherElem in zip(myElements, otherElements):
-            if (myElem != otherElem):
+            if myElem != otherElem:
                 return False
         return True
 

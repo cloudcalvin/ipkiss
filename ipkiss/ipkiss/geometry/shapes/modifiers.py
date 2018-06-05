@@ -31,10 +31,26 @@ from ... import settings
 from numpy import array, arange, roll, size, amax, amin, column_stack, sin, cos, vstack
 from numpy import tan, abs, ones, flipud, sign, delete, hstack, cumsum
 from math import pi, atan2
-from ipcore.properties.predefined import AngleProperty, RESTRICT_NONNEGATIVE, RESTRICT_NUMBER, RESTRICT_POSITIVE
-from ipcore.properties.predefined import PositiveNumberProperty, NonNegativeNumberProperty, BoolProperty, AngleProperty, NumberProperty
+from ipcore.properties.predefined import (
+    AngleProperty,
+    RESTRICT_NONNEGATIVE,
+    RESTRICT_NUMBER,
+    RESTRICT_POSITIVE,
+)
+from ipcore.properties.predefined import (
+    PositiveNumberProperty,
+    NonNegativeNumberProperty,
+    BoolProperty,
+    AngleProperty,
+    NumberProperty,
+)
 from ipcore.properties.initializer import SUPPRESSED
-from ipcore.properties.descriptor import RestrictedProperty, DefinitionProperty, LockedProperty, FunctionProperty
+from ipcore.properties.descriptor import (
+    RestrictedProperty,
+    DefinitionProperty,
+    LockedProperty,
+    FunctionProperty,
+)
 from ipcore.properties.restrictions import RestrictList, RestrictRange
 from ipkiss.geometry.coord import Size2Property
 from ipkiss.log import IPKISS_LOG as LOG
@@ -82,14 +98,14 @@ class ShapeRoundGeneric(__ShapeModifier__):
         S1 = Shape(shape)
         S = Shape(S1).remove_straight_angles()
         R = array(radii)
-        straight = (abs(abs((S1.turns_rad() + (0.5 * pi)) % pi) - 0.5 * pi) <
-                    0.00001)
+        straight = abs(abs((S1.turns_rad() + (0.5 * pi)) % pi) - 0.5 * pi) < 0.00001
         R = delete(radii, straight.nonzero()[0], 0)
         return (S, R)
 
     def define_points(self, pts):
         (Swsa, R) = self.__original_shape_without_straight_angles__(
-            self.original_shape, self.radii)
+            self.original_shape, self.radii
+        )
         closed = Swsa.closed
         if len(self.radii) != len(Swsa):
             raise IpcoreAttributeException(
@@ -109,17 +125,20 @@ class ShapeRoundGeneric(__ShapeModifier__):
         S = []
         if not closed:
             S.append(array([c[0]]))
-        for i in range(1, len(c) - 1):  #ignore first and last point in matrix
-            sh = ShapeBendRelative(Swsa[i], r[i], a1[i] * RAD2DEG,
-                                   t[i] * RAD2DEG, self.angle_step)
+        for i in range(1, len(c) - 1):  # ignore first and last point in matrix
+            sh = ShapeBendRelative(
+                Swsa[i], r[i], a1[i] * RAD2DEG, t[i] * RAD2DEG, self.angle_step
+            )
             S.append(sh.points)
 
-        if closed:  #construct first and last bend in case the shape is closed
-            sh = ShapeBendRelative(Swsa[-1], r[-1], a1[-1] * RAD2DEG,
-                                   t[-1] * RAD2DEG, self.angle_step)
+        if closed:  # construct first and last bend in case the shape is closed
+            sh = ShapeBendRelative(
+                Swsa[-1], r[-1], a1[-1] * RAD2DEG, t[-1] * RAD2DEG, self.angle_step
+            )
             S.append(sh.points)
-            sh = ShapeBendRelative(Swsa[0], r[0], a1[0] * RAD2DEG,
-                                   t[0] * RAD2DEG, self.angle_step)
+            sh = ShapeBendRelative(
+                Swsa[0], r[0], a1[0] * RAD2DEG, t[0] * RAD2DEG, self.angle_step
+            )
             S.append(sh.points)
             self.closed = True
         else:
@@ -135,28 +154,31 @@ class ShapeRoundGeneric(__ShapeModifier__):
         D = s.distances()
         a2 = s.angles_rad()  # angle to next vertex
         a1 = roll(a2, 1)  # angle from previous vertex
-        t = (a2 - a1 + pi) % (
-            2 * pi) - pi  # turns, save an extra angle computation
+        t = (a2 - a1 + pi) % (2 * pi) - pi  # turns, save an extra angle computation
         tt = abs(tan(0.5 * t))
         L = R * tt  # length of the straight section consumed by the bend
         (Swsa, dummy) = self.__original_shape_without_straight_angles__(
-            self.original_shape, self.radii)
+            self.original_shape, self.radii
+        )
         if not Swsa.closed:
             L[0] = 0
             L[-1] = 0
         # check where the bend consumes more length than possible!
-        m_L = ((L + roll(L, -1)) - D)  # missing length in the next segment
-        missing_L = amax(column_stack((m_L, roll(m_L, 1))),
-                         1)  # missing length over previous and next segment
-        overf = (missing_L > 0.5 / settings.get_grids_per_unit())
-        r[overf] = 0.5 * (amin(column_stack(
-            (D[overf], roll(D, 1)[overf])), 1)) / tt[overf]
+        m_L = (L + roll(L, -1)) - D  # missing length in the next segment
+        missing_L = amax(
+            column_stack((m_L, roll(m_L, 1))), 1
+        )  # missing length over previous and next segment
+        overf = missing_L > 0.5 / settings.get_grids_per_unit()
+        r[overf] = (
+            0.5 * (amin(column_stack((D[overf], roll(D, 1)[overf])), 1)) / tt[overf]
+        )
         # FIXME: Find a more robust algorithm to reduce the radius if there is insufficient space
         r_difference = R - r
-        if (r_difference >
-                settings.get_current_library().units_per_grid).any():
-            LOG.warning("Bend radius is reduced by maximum %f to round shape."
-                        % max(r_difference))
+        if (r_difference > settings.get_current_library().units_per_grid).any():
+            LOG.warning(
+                "Bend radius is reduced by maximum %f to round shape."
+                % max(r_difference)
+            )
         if not Swsa.closed:
             r[0] = 0
             r[-1] = 0
@@ -165,8 +187,10 @@ class ShapeRoundGeneric(__ShapeModifier__):
 
     def length(self):
         import sys
+
         (Swsa, R) = self.__original_shape_without_straight_angles__(
-            self.original_shape, self.radii)
+            self.original_shape, self.radii
+        )
         (r, tt, t, a1, a2, L, D) = self.__radii_and_turns__(Swsa)
         L2 = sum(D) + sum(abs(t) * r - 2 * L)
         if not self.original_shape.closed:
@@ -176,6 +200,7 @@ class ShapeRoundGeneric(__ShapeModifier__):
 
 class ShapeRound(ShapeRoundGeneric):
     """ returns a shape with rounded corners based on a given shape """
+
     radius = NonNegativeNumberProperty(required=True)
 
     def define_radii(self):
@@ -185,12 +210,13 @@ class ShapeRound(ShapeRoundGeneric):
         return r
 
     def length(self):
-        #self.radii = ones((len(self.original_shape))) * self.radius
+        # self.radii = ones((len(self.original_shape))) * self.radius
         return super(ShapeRound, self).length()
 
 
 class ShapeStub(__ShapeModifier__):
     """ stubs the corners of a given shape """
+
     stub_width = NonNegativeNumberProperty(required=True)
     only_sharp_angles = BoolProperty(default=False)
 
@@ -203,7 +229,7 @@ class ShapeStub(__ShapeModifier__):
         if self.original_shape.is_closed():
             if not c[0] == c[-1]:
                 c.append(c[0])
-            #closed curve
+            # closed curve
             c.append(c[1])
         else:
             # open curve
@@ -214,8 +240,7 @@ class ShapeStub(__ShapeModifier__):
             angle1 = angle_rad(c[i], c[i - 1])
             angle2 = angle_rad(c[i + 1], c[i])
             turn = (angle2 - angle1 + pi) % (2 * pi) - pi
-            if turn == 0 or (abs(turn) <=
-                             (pi / 2.0) and self.only_sharp_angles):
+            if turn == 0 or (abs(turn) <= (pi / 2.0) and self.only_sharp_angles):
                 pts.append(c[i])
             elif abs(turn == pi):
                 LOG.error(
@@ -238,26 +263,30 @@ class ShapeStub(__ShapeModifier__):
                 s2 = (c[i][0] + L * cos(angle2), c[i][1] + L * sin(angle2))
                 pts.append(s1)
                 pts.append(s2)
-        ''' REFACTORED --> moved to constructor
+        """ REFACTORED --> moved to constructor
         if self.original_shape.closed:
             #closed curve
             self.close()
         else:
-        '''
+        """
         if not self.original_shape.closed:  # open curve
             pts.append(c[-1])
 
         if min_sw < self.stub_width:
             LOG.warning(
                 "Warning: ShapeStub::define_points : Stub width is reduced from "
-                + str(
-                    self.stub_width) + " to " + str(min_sw) + "to stub shape.")
+                + str(self.stub_width)
+                + " to "
+                + str(min_sw)
+                + "to stub shape."
+            )
 
         return pts
 
 
 class ShapeSerif(__ShapeModifier__):
     """ puts a bump on the corners of a given shape """
+
     stub_width = PositiveNumberProperty(required=True)
     stub_height = PositiveNumberProperty(required=True)
     tip_width = NonNegativeNumberProperty(required=True)
@@ -278,7 +307,7 @@ class ShapeSerif(__ShapeModifier__):
         if self.original_shape.is_closed():
             if not c[0] == c[-1]:
                 c.append(c[0])
-            #closed curve
+            # closed curve
             c.append(c[1])
         else:
             # open curve
@@ -291,8 +320,7 @@ class ShapeSerif(__ShapeModifier__):
             angle1 = angle_rad(c[i], c[i - 1])
             angle2 = angle_rad(c[i + 1], c[i])
             turn = (angle2 - angle1 + pi) % (2 * pi) - pi
-            if turn == 0 or (abs(turn) <=
-                             (pi / 2.0) and self.only_sharp_angles):
+            if turn == 0 or (abs(turn) <= (pi / 2.0) and self.only_sharp_angles):
                 pts.append(c[i])
             elif abs(turn == pi):
                 LOG.error("Cannot stub shape with a 180 degree turn")
@@ -311,22 +339,28 @@ class ShapeSerif(__ShapeModifier__):
 
                 theta_div2 = (pi - angle1 + angle2) % (2 * pi) / 2.0
 
-                s1 = Coord2(c[i][0] - L * cos(angle1),
-                            c[i][1] - L * sin(angle1))
+                s1 = Coord2(c[i][0] - L * cos(angle1), c[i][1] - L * sin(angle1))
                 s2 = (c[i][0] + L * cos(angle2), c[i][1] + L * sin(angle2))
 
                 B = -self.stub_height * sign(turn)
                 delta = 0.5 * (self.stub_width - self.tip_width)
-                s2 = (s1[0] + B * cos(angle1 + theta_div2) +
-                      delta * cos(angle1 + theta_div2 - pi / 2.0),
-                      s1[1] + B * sin(angle1 + theta_div2) +
-                      delta * sin(angle1 + theta_div2 - pi / 2.0))
-                s4 = Coord2(c[i][0] + L * cos(angle2),
-                            c[i][1] + L * sin(angle2))
-                s3 = (s4[0] + B * cos(angle2 + pi - theta_div2) +
-                      delta * cos(angle2 + pi - theta_div2 + pi / 2.0),
-                      s4[1] + B * sin(angle2 + pi - theta_div2) +
-                      delta * sin(angle2 + pi - theta_div2 + pi / 2.0))
+                s2 = (
+                    s1[0]
+                    + B * cos(angle1 + theta_div2)
+                    + delta * cos(angle1 + theta_div2 - pi / 2.0),
+                    s1[1]
+                    + B * sin(angle1 + theta_div2)
+                    + delta * sin(angle1 + theta_div2 - pi / 2.0),
+                )
+                s4 = Coord2(c[i][0] + L * cos(angle2), c[i][1] + L * sin(angle2))
+                s3 = (
+                    s4[0]
+                    + B * cos(angle2 + pi - theta_div2)
+                    + delta * cos(angle2 + pi - theta_div2 + pi / 2.0),
+                    s4[1]
+                    + B * sin(angle2 + pi - theta_div2)
+                    + delta * sin(angle2 + pi - theta_div2 + pi / 2.0),
+                )
                 pts.append(s1)
                 pts.append(s2)
                 pts.append(s3)
@@ -337,17 +371,24 @@ class ShapeSerif(__ShapeModifier__):
             pts.append(c[-1])
 
         if min_sw < self.stub_width:
-            LOG.warning("Stub width is reduced from " + str(self.stub_width) +
-                        " to " + str(min_sw) + "to stub shape.")
+            LOG.warning(
+                "Stub width is reduced from "
+                + str(self.stub_width)
+                + " to "
+                + str(min_sw)
+                + "to stub shape."
+            )
 
         return pts
 
 
 class __ShapeStartEndAngle__(__ShapeModifier__):
     start_face_angle = DefinitionProperty(
-        restriction=RESTRICT_NUMBER, fdef_name="define_start_face_angle")
+        restriction=RESTRICT_NUMBER, fdef_name="define_start_face_angle"
+    )
     end_face_angle = DefinitionProperty(
-        restriction=RESTRICT_NUMBER, fdef_name="define_end_face_angle")
+        restriction=RESTRICT_NUMBER, fdef_name="define_end_face_angle"
+    )
 
     @cache()
     def __get_original_shape_without_straight_angles__(self):
@@ -389,6 +430,7 @@ class __ShapeStartEndAngle__(__ShapeModifier__):
 
 class __ShapePathBase__(__ShapeStartEndAngle__):
     """ base class for path shapes"""
+
     path_width = PositiveNumberProperty(required=True)
 
 
@@ -397,7 +439,8 @@ class ShapePathSimple(__ShapePathBase__):
 
     def define_points(self, pts):
         original = self.__get_original_shape_without_straight_angles__()
-        if len(original) <= 1: return
+        if len(original) <= 1:
+            return
 
         a2 = original.angles_rad() * 0.5
         a1 = roll(a2, 1)
@@ -411,24 +454,26 @@ class ShapePathSimple(__ShapePathBase__):
 
         a_plus = a2 + a1
         cos_a_min = cos(a2 - a1)
-        offsets = column_stack(
-            (-sin(a_plus) / cos_a_min,
-             cos(a_plus) / cos_a_min)) * (0.5 * self.path_width)
+        offsets = column_stack((-sin(a_plus) / cos_a_min, cos(a_plus) / cos_a_min)) * (
+            0.5 * self.path_width
+        )
 
         # compute offsets from each point
-        pts = vstack((original.points + offsets,
-                      flipud(original.points - offsets)))
+        pts = vstack((original.points + offsets, flipud(original.points - offsets)))
         return pts
 
 
 class ShapePathSpike(__ShapePathBase__):
     """ simple path based on a centerline shape,but with a sharp endpoint with a given angle """
+
     spike_angle = AngleProperty(
-        restriction=RestrictRange(0.0, 180.0, False, True), default=90.0)
+        restriction=RestrictRange(0.0, 180.0, False, True), default=90.0
+    )
 
     def define_points(self, pts):
         original = self.__get_original_shape_without_straight_angles__()
-        if len(original) <= 1: return
+        if len(original) <= 1:
+            return
         a = original.angles_rad()
         a2 = a * 0.5
         a1 = roll(a2, 1)
@@ -442,27 +487,31 @@ class ShapePathSpike(__ShapePathBase__):
 
         a_plus = a2 + a1
         cos_a_min = cos(a2 - a1)
-        offsets = column_stack(
-            (-sin(a_plus) / cos_a_min,
-             cos(a_plus) / cos_a_min)) * (0.5 * self.path_width)
+        offsets = column_stack((-sin(a_plus) / cos_a_min, cos(a_plus) / cos_a_min)) * (
+            0.5 * self.path_width
+        )
 
         # spikes
         if not original.closed and self.spike_angle > 0 and self.spike_angle < 180.0:
-            L = 0.5 * self.path_width / tan(
-                self.spike_angle * constants.DEG2RAD * 0.5)
-            start_spike = array([[
-                original[0][0] - cos(a[0]) * L, original[0][1] - sin(a[0]) * L
-            ]])
-            end_spike = array([[
-                original[-1][0] + cos(a[-2]) * L,
-                original[-1][1] + sin(a[-2]) * L
-            ]])
+            L = 0.5 * self.path_width / tan(self.spike_angle * constants.DEG2RAD * 0.5)
+            start_spike = array(
+                [[original[0][0] - cos(a[0]) * L, original[0][1] - sin(a[0]) * L]]
+            )
+            end_spike = array(
+                [[original[-1][0] + cos(a[-2]) * L, original[-1][1] + sin(a[-2]) * L]]
+            )
         else:
             start_spike = ndarray((0, 2))
             end_spike = ndarray((0, 2))
 
-        pts = vstack((start_spike, original.points + offsets, end_spike,
-                      flipud(original.points - offsets)))
+        pts = vstack(
+            (
+                start_spike,
+                original.points + offsets,
+                end_spike,
+                flipud(original.points - offsets),
+            )
+        )
         return pts
 
 
@@ -490,9 +539,11 @@ class ShapePathRounded(__ShapePathBase__):
                 radius=self.path_width / 2.0,
                 start_angle=(angle * RAD2DEG) + 270.0,
                 end_angle=(angle * RAD2DEG) + 90.0,
-                clockwise=True))
+                clockwise=True,
+            )
+        )
 
-        #middle
+        # middle
         for i in range(1, len(coords) - 1):
             x = coords[i][0]
             y = coords[i][1]
@@ -520,7 +571,9 @@ class ShapePathRounded(__ShapePathBase__):
                         radius=self.path_width,
                         start_angle=(angle1 * RAD2DEG) - 90.0,
                         end_angle=(angle2 * RAD2DEG) - 90.0,
-                        clockwise=False))
+                        clockwise=False,
+                    )
+                )
             else:
                 # turn east
                 west_coords.extend(
@@ -529,10 +582,12 @@ class ShapePathRounded(__ShapePathBase__):
                         radius=self.path_width,
                         start_angle=(angle1 * RAD2DEG) + 90.0,
                         end_angle=(angle2 * RAD2DEG) + 90.0,
-                        clockwise=True))
+                        clockwise=True,
+                    )
+                )
                 east_coords.append(c_east)
 
-        #end
+        # end
         x = coords[-1][0]
         y = coords[-1][1]
         angle = atan2(y - coords[-2][1], x - coords[-2][0])
@@ -543,7 +598,9 @@ class ShapePathRounded(__ShapePathBase__):
                 center=(x, y),
                 radius=self.path_width / 2.0,
                 start_angle=(angle * RAD2DEG) - 90.0,
-                end_angle=(angle * RAD2DEG) + 90.0))
+                end_angle=(angle * RAD2DEG) + 90.0,
+            )
+        )
         east_coords.reverse()
         pts.extend(west_coords)
         pts.extend(east_coords)
@@ -556,7 +613,8 @@ class ShapePathExtended(__ShapePathBase__):
 
     def __init__(self, original_shape, path_width, **kwargs):
         super(ShapePathExtended, self).__init__(
-            original_shape=original_shape, path_width=path_width, **kwargs)
+            original_shape=original_shape, path_width=path_width, **kwargs
+        )
 
     def define_points(self, pts):
         # TODO: include start_face_angle and end_face_angle in the calculations
@@ -573,12 +631,20 @@ class ShapePathExtended(__ShapePathBase__):
         angle = atan2(coords[1][1] - y, coords[1][0] - x)
         sa = sin(angle)
         ca = cos(angle)
-        west_coords.append((x - 0.5 * self.path_width * (sa + ca),
-                            y + 0.5 * self.path_width * (ca - sa)))
-        east_coords.append((x + 0.5 * self.path_width * (sa - ca),
-                            y - 0.5 * self.path_width * (ca + sa)))
+        west_coords.append(
+            (
+                x - 0.5 * self.path_width * (sa + ca),
+                y + 0.5 * self.path_width * (ca - sa),
+            )
+        )
+        east_coords.append(
+            (
+                x + 0.5 * self.path_width * (sa - ca),
+                y - 0.5 * self.path_width * (ca + sa),
+            )
+        )
 
-        #middle
+        # middle
         for i in range(1, len(coords) - 1):
             x = coords[i][0]
             y = coords[i][1]
@@ -600,16 +666,24 @@ class ShapePathExtended(__ShapePathBase__):
             west_coords.append(c_west)
             east_coords.append(c_east)
 
-        #end
+        # end
         x = coords[-1][0]
         y = coords[-1][1]
         angle = atan2(y - coords[-2][1], x - coords[-2][0])
         sa = sin(angle)
         ca = cos(angle)
-        west_coords.append((x - 0.5 * self.path_width * (sa - ca),
-                            y + 0.5 * self.path_width * (ca + sa)))
-        east_coords.append((x + 0.5 * self.path_width * (sa + ca),
-                            y - 0.5 * self.path_width * (ca - sa)))
+        west_coords.append(
+            (
+                x - 0.5 * self.path_width * (sa - ca),
+                y + 0.5 * self.path_width * (ca + sa),
+            )
+        )
+        east_coords.append(
+            (
+                x + 0.5 * self.path_width * (sa + ca),
+                y - 0.5 * self.path_width * (ca - sa),
+            )
+        )
         east_coords.reverse()
         pts.extend(west_coords)
         pts.extend(east_coords)
@@ -647,7 +721,7 @@ class ShapePathStub(__ShapePathBase__):
         west_coords.append((x - w * sin(new_angle), y + w * cos(new_angle)))
         east_coords.append((x + w * sin(new_angle), y - w * cos(new_angle)))
 
-        #middle
+        # middle
         for i in range(1, len(coords) - 1):
             x = coords[i][0]
             y = coords[i][1]
@@ -669,7 +743,7 @@ class ShapePathStub(__ShapePathBase__):
             west_coords.append(c_west)
             east_coords.append(c_east)
 
-        #end
+        # end
         x = coords[-1][0]
         y = coords[-1][1]
         angle = atan2(y - coords[-2][1], x - coords[-2][0])
@@ -685,11 +759,13 @@ class ShapePathStub(__ShapePathBase__):
         west_coords.append((x - w * sin(angle), y + w * cos(angle)))
         east_coords.append((x + w * sin(angle), y - w * cos(angle)))
 
-        if (self.stub_width > 0):
+        if self.stub_width > 0:
             east_coords = ShapeStub(
-                original_shape=east_coords, stub_width=self.stub_width)
+                original_shape=east_coords, stub_width=self.stub_width
+            )
             west_coords = ShapeStub(
-                original_shape=west_coords, stub_width=self.stub_width)
+                original_shape=west_coords, stub_width=self.stub_width
+            )
         east_coords.reverse()
         pts.extend(west_coords)
         pts.extend(east_coords)
@@ -697,41 +773,50 @@ class ShapePathStub(__ShapePathBase__):
         return pts
 
 
-def ShapePath(original_shape,
-              path_width,
-              path_type=constants.PATH_TYPE_NORMAL,
-              stub_width=0.0,
-              **kwargs):
+def ShapePath(
+    original_shape,
+    path_width,
+    path_type=constants.PATH_TYPE_NORMAL,
+    stub_width=0.0,
+    **kwargs
+):
     """ path shape based on centerline """
     if stub_width != 0.0:
         return ShapePathStub(
             original_shape=original_shape,
             path_width=path_width,
             stub_width=0.0,
-            **kwargs)
+            **kwargs
+        )
     elif path_type == constants.PATH_TYPE_NORMAL:
         return ShapePathSimple(
-            original_shape=original_shape, path_width=path_width, **kwargs)
+            original_shape=original_shape, path_width=path_width, **kwargs
+        )
     elif path_type == constants.PATH_TYPE_EXTENDED:
         return ShapePathExtended(
-            original_shape=original_shape, path_width=path_width, **kwargs)
+            original_shape=original_shape, path_width=path_width, **kwargs
+        )
     elif path_type == constants.PATH_TYPE_ROUNDED:
         return ShapePathRounded(
-            original_shape=original_shape, path_width=path_width, **kwargs)
+            original_shape=original_shape, path_width=path_width, **kwargs
+        )
     raise IpcoreException("Invalid path type in ShapePath factory method")
 
 
 class ShapeOffset(__ShapeStartEndAngle__):
     """ generates a shape with a given offset from its original shape"""
+
     offset = NumberProperty(required=True)
 
     def __init__(self, original_shape, offset, **kwargs):
         super(ShapeOffset, self).__init__(
-            original_shape=original_shape, offset=offset, **kwargs)
+            original_shape=original_shape, offset=offset, **kwargs
+        )
 
     def define_points(self, pts):
         original = self.__get_original_shape_without_straight_angles__()
-        if len(original) <= 1: return
+        if len(original) <= 1:
+            return
 
         a2 = original.angles_rad() * 0.5
         a1 = roll(a2, 1)
@@ -745,22 +830,25 @@ class ShapeOffset(__ShapeStartEndAngle__):
 
         a_plus = a2 + a1
         cos_a_min = cos(a2 - a1)
-        offsets = column_stack((-sin(a_plus) / cos_a_min,
-                                cos(a_plus) / cos_a_min)) * (self.offset)
+        offsets = column_stack((-sin(a_plus) / cos_a_min, cos(a_plus) / cos_a_min)) * (
+            self.offset
+        )
 
         # compute offsets from each point
-        pts = (original.points + offsets)
+        pts = original.points + offsets
         return pts
 
 
 class ShapeGrow(__ShapeModifier__):
     """ generates a shape with uniformly grows """
+
     offset = DefinitionProperty(fdef_name="define_offset")
     amount = NumberProperty(required=True)
 
     def __init__(self, original_shape, amount, **kwargs):
         super(ShapeGrow, self).__init__(
-            original_shape=original_shape, amount=amount, **kwargs)
+            original_shape=original_shape, amount=amount, **kwargs
+        )
 
     def is_closed(self):
         return self.original_shape.is_closed()
@@ -773,7 +861,8 @@ class ShapeGrow(__ShapeModifier__):
 
     def define_points(self, pts):
         original = Shape(self.original_shape).remove_straight_angles()
-        if len(original) <= 1: return
+        if len(original) <= 1:
+            return
 
         a2 = original.angles_rad() * 0.5
         a1 = roll(a2, 1)
@@ -781,22 +870,26 @@ class ShapeGrow(__ShapeModifier__):
         a_plus = a2 + a1
 
         cos_a_min = cos(a2 - a1)
-        offsets = column_stack((-sin(a_plus) / cos_a_min,
-                                cos(a_plus) / cos_a_min)) * (self.offset)
+        offsets = column_stack((-sin(a_plus) / cos_a_min, cos(a_plus) / cos_a_min)) * (
+            self.offset
+        )
 
         # compute offsets from each point
-        pts = (original.points + offsets)
+        pts = original.points + offsets
         return pts
 
 
 class ShapeVariableOffset(__ShapeModifier__):
     """ generates a shape with a variable offset from its original shape"""
+
     offsets = RestrictedProperty(
-        restriction=RestrictList(RESTRICT_NUMBER), required=True)
+        restriction=RestrictList(RESTRICT_NUMBER), required=True
+    )
 
     def __init__(self, original_shape, offsets, **kwargs):
         super(ShapeVariableOffset, self).__init__(
-            original_shape=original_shape, offsets=offsets, **kwargs)
+            original_shape=original_shape, offsets=offsets, **kwargs
+        )
 
     def define_points(self, pts):
         if len(self.offset) != len(self.original_shape):
@@ -804,7 +897,8 @@ class ShapeVariableOffset(__ShapeModifier__):
                 "Length of shape and offsets should be the same in ShapeVariableOffset"
             )
         original = self.original_shape
-        if len(original) <= 1: return
+        if len(original) <= 1:
+            return
 
         a2 = original.angles_rad() * 0.5
         a1 = roll(a2, 1)
@@ -818,26 +912,31 @@ class ShapeVariableOffset(__ShapeModifier__):
 
         a_plus = a2 + a1
         cos_a_min = cos(a2 - a1)
-        offsets = column_stack((-sin(a_plus) / cos_a_min * self.offset,
-                                cos(a_plus) / cos_a_min * self.offset))
+        offsets = column_stack(
+            (
+                -sin(a_plus) / cos_a_min * self.offset,
+                cos(a_plus) / cos_a_min * self.offset,
+            )
+        )
 
         # compute offsets from each point
-        pts = (original.points + offsets)
+        pts = original.points + offsets
         return pts
 
 
 class ShapeExtendEnds(__ShapeModifier__):
     """ stubs the corners of a given shape """
+
     start_extension = NonNegativeNumberProperty(required=True)
     end_extension = NonNegativeNumberProperty(required=True)
 
-    def __init__(self, original_shape, start_extension, end_extension,
-                 **kwargs):
+    def __init__(self, original_shape, start_extension, end_extension, **kwargs):
         super(ShapeExtendEnds, self).__init__(
             original_shape=original_shape,
             start_extension=start_extension,
             end_extension=end_extension,
-            **kwargs)
+            **kwargs
+        )
 
     def define_points(self, pts):
         c = Shape(self.original_shape)
@@ -846,17 +945,22 @@ class ShapeExtendEnds(__ShapeModifier__):
             return
 
         a1 = angle_rad(c[0], c[1])
-        pts += Coord2(c[0].x + cos(a1) * self.start_extension,
-                      c[0].y + sin(a1) * self.start_extension)
+        pts += Coord2(
+            c[0].x + cos(a1) * self.start_extension,
+            c[0].y + sin(a1) * self.start_extension,
+        )
         pts += c[1:-1]
         a1 = angle_rad(c[-1], c[-2])
-        pts += Coord2(c[-1].x + cos(a1) * self.end_extension,
-                      c[-1].y + sin(a1) * self.end_extension)
+        pts += Coord2(
+            c[-1].x + cos(a1) * self.end_extension,
+            c[-1].y + sin(a1) * self.end_extension,
+        )
         return pts
 
 
 class ShapeFit(__ShapeModifier__):
     """ fits a shape in a given box """
+
     south_west = Coord2Property(required=True)
     north_east = Coord2Property(required=True)
 
@@ -865,22 +969,24 @@ class ShapeFit(__ShapeModifier__):
             original_shape=original_shape,
             south_west=south_west,
             north_east=north_east,
-            **kwargs)
+            **kwargs
+        )
 
     def define_points(self, pts):
         c = Shape(self.original_shape)
-        #rescale
+        # rescale
         SI = c.size_info
         size = SI.size
         SI2 = SizeInfo(
             west=self.south_west[0],
             east=self.north_east[0],
             north=self.north_east[1],
-            south=self.south_west[1])
+            south=self.south_west[1],
+        )
         box_size = SI2.size
         scale_factor = min([box_size[0] / size[0], box_size[1] / size[1]])
         c.magnify((0.0, 0.0), scale_factor)
-        #translate
+        # translate
         bl = Coord2(SI.west, SI.south)
         translation = (self.south_west[0] - bl[0], self.south_west[1] - bl[1])
         c.move(translation)
@@ -890,6 +996,7 @@ class ShapeFit(__ShapeModifier__):
 
 class ShapeShorten(__ShapeModifier__):
     """ Shortens a shape on both ends by given trim lengths """
+
     trim_lengths = Size2Property(default=(0.0, 0.0))
 
     def define_points(self, pts):
@@ -906,7 +1013,7 @@ class ShapeShorten(__ShapeModifier__):
 
         if start_point_distance > end_point_distance:
             raise AttributeError(
-                'trim_lengths should be small enough to leave part of the shape'
+                "trim_lengths should be small enough to leave part of the shape"
             )
 
         L = len(S)
@@ -923,9 +1030,7 @@ class ShapeShorten(__ShapeModifier__):
                     d2 = cumul[i - 1]
                     fraction = (start_point_distance - d2) / (d1 - d2)
                     if fraction > 0 and fraction < 1:
-                        points += [
-                            S[i] * fraction + S[max(i - 1, 0)] * (1 - fraction)
-                        ]
+                        points += [S[i] * fraction + S[max(i - 1, 0)] * (1 - fraction)]
                     start_point_added = True
             if d1 >= start_point_distance and d1 <= end_point_distance:
                 points += [S[i]]
@@ -943,8 +1048,10 @@ class ShapeShorten(__ShapeModifier__):
 
 class ShapeSample(__ShapeModifier__):
     """ creates a shape sampling points on another shape along specified distances between the sampling point"""
+
     sampling_distances = RestrictedProperty(
-        required=True, restriction=RestrictList(RESTRICT_POSITIVE))
+        required=True, restriction=RestrictList(RESTRICT_POSITIVE)
+    )
 
     def define_points(self, pts):
         S = Shape(self.original_shape)
@@ -965,9 +1072,7 @@ class ShapeSample(__ShapeModifier__):
             fraction = (D - d1) / (d2 - d1)
             last_point = S[max(j - 1, 0)]
             next_point = S[j % L]
-            sampling_points += [
-                fraction * next_point + (1 - fraction) * last_point
-            ]
+            sampling_points += [fraction * next_point + (1 - fraction) * last_point]
 
         pts = array(sampling_points)
         return pts
@@ -975,13 +1080,17 @@ class ShapeSample(__ShapeModifier__):
 
 class ShapeSamplePeriodic(ShapeSample):
     """ creates a shape sampling points on another shape along specified periodic distances from the start point of the shape """
+
     sampling_period = PositiveNumberProperty(required=True)
     exclude_ends = Size2Property(
-        default=(0.0, 0.0), doc="Lengths not taken into account on both ends")
+        default=(0.0, 0.0), doc="Lengths not taken into account on both ends"
+    )
     sampling_distances = LockedProperty()
 
     def define_sampling_distances(self):
         L = self.original_shape.length()
-        return arange(self.exclude_ends[0],
-                      L - self.exclude_ends[1] + 0.001 * self.sampling_period,
-                      self.sampling_period)
+        return arange(
+            self.exclude_ends[0],
+            L - self.exclude_ends[1] + 0.001 * self.sampling_period,
+            self.sampling_period,
+        )

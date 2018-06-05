@@ -26,6 +26,7 @@ from ipkiss.all import *
 
 class FiberCouplerCleave(FiberCoupler):
     """ fiber coupler grating base class, which combines a grating on top of an aperture """
+
     wg_definition = WaveguideDefProperty(required=True)
     wg_length = PositiveNumberProperty(default=1000.0)
     wg = DefinitionProperty(fdef_name="define_wg")

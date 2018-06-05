@@ -31,11 +31,11 @@ def is_call_internal(obj, level=1):
     f = sys._getframe(1 + level).f_locals
     if not "self" in f:
         return False
-    return (f["self"] is obj)
+    return f["self"] is obj
 
 
 def do_hash(obj):
-    if (isinstance(obj, list)):
+    if isinstance(obj, list):
         return abs(sum(do_hash(e) for e in obj))
     else:
         return abs(zlib.adler32(str(obj)))
@@ -46,6 +46,7 @@ def extract_kwarg(kwargs, arg_name):
         arg = kwargs[arg_name]
     except KeyError as ke:
         raise Exception(
-            "Keyword argument '%s' is required but was not found." % arg_name)
+            "Keyword argument '%s' is required but was not found." % arg_name
+        )
     del kwargs[arg_name]
     return arg

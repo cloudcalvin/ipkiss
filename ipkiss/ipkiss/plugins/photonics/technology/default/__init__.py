@@ -19,7 +19,11 @@
 #
 # Contact: ipkiss@intec.ugent.be
 
-from ipkiss.technology.technology import TechnologyLibrary, TechnologyTree, DelayedInitTechnologyTree
+from ipkiss.technology.technology import (
+    TechnologyLibrary,
+    TechnologyTree,
+    DelayedInitTechnologyTree,
+)
 from ipkiss.technology import get_technology
 
 __all__ = ["TECH"]
@@ -38,5 +42,5 @@ TECH.METRICS.ANGLE_STEP = 1.0
 from ..common import *
 from .agnostic import *
 
-#activate the "ports" mixin
+# activate the "ports" mixin
 import ipkiss.plugins.photonics.port.aspect

@@ -37,7 +37,8 @@ class __ImportBase__(StrongPropertyInitializer):
     filename = FilenameProperty(default="")
     layer_map = RestrictedProperty(default=TECH.GDSII.IMPORT_LAYER_MAP)
     input_handler = RestrictedProperty(
-        default=InputGdsii, restriction=RestrictClass(InputBasic))
+        default=InputGdsii, restriction=RestrictClass(InputBasic)
+    )
 
 
 class ImportLayout(StoredNoDistortTransformable, __ImportBase__):
@@ -53,8 +54,9 @@ class ImportLayout(StoredNoDistortTransformable, __ImportBase__):
             L = input.read()
             F.close()
         else:
-            raise IpkissException("ImportLayout::read : Could not find " +
-                                  self.filename + " for import.")
+            raise IpkissException(
+                "ImportLayout::read : Could not find " + self.filename + " for import."
+            )
         return L
 
 
@@ -64,13 +66,15 @@ class ImportStructure(__ImportBase__, Structure):
     gzipped = BoolProperty(default=False)
 
     def define_prefix(self):
-        return (self.name + "_")
+        return self.name + "_"
 
     def get_header_only(self):
         from ipkiss.io.input_gdsii import InputGdsiiHeader
+
         if os.path.exists(self.filename):
             if self.gzipped:
                 from gzip import GzipFile
+
                 F = GzipFile(self.filename, mode="rb")
             else:
                 F = open(self.filename, "rb")
@@ -81,8 +85,8 @@ class ImportStructure(__ImportBase__, Structure):
             F.close()
         else:
             raise IpkissException(
-                "ImportStructure:: Could not find " + self.filename +
-                " for import.")  #FIXME - should be PicazzoException
+                "ImportStructure:: Could not find " + self.filename + " for import."
+            )  # FIXME - should be PicazzoException
         return L
 
     @cache()
@@ -93,19 +97,21 @@ class ImportStructure(__ImportBase__, Structure):
         if os.path.exists(self.filename):
             if self.gzipped:
                 from gzip import GzipFile
+
                 F = GzipFile(self.filename, mode="rb")
             else:
                 F = open(self.filename, "rb")
             input = self.input_handler(
-                F, stop_on_unknown_gds_layer=False, log_bufsize=filesize)
+                F, stop_on_unknown_gds_layer=False, log_bufsize=filesize
+            )
             input.layer_map = self.layer_map
             input.prefix = self.prefix
             L = input.read()
             F.close()
         else:
             raise IpkissException(
-                "ImportStructure:: Could not find " + self.filename +
-                " for import.")  #FIXME - should be PicazzoException
+                "ImportStructure:: Could not find " + self.filename + " for import."
+            )  # FIXME - should be PicazzoException
         return L
 
     @cache()

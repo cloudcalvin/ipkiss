@@ -26,8 +26,7 @@ __all__ = ["ColumnSet"]
 
 
 class ColumnSet(Structure):
-    columns = RestrictedProperty(
-        restriction=RestrictTypeList(IoColumn), required=True)
+    columns = RestrictedProperty(restriction=RestrictTypeList(IoColumn), required=True)
 
     def define_elements(self, elems):
         for c in self.columns:

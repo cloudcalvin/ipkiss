@@ -39,8 +39,8 @@ class VMirror(__SpecialNoDistortTransform__):
     """ mirror transformation around y-plane """
 
     def __init__(self, mirror_plane_y=0.0, **kwargs):
-        kwargs['translation'] = SUPPRESSED
-        kwargs['v_mirror'] = True
+        kwargs["translation"] = SUPPRESSED
+        kwargs["v_mirror"] = True
 
         super(VMirror, self).__init__(mirror_plane_y=mirror_plane_y, **kwargs)
 
@@ -52,7 +52,8 @@ class VMirror(__SpecialNoDistortTransform__):
         "__mirror_plane_y__",
         set_mirror_plane_y,
         restriction=RESTRICT_NUMBER,
-        default=0.0)
+        default=0.0,
+    )
 
     # overloading for efficiency
     def apply_to_coord(self, coord):
@@ -108,9 +109,9 @@ class HMirror(__SpecialNoDistortTransform__):
     """ mirror transformation around x plane """
 
     def __init__(self, mirror_plane_x=0.0, **kwargs):
-        kwargs['translation'] = SUPPRESSED
-        kwargs['v_mirror'] = True
-        kwargs['rotation'] = 180.0
+        kwargs["translation"] = SUPPRESSED
+        kwargs["v_mirror"] = True
+        kwargs["rotation"] = 180.0
 
         super(HMirror, self).__init__(mirror_plane_x=mirror_plane_x, **kwargs)
 
@@ -122,7 +123,8 @@ class HMirror(__SpecialNoDistortTransform__):
         "__mirror_plane_x__",
         set_mirror_plane_x,
         restriction=RESTRICT_NUMBER,
-        default=0.0)
+        default=0.0,
+    )
 
     def __h_flip__(self, coord):
         """ internal use: mirror coordinate around y-axis """
@@ -191,8 +193,8 @@ class CMirror(__SpecialNoDistortTransform__):
     """ mirror around point (= 180 degree turn)"""
 
     def __init__(self, mirror_center=(0.0, 0.0), **kwargs):
-        kwargs['translation'] = SUPPRESSED
-        kwargs['rotation'] = 180.0
+        kwargs["translation"] = SUPPRESSED
+        kwargs["rotation"] = 180.0
         super(CMirror, self).__init__(mirror_center=mirror_center, **kwargs)
 
     def set_mirror_center(self, center):
@@ -205,7 +207,8 @@ class CMirror(__SpecialNoDistortTransform__):
         set_mirror_center,
         restriction=RestrictType(Coord2),
         preprocess=ProcessorTypeCast(Coord2),
-        default=(0.0, 0.0))
+        default=(0.0, 0.0),
+    )
 
     def __c_flip__(self, coord):
         """ internal use: point mirror coordinate """

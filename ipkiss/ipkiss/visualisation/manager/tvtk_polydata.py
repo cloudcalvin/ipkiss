@@ -30,7 +30,8 @@ class TvtkRenderVisualisationManager(__VisualisationManager__):
     item = RestrictedProperty(
         required=True,
         restriction=RestrictType(tvtk.Renderer),
-        doc="Renderer to be visualized")
+        doc="Renderer to be visualized",
+    )
 
     renderer = DefinitionProperty(fdef_name="define_renderer", locked=True)
 
@@ -76,10 +77,12 @@ class TvtkRenderVisualisationManager(__VisualisationManager__):
 class TvtkPolydataVisualisationManager(TvtkRenderVisualisationManager):
     """ Object that manages visualization of TVTK Polydata: on screen, saving to image ...
     """
+
     item = RestrictedProperty(
         required=True,
         restriction=RestrictType(tvtk.DataSet),
-        doc="PolyData to be visualized")
+        doc="PolyData to be visualized",
+    )
     mapper_type = RestrictedProperty(default=tvtk.DataSetMapper)
     mapper = DefinitionProperty(fdef_name="define_mapper")
 
@@ -91,7 +94,7 @@ class TvtkPolydataVisualisationManager(TvtkRenderVisualisationManager):
 
         mapper = self.mapper
         mapper.input = self.item
-        mapper.scalar_mode = 'default'  #'use_cell_data'
+        mapper.scalar_mode = "default"  # 'use_cell_data'
         actor = tvtk.Actor()
         actor.mapper = mapper
         actor.add_position(0, 0, 0)

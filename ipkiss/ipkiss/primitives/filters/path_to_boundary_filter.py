@@ -34,15 +34,15 @@ class PathToBoundaryFilter(Filter):
                 ShapePath(
                     original_shape=item.shape,
                     path_width=abs(item.line_width),
-                    path_type=item.path_type),
-                transformation=item.transformation)
+                    path_type=item.path_type,
+                ),
+                transformation=item.transformation,
+            )
             resultBoundaryList = [resultBoundary]
-            LOG.debug(
-                "Result has %i points" % len(resultBoundary.shape.points))
+            LOG.debug("Result has %i points" % len(resultBoundary.shape.points))
             return resultBoundaryList
         else:
-            LOG.debug(
-                "Path linewidth is zero: PathToBoundaryFilter not applied.")
+            LOG.debug("Path linewidth is zero: PathToBoundaryFilter not applied.")
             return [item]
 
     def __repr__(self):

@@ -32,30 +32,34 @@ from ipkiss.all import *
 class ExampleTapersExtended(Structure):
     def define_elements(self, elems):
 
-        #tapering from RaisedWGFCWgElDefinition to WGFCWgElDefinition
+        # tapering from RaisedWGFCWgElDefinition to WGFCWgElDefinition
         wg_def_start = RaisedWGFCWgElDefinition(top_width=2.0)
         wg_def_end = WGFCWgElDefinition(
             wg_width=0.8,
             trench_width=2.0,
             shallow_wg_width=0.40,
-            shallow_trench_width=2.0)
+            shallow_trench_width=2.0,
+        )
         taper1 = WgElPortTaperExtended(
             start_port=OpticalPort(
-                position=(90.0, 80.0), wg_definition=wg_def_start, angle=60.0),
+                position=(90.0, 80.0), wg_definition=wg_def_start, angle=60.0
+            ),
             end_wg_def=wg_def_end,
             straight_extension=(70.0, 40.0),
-            length=20.0)  #default taper length is 10.0
+            length=20.0,
+        )  # default taper length is 10.0
         elems += taper1
 
-        #tapering from RaisedFCWgElDefinition to WgElDefinition
+        # tapering from RaisedFCWgElDefinition to WgElDefinition
         wg_def_start = RaisedFCWgElDefinition(shallow_wg_width=2.0)
         wg_def_end = WgElDefinition(wg_width=1.0)
         taper2 = WgElPortTaperExtended(
             start_port=OpticalPort(
-                position=(-10.0, 10.0), wg_definition=wg_def_start,
-                angle=90.0),
+                position=(-10.0, 10.0), wg_definition=wg_def_start, angle=90.0
+            ),
             end_wg_def=wg_def_end,
-            straight_extension=(25.0, 10.0))
+            straight_extension=(25.0, 10.0),
+        )
         elems += taper2
 
         return elems
@@ -66,4 +70,5 @@ if __name__ == "__main__":
     d.write_gdsii("sample_tapers_extended.gds")
 
     from ipkiss.plugins.vfabrication import *
+
     d.visualize_2d()

@@ -34,8 +34,7 @@ class IoBlockStructure(IoBlock, Structure):
 
 
 class __IoCompoundBlockGroup__(IoCompoundBlock, __Group__):
-    __additional_elements__ = ElementList(
-    )  # this is not a property, rather a store
+    __additional_elements__ = ElementList()  # this is not a property, rather a store
 
     def define_elements(self, elems):
         for i in range(len(self.blocks)):
@@ -48,10 +47,10 @@ class __IoCompoundBlockGroup__(IoCompoundBlock, __Group__):
 
     def add_abs(self, struct, position, transformation=None):
         if not isinstance(struct, Structure):
-            raise TypeError("Invalid type " + str(type(struct)) +
-                            " for structure in add_abs()")
-        self.__additional_elements__.append(
-            SRef(struct, position, transformation))
+            raise TypeError(
+                "Invalid type " + str(type(struct)) + " for structure in add_abs()"
+            )
+        self.__additional_elements__.append(SRef(struct, position, transformation))
 
     def __iadd__(self, something):
         if isinstance(something, IoBlock):
@@ -63,8 +62,9 @@ class __IoCompoundBlockGroup__(IoCompoundBlock, __Group__):
             self.__additional_elements__.extend(something)
             return self
         else:
-            raise TypeError("Cannot add " + str(type(something)) +
-                            " to IoCompoundBlockStructure.")
+            raise TypeError(
+                "Cannot add " + str(type(something)) + " to IoCompoundBlockStructure."
+            )
 
 
 class IoCompoundBlockGroup(Group, __IoCompoundBlockGroup__):
@@ -79,9 +79,11 @@ class IoTitleBlock(IoBlockStructure):
     process = ProcessProperty(default=TECH.PROCESS.WG)
     text = StringProperty(required=True)
     center_clearout = RestrictedProperty(
-        restriction=RESTRICT_NUMBER_TUPLE2, default=(0.0, 0.0))
+        restriction=RESTRICT_NUMBER_TUPLE2, default=(0.0, 0.0)
+    )
     edge_clearout = RestrictedProperty(
-        restriction=RESTRICT_NUMBER_TUPLE2, default=(0.0, 0.0))
+        restriction=RESTRICT_NUMBER_TUPLE2, default=(0.0, 0.0)
+    )
 
     __name_prefix__ = "IOTITLEBLOCK"
 
@@ -92,34 +94,46 @@ class IoTitleBlock(IoBlockStructure):
         return 1
 
     def define_elements(self, elems):
-        title = Structure(self.name + "_1",
-                          PolygonText(
-                              PPLayer(self.process, TECH.PURPOSE.DF.TEXT),
-                              self.text, (0.0, 0.0),
-                              alignment=(TEXT_ALIGN_CENTER, TEXT_ALIGN_MIDDLE),
-                              font=TEXT_FONT_COMPACT,
-                              height=0.7 * self.y_spacing))
+        title = Structure(
+            self.name + "_1",
+            PolygonText(
+                PPLayer(self.process, TECH.PURPOSE.DF.TEXT),
+                self.text,
+                (0.0, 0.0),
+                alignment=(TEXT_ALIGN_CENTER, TEXT_ALIGN_MIDDLE),
+                font=TEXT_FONT_COMPACT,
+                height=0.7 * self.y_spacing,
+            ),
+        )
         w = title.size_info().width
         N_periods = int(
-            0.5 *
-            (0.5 * self.width - self.center_clearout[0] - self.edge_clearout[0]
-             ) / w)
+            0.5
+            * (0.5 * self.width - self.center_clearout[0] - self.edge_clearout[0])
+            / w
+        )
         if N_periods > 0:
-            period = (0.5 * self.width - self.center_clearout[0] -
-                      self.edge_clearout[0]) / N_periods
-            pos = (0.5 * period + self.edge_clearout[0],
-                   self.south_west[1] * self.y_spacing)
+            period = (
+                0.5 * self.width - self.center_clearout[0] - self.edge_clearout[0]
+            ) / N_periods
+            pos = (
+                0.5 * period + self.edge_clearout[0],
+                self.south_west[1] * self.y_spacing,
+            )
             elems += ARefX(title, pos, period, N_periods)
 
         N_periods = int(
-            0.5 *
-            (0.5 * self.width - self.center_clearout[1] - self.edge_clearout[1]
-             ) / w)
+            0.5
+            * (0.5 * self.width - self.center_clearout[1] - self.edge_clearout[1])
+            / w
+        )
         if N_periods > 0:
-            period = (0.5 * self.width - self.center_clearout[1] -
-                      self.edge_clearout[1]) / N_periods
-            pos = (0.5 * self.width + 0.5 * period + self.center_clearout[1],
-                   self.south_east[1])
+            period = (
+                0.5 * self.width - self.center_clearout[1] - self.edge_clearout[1]
+            ) / N_periods
+            pos = (
+                0.5 * self.width + 0.5 * period + self.center_clearout[1],
+                self.south_east[1],
+            )
             elems += ARefX(title, pos, period, N_periods)
 
         return elems

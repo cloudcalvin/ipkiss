@@ -27,5 +27,4 @@ RESTRICTION = "Prior written permission is required before using this software o
 AUTHOR = "Wim Bogaerts, Emmanuel Lambert and others"
 AUTHOR_EMAIL = "Wim.bogaerts@intec.ugent.be"
 
-START_MESSAGE = "%s %s - %s \n%s" % (LIB_NAME, VERSION, COPYRIGHT_INFO,
-                                     RESTRICTION)
+START_MESSAGE = "%s %s - %s \n%s" % (LIB_NAME, VERSION, COPYRIGHT_INFO, RESTRICTION)

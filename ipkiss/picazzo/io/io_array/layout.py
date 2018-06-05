@@ -28,13 +28,16 @@ __all__ = ["IoArray", "IoPeriodicArray", "IoRegularArray"]
 class IoArray(Structure):
     __name_prefix__ = "io_array"
     fibcoups = RestrictedProperty(
-        restriction=RestrictTypeList(Structure), required=True)
+        restriction=RestrictTypeList(Structure), required=True
+    )
     positions = ShapeProperty(required=True)
 
     def define_name(self):
-        return "%s_%d_%d" % (self.__name_prefix__,
-                             do_hash("".join([f.name for f in self.fibcoups])),
-                             do_hash("".join([p for p in self.positions])))
+        return "%s_%d_%d" % (
+            self.__name_prefix__,
+            do_hash("".join([f.name for f in self.fibcoups])),
+            do_hash("".join([p for p in self.positions])),
+        )
 
     def define_elements(self, elems):
         for i in range(len(self.fibcoups)):
@@ -53,9 +56,11 @@ class IoRegularArray(IoArray):
     spacing = PositiveNumberProperty(default=250.0)
 
     def define_name(self):
-        return "%s_%d_%d" % (self.__name_prefix__,
-                             do_hash("".join([f.name for f in self.fibcoups])),
-                             self.spacing)
+        return "%s_%d_%d" % (
+            self.__name_prefix__,
+            do_hash("".join([f.name for f in self.fibcoups])),
+            self.spacing,
+        )
 
     def define_positions(self):
         return [(0.0, i * self.spacing) for i in range(len(self.fibcoups))]
@@ -79,15 +84,18 @@ class IoPeriodicArray(IoRegularArray):
     n_o_fibcoup = IntProperty(restriction=RESTRICT_POSITIVE, default=4)
 
     def define_name(self):
-        return "%s_%s_%d_%d" % (self.__name_prefix__, self.fibcoup.name,
-                                self.n_o_fibcoup, self.spacing * 1000)
+        return "%s_%s_%d_%d" % (
+            self.__name_prefix__,
+            self.fibcoup.name,
+            self.n_o_fibcoup,
+            self.spacing * 1000,
+        )
 
     def define_fibcoups(self):
         return [self.fibcoup for i in range(self.n_o_fibcoup)]
 
     def define_elements(self, elems):
-        elems += ARefY(self.fibcoup, (0.0, 0.0), self.spacing,
-                       self.n_o_fibcoup)
+        elems += ARefY(self.fibcoup, (0.0, 0.0), self.spacing, self.n_o_fibcoup)
         return elems
 
     def define_ports(self, ports):

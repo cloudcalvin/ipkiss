@@ -28,62 +28,78 @@ class VFabricationProcessFlow(StrongPropertyInitializer):
     active_processes = RestrictedListProperty(
         required=True,
         allowed_types=[ProcessLayer],
-        doc="Full list of all the processes relevant for virtual fabrication")
+        doc="Full list of all the processes relevant for virtual fabrication",
+    )
     process_to_material_stack_map = RestrictedListProperty(
         required=True,
         allowed_types=[tuple],
-        doc="Mapping from physical process to material stack")
+        doc="Mapping from physical process to material stack",
+    )
     is_lf_fabrication = DictProperty(
         required=True,
-        doc=
-        "Dict indicating for every process with True/False if it is fabricated in LF"
+        doc="Dict indicating for every process with True/False if it is fabricated in LF",
     )
 
     def __add__(self, other):
         from ipkiss.all import get_technology
+
         TECH = get_technology()
         return self.add(other, material_stack_factory=TECH.MATERIAL_STACKS)
 
     def add(self, other, material_stack_factory):
         if not isinstance(other, VFabricationProcessFlow):
             raise Exception(
-                "Cannot add %s to an object of type VFabricationProcessFlow.")
-        #active processes
+                "Cannot add %s to an object of type VFabricationProcessFlow."
+            )
+        # active processes
         result_active_processes = []
         result_active_processes.extend(self.active_processes)
         result_active_processes.extend(other.active_processes)
-        #process_to_material_stack_map
+        # process_to_material_stack_map
         from ipkiss.technology import get_technology
+
         TECH = get_technology()
         result_process_to_material_stack_map = []
-        for (my_process_indicators,
-             my_material_stack) in self.process_to_material_stack_map:
-            for (other_process_indicators,
-                 other_material_stack) in other.process_to_material_stack_map:
+        for (
+            my_process_indicators,
+            my_material_stack,
+        ) in self.process_to_material_stack_map:
+            for (
+                other_process_indicators,
+                other_material_stack,
+            ) in other.process_to_material_stack_map:
                 result_process_indicators = list(my_process_indicators) + list(
-                    other_process_indicators)
+                    other_process_indicators
+                )
                 result_material_stack = my_material_stack + other_material_stack
-                setattr(material_stack_factory,
-                        "MSTACK_%s_%s" % (str(do_hash(my_material_stack)),
-                                          str(do_hash(other_material_stack))),
-                        result_material_stack)
+                setattr(
+                    material_stack_factory,
+                    "MSTACK_%s_%s"
+                    % (
+                        str(do_hash(my_material_stack)),
+                        str(do_hash(other_material_stack)),
+                    ),
+                    result_material_stack,
+                )
                 result_process_to_material_stack_map.append(
-                    (result_process_indicators, result_material_stack))
-        #is_lf_fabrication
+                    (result_process_indicators, result_material_stack)
+                )
+        # is_lf_fabrication
         result_is_lf_fabrication = dict()
         result_is_lf_fabrication.update(self.is_lf_fabrication)
         result_is_lf_fabrication.update(other.is_lf_fabrication)
-        #final result
+        # final result
         result_process = VFabricationProcessFlow(
             active_processes=result_active_processes,
             process_to_material_stack_map=result_process_to_material_stack_map,
-            is_lf_fabrication=result_is_lf_fabrication)
+            is_lf_fabrication=result_is_lf_fabrication,
+        )
         return result_process
 
 
-def VFabricationProcessFlowProperty(internal_member_name=None,
-                                    restriction=None,
-                                    **kwargs):
+def VFabricationProcessFlowProperty(
+    internal_member_name=None, restriction=None, **kwargs
+):
     """Property for VFabricationProcessFlow"""
     R = RestrictType(VFabricationProcessFlow) & restriction
     return RestrictedProperty(internal_member_name, restriction=R, **kwargs)

@@ -25,12 +25,15 @@ from ipcore.all import *
 class __VisualisationManager__(StrongPropertyInitializer):
     """ Object that manages visualisation of an item: on screen, saving to image ...
     """
+
     item = DefinitionProperty(required=True, doc="item to be visualized")
 
     def save_image(self, filename):
-        raise AttributeError("save_image() is not defined in class %s",
-                             self.__class__.__name__)
+        raise AttributeError(
+            "save_image() is not defined in class %s", self.__class__.__name__
+        )
 
     def show(self):
-        raise AttributeError("show() is not defined in class %s",
-                             self.__class__.__name__)
+        raise AttributeError(
+            "show() is not defined in class %s", self.__class__.__name__
+        )

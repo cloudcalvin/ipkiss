@@ -35,8 +35,7 @@ from picazzo.wg.grating.layout import __WgGratingPeriod__, WgGrating
 
 class WgGratingPeriodShallow(__WgGratingPeriod__):
     __name_prefix__ = "MY_WG_GPS_"
-    fill_factor = RestrictedProperty(
-        restriction=RESTRICT_FRACTION, default=0.5)
+    fill_factor = RestrictedProperty(restriction=RESTRICT_FRACTION, default=0.5)
     deep_process = ProcessProperty(default=TECH.PROCESS.WG)
     shallow_process = ProcessProperty(default=TECH.PROCESS.FC)
     grating_trench = NumberProperty(default=0.5)
@@ -46,19 +45,18 @@ class WgGratingPeriodShallow(__WgGratingPeriod__):
             layer=PPLayer(self.shallow_process, TECH.PURPOSE.DF.TRENCH),
             begin_coord=((0.5 - self.fill_factor / 2.0) * self.length, 0.),
             end_coord=((0.5 + self.fill_factor / 2.0) * self.length, 0.),
-            line_width=self.wg_definition.wg_width + 2. * self.grating_trench)
+            line_width=self.wg_definition.wg_width + 2. * self.grating_trench,
+        )
 
         return elems
 
     def define_ports(self, prts):
         prts += [
             OpticalPort(
-                position=(0.0, 0.0),
-                angle=-180.0,
-                wg_definition=self.wg_definition),
+                position=(0.0, 0.0), angle=-180.0, wg_definition=self.wg_definition
+            ),
             OpticalPort(
-                position=(self.length, 0.0),
-                angle=0.0,
-                wg_definition=self.wg_definition)
+                position=(self.length, 0.0), angle=0.0, wg_definition=self.wg_definition
+            ),
         ]
         return prts

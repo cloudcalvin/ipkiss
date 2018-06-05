@@ -33,15 +33,16 @@ class ConfigTree(object):
         self.overwrite_allowed = overwrite_allowed
 
     def __setattr__(self, key, value):
-        if (key in self.__dict__) and (key not in [
-                "name", "description", "__initialized__", "overwrite_allowed"
-        ]):
+        if (key in self.__dict__) and (
+            key not in ["name", "description", "__initialized__", "overwrite_allowed"]
+        ):
             current_value = self.__dict__[key]
-            if (current_value != value):
-                if (not (key in self.overwrite_allowed)):
+            if current_value != value:
+                if not (key in self.overwrite_allowed):
                     raise IpcoreAttributeException(
                         "Overwriting attributes in a configuration tree is not allowed (the attribute %s already has a value %s)"
-                        % (key, str(current_value)))
+                        % (key, str(current_value))
+                    )
                 else:
                     self.__dict__[key] = value
         else:
@@ -54,13 +55,19 @@ class ConfigTree(object):
         for k in keys:
             value = self.__dict__[k]
             if isinstance(value, ConfigTree):
-                child_doc = value.__generate_doc__(header.upper() + "." +
-                                                   k.upper())
+                child_doc = value.__generate_doc__(header.upper() + "." + k.upper())
                 doc = doc + child_doc + "\n"
             else:
                 if not (k.startswith("__")):
-                    doc = doc + header.upper() + "." + k.upper() + " = " + str(
-                        value) + "\n"
+                    doc = (
+                        doc
+                        + header.upper()
+                        + "."
+                        + k.upper()
+                        + " = "
+                        + str(value)
+                        + "\n"
+                    )
         return doc
 
     def keys(self):
@@ -97,8 +104,7 @@ class DelayedInitConfigTree(ConfigTree):
 
     def __getattr__(self, key):
         if self.__initialized__:
-            raise IpcoreAttributeException(
-                "No attribute %s of ConfigTree" % key)
+            raise IpcoreAttributeException("No attribute %s of ConfigTree" % key)
         self.initialize()
         self.__initialized__ = True
         return getattr(self, key)
@@ -118,5 +124,6 @@ class FallbackConfigTree(ConfigTree):
         if (not hasattr(self, "fallback")) or (self.fallback is None):
             raise IpcoreAttributeException(
                 "Attribute %s of the configuration tree could not be found: have you imported a configuration file?"
-                % key)
+                % key
+            )
         return getattr(self.fallback, key)

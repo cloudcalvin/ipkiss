@@ -28,21 +28,25 @@ class ExampleColumnParameters1(Structure):
     def define_elements(self, elems):
         # define a column
         from picazzo.io.column import IoColumnGroup
+
         my_column = IoColumnGroup(
-            south_east=(2000.0, 0.0),  # column width = 2000um
-            y_spacing=25.0)  # vertical spacing between waveguides
+            south_east=(2000.0, 0.0), y_spacing=25.0  # column width = 2000um
+        )  # vertical spacing between waveguides
 
         # define a component
         from picazzo.filters.ring import RingRect180DropFilter
+
         my_ring = RingRect180DropFilter(name="My_Ring")
 
         # add the component to the column
         from picazzo.io.fibcoup import IoFibcoup
+
         my_column.add(
             my_ring,
             offset=(50, 50),  # offset the structure from the center
             adapter=IoFibcoup,  # this is the default adapter.
-            transformation=Rotation(rotation=10.0))  # transform the structure
+            transformation=Rotation(rotation=10.0),
+        )  # transform the structure
 
         elems += my_column
         return elems
@@ -56,32 +60,30 @@ class ExampleColumnParameters2(Structure):
     def define_elements(self, elems):
         # define a column
         from picazzo.io.column import IoColumnGroup
+
         my_column = IoColumnGroup(
-            south_east=(2000.0, 0.0),  # column width = 2000um
-            y_spacing=25.0)  # vertical spacing between waveguides
+            south_east=(2000.0, 0.0), y_spacing=25.0  # column width = 2000um
+        )  # vertical spacing between waveguides
 
         # define a component
         from picazzo.filters.ring import RingRect180DropFilter
+
         my_ring = RingRect180DropFilter(name="My_Ring")
 
         # add the component to the column
         my_column.add(
             my_ring,
             # the following are parameters of the IOFibcoup adapter, which are passed on
-            taper_length=
-            50.0,  # taper from component to intermediate waveguide. Default = 300.
+            taper_length=50.0,  # taper from component to intermediate waveguide. Default = 300.
             wg_width=2.0,  # width of intermediate waveguide. Default = 3.0
-            trench_width=
-            2.0,  # trench width of intermediate waveguide. Default from TECH
+            trench_width=2.0,  # trench width of intermediate waveguide. Default from TECH
             connect_length=100.0,  # horizontal length of Fanout. Default = 40.0
-            bend_radius=30.0,  # bend radius of Fanout. Default from TECH 
+            bend_radius=30.0,  # bend radius of Fanout. Default from TECH
             minimum_straight=8.0,  # minimum straight sections
             fibcoup=TECH.IO.FIBCOUP.DEFAULT_GRATING,  # default fiber coupler
-            fibcoup_offset=
-            30.0,  # offset of grating coupler from the edge. Default = 25.6
-            fibcoup_taper_length=
-            200.0,  # Taper length from intermedeate waveguide to fiber coupler
-            merged_waveguides=False  # bundle waveguide in Fanout
+            fibcoup_offset=30.0,  # offset of grating coupler from the edge. Default = 25.6
+            fibcoup_taper_length=200.0,  # Taper length from intermedeate waveguide to fiber coupler
+            merged_waveguides=False,  # bundle waveguide in Fanout
         )
         elems += my_column
         return elems

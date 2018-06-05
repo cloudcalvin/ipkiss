@@ -41,7 +41,7 @@ class __Processor__(StrongPropertyInitializer):
         pass
 
     def stopProcessing(self):
-        '''A flag indicating if the last processing step triggered the end of the procedure.'''
+        """A flag indicating if the last processing step triggered the end of the procedure."""
         return False
 
 
@@ -67,12 +67,12 @@ class __StopCriterium__(StrongPropertyInitializer):
 
 class ProcessorStopCriterium(__StopCriterium__):
     """Stop criterium that does a callback to the processor to make the decision."""
+
     processor = RestrictedProperty(
         required=False,
         default=__Processor__(),
         restriction=RestrictType(__Processor__),
-        doc=
-        "Reference back to the processor: this can be used to retrieve information about the processed steps, in order to make a decision for the stop criterium."
+        doc="Reference back to the processor: this can be used to retrieve information about the processed steps, in order to make a decision for the stop criterium.",
     )
 
     def __init__(self, **kwargs):

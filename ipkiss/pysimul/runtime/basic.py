@@ -67,11 +67,13 @@ class FieldComponent(StrongPropertyInitializer):
     axis = RestrictedProperty(
         required=True,
         restriction=RestrictType(Axis),
-        doc="The axis of the component (X, Y or Z).")
+        doc="The axis of the component (X, Y or Z).",
+    )
     emType = RestrictedProperty(
         required=True,
         restriction=RestrictType(ElectromagneticFieldType),
-        doc="The type of electromagnetic component (E or H).")
+        doc="The type of electromagnetic component (E or H).",
+    )
 
     def __init__(self, **kwargs):
         super(FieldComponent, self).__init__(**kwargs)
@@ -105,39 +107,47 @@ class __EMSource__(SimulationParameterContainer):
     field_component = RestrictedProperty(
         required=True,
         restriction=RestrictType(FieldComponent),
-        doc="The electromagnetic component of the source")
+        doc="The electromagnetic component of the source",
+    )
     name = RestrictedProperty(
         default="SOURCE",
         restriction=RESTRICT_STRING,
-        doc="A user-friendly name assigned to the source")
+        doc="A user-friendly name assigned to the source",
+    )
     amplitude = RestrictedProperty(
         default=1.0,
         restriction=RESTRICT_NUMBER & RESTRICT_POSITIVE,
-        doc="Amplitude of the Gaussian source")
+        doc="Amplitude of the Gaussian source",
+    )
 
     pass
 
 
 class __EMVolumeSource__(SimulationParameterContainer):
     """Electromagnetic volume source"""
+
     north = RestrictedProperty(
         required=True,
         restriction=RESTRICT_COORD3,
-        doc="Upper left corner of the source plane")
+        doc="Upper left corner of the source plane",
+    )
     south = RestrictedProperty(
         required=True,
         restriction=RESTRICT_COORD3,
-        doc="Lower right corner of the source plane")
+        doc="Lower right corner of the source plane",
+    )
 
     pass
 
 
 class __EMPointSource__(SimulationParameterContainer):
     """Electromagnetic point source"""
+
     point = RestrictedProperty(
         required=True,
         restriction=RESTRICT_COORD3,
-        doc="Coordinates of the point source")
+        doc="Coordinates of the point source",
+    )
 
     pass
 
@@ -146,11 +156,13 @@ class __GaussianSource__(__EMSource__):
     center_wavelength = RestrictedProperty(
         required=True,
         restriction=RESTRICT_FLOAT & RESTRICT_POSITIVE,
-        doc="Center wavelength (in nm) of the gaussian source")
+        doc="Center wavelength (in nm) of the gaussian source",
+    )
     pulse_width = RestrictedProperty(
         required=True,
         restriction=RESTRICT_FLOAT & RESTRICT_POSITIVE,
-        doc="Width (in nm) of the Gaussian source")
+        doc="Width (in nm) of the Gaussian source",
+    )
 
     def __init__(self, **kwargs):
         super(__GaussianSource__, self).__init__(**kwargs)
@@ -160,25 +172,28 @@ class __ContinuousSource__(__EMSource__):
     center_wavelength = RestrictedProperty(
         required=True,
         restriction=RESTRICT_FLOAT & RESTRICT_POSITIVE,
-        doc="Center wavelength (in nm) of the continuous source")
+        doc="Center wavelength (in nm) of the continuous source",
+    )
     smoothing_width = RestrictedProperty(
         default=0.0,
         restriction=RESTRICT_FLOAT & RESTRICT_NONNEGATIVE,
-        doc="Temporal smoothing width of continuous source (default: 0)")
+        doc="Temporal smoothing width of continuous source (default: 0)",
+    )
     cutoff = RestrictedProperty(
         default=3.0,
         restriction=RESTRICT_FLOAT & RESTRICT_NONNEGATIVE,
-        doc=
-        "How many widths the current decays for before we cut it off and set it to zero; the default is 3.0. A larger value of cutoff will reduce the amount of high-frequency components that are introduced by the start/stop of the source, but will of course lead to longer simulation times."
+        doc="How many widths the current decays for before we cut it off and set it to zero; the default is 3.0. A larger value of cutoff will reduce the amount of high-frequency components that are introduced by the start/stop of the source, but will of course lead to longer simulation times.",
     )
     start_time = RestrictedProperty(
         default=0.0,
         restriction=RESTRICT_FLOAT & RESTRICT_NONNEGATIVE,
-        doc="Start time of the continuous source (default: 0)")
+        doc="Start time of the continuous source (default: 0)",
+    )
     stop_time = RestrictedProperty(
-        default=float('inf'),
+        default=float("inf"),
         restriction=RESTRICT_FLOAT & RESTRICT_POSITIVE,
-        doc="Stop time of the continuous source (default: infinity)")
+        doc="Stop time of the continuous source (default: infinity)",
+    )
 
 
 class __AmplitudeShapedSource__(__EMSource__):
@@ -204,8 +219,9 @@ class ContinuousVolumeSource(__EMVolumeSource__, __ContinuousSource__):
     pass
 
 
-class AmplitudeShapedContinuousVolumeSource(ContinuousVolumeSource,
-                                            __AmplitudeShapedSource__):
+class AmplitudeShapedContinuousVolumeSource(
+    ContinuousVolumeSource, __AmplitudeShapedSource__
+):
     pass
 
 
@@ -216,7 +232,8 @@ class __DataCollector__(SimulationParameterContainer):
     name = RestrictedProperty(
         default="Datacollector",
         restriction=RESTRICT_STRING,
-        doc="A user-friendly name assigned to the datacollector")
+        doc="A user-friendly name assigned to the datacollector",
+    )
 
     def __init__(self, **kwargs):
         super(__DataCollector__, self).__init__(**kwargs)
@@ -227,35 +244,43 @@ class __DataCollector__(SimulationParameterContainer):
 
 class Fluxplane(__DataCollector__):
     """Plane for incremental capturing of the flux """
+
     north = RestrictedProperty(
         required=True,
         restriction=RESTRICT_COORD3,
-        doc="Upper left corner of the fluxplane")
+        doc="Upper left corner of the fluxplane",
+    )
     south = RestrictedProperty(
         required=True,
         restriction=RESTRICT_COORD3,
-        doc="Lower right corner of the fluxplane")
+        doc="Lower right corner of the fluxplane",
+    )
     center_wavelength = RestrictedProperty(
         required=True,
         restriction=RESTRICT_FLOAT & RESTRICT_NONNEGATIVE,
-        doc="Center wavelength (in nm) for collecting the flux")
+        doc="Center wavelength (in nm) for collecting the flux",
+    )
     pulse_width = RestrictedProperty(
         required=True,
         restriction=RESTRICT_FLOAT & RESTRICT_NONNEGATIVE,
-        doc="Wavelength width (in nm) for collecting the flux")
+        doc="Wavelength width (in nm) for collecting the flux",
+    )
     number_of_sampling_freq = RestrictedProperty(
         required=True,
         restriction=RESTRICT_INT & RESTRICT_NONNEGATIVE,
-        doc="Number of discrete sampling frequencies to monitor the flux")
-    flux_per_freq_callback = lambda: 0  #callback function (probably to the engine), to get the flux values. To be set upon initialisation
+        doc="Number of discrete sampling frequencies to monitor the flux",
+    )
+    flux_per_freq_callback = (
+        lambda: 0
+    )  # callback function (probably to the engine), to get the flux values. To be set upon initialisation
     flux_per_freq = RestrictedProperty(
         default=[[], []],
         restriction=RestrictType(list),
-        doc="the flux per frequency that was collected during the simulation")
+        doc="the flux per frequency that was collected during the simulation",
+    )
     init_hdf5 = StringProperty(
         default=None,
-        doc=
-        "The name of a HDF5 file from which to load initial values of the flux"
+        doc="The name of a HDF5 file from which to load initial values of the flux",
     )
 
     def initialize(self):
@@ -267,11 +292,12 @@ class Fluxplane(__DataCollector__):
         return self.flux_per_freq
 
     def persist_to_file(self, filename=None):
-        if (filename == None):
+        if filename == None:
             filename = "fluxplane_%s_%s.pickle" % (self.north, self.south)
-        f = open(filename, 'wb')
+        f = open(filename, "wb")
         LOG.debug("Persisting Fluxplane to file : %s" % filename)
         import pickle
+
         pickle.dump(self, f)
         f.close()
 
@@ -291,7 +317,7 @@ class Fluxplane(__DataCollector__):
         )
 
     def __getstate__(self):
-        #pickle cannot serialize lambda functions
+        # pickle cannot serialize lambda functions
         self.flux_per_freq_callback = None
         self.save_hdf5 = None
         self.load_hdf5 = None
@@ -301,20 +327,24 @@ class Fluxplane(__DataCollector__):
 
 class Probingpoint(__DataCollector__):
     """Probing point where the field is monitored """
+
     point = RestrictedProperty(
         required=True,
         restriction=RESTRICT_COORD3,
-        doc="The coordinates of the probing point")
-    fieldValueCallback = lambda: 0  #callback function (probably to the engine), to get the field value at this probing point. To be set by the engine upon initialisation
+        doc="The coordinates of the probing point",
+    )
+    fieldValueCallback = (
+        lambda: 0
+    )  # callback function (probably to the engine), to get the field value at this probing point. To be set by the engine upon initialisation
 
     def collect(self, pComp):
-        '''Collect the value of the field at the probing point for the specified component'''
+        """Collect the value of the field at the probing point for the specified component"""
         cf = self.fieldValueCallback
         f = cf(pComp)
         return f
 
     def __getstate__(self):
-        #pickle cannot serialize lambda functions
+        # pickle cannot serialize lambda functions
         self.fieldValueCallback = None
         return self.__dict__
 
@@ -327,13 +357,13 @@ class __SimulationVolume__(SimulationParameterContainer):
     geometry = DefinitionProperty(fdef_name="define_geometry")
 
     def get_material_dataset(self, resolution=1.0):
-        '''Get a dataset with the material at every coordinate in the simulation volume'''
+        """Get a dataset with the material at every coordinate in the simulation volume"""
         raise NotImplementedException(
             "Abstract class :: please implement 'get_material_dataset' in your subclass."
         )
 
     def get_dimensions(self):
-        '''Return a numpy array with the size dimensions of the dielectric'''
+        """Return a numpy array with the size dimensions of the dielectric"""
         raise NotImplementedException(
             "Abstract class :: please implement 'get_dimensions' in your subclass."
         )
@@ -344,22 +374,23 @@ class SimulationVolume1D(CartesianGeometry1D, __SimulationVolume__):
     window_width = FunctionNameProperty(fget_name="get_window_width")
 
     def get_dimensions(self):
-        '''Return a numpy array with the size dimensions of the dielectric'''
+        """Return a numpy array with the size dimensions of the dielectric"""
         return numpy.array([self.width])
 
     def get_material_dataset(self, resolution=1.0):
-        '''Get a dataset with the material on each coordinate'''
+        """Get a dataset with the material on each coordinate"""
         raise NotImplementedException("To be implemented by subclass.")
 
     def get_window_width(self):
-        if (self.has_window_defined()):
+        if self.has_window_defined():
             return self.window_size_info.width
         else:
             return self.width
 
     def has_window_defined(self):
-        if (not (self.window_size_info is None)) and (self.window_size_info !=
-                                                      EMPTY_SIZE_INFO):
+        if (not (self.window_size_info is None)) and (
+            self.window_size_info != EMPTY_SIZE_INFO
+        ):
             return True
         else:
             return False
@@ -375,11 +406,11 @@ class SimulationVolume2D(CartesianGeometry2D, SimulationVolume1D):
     window_height = FunctionNameProperty(fget_name="get_window_height")
 
     def get_dimensions(self):
-        '''Return a numpy array with the size dimensions of the dielectric'''
+        """Return a numpy array with the size dimensions of the dielectric"""
         return numpy.array([self.width, self.height])
 
     def get_window_height(self):
-        if (self.has_window_defined()):
+        if self.has_window_defined():
             return self.window_size_info.height
         else:
             return self.height
@@ -400,11 +431,11 @@ class SimulationVolume3D(CartesianGeometry3D, SimulationVolume2D):
     window_thickness = FunctionNameProperty(fget_name="get_window_thickness")
 
     def get_dimensions(self):
-        '''Return a numpy array with the size dimensions of the dielectric'''
+        """Return a numpy array with the size dimensions of the dielectric"""
         return numpy.array([self.width, self.height, self.thickness])
 
     def get_material_dataset(self, resolution=1.0):
-        '''Get a dataset with the material on each coordinate'''
+        """Get a dataset with the material on each coordinate"""
         raise NotImplementedException("To be implemented by subclass.")
 
     def get_window_thickness(self):
@@ -420,37 +451,40 @@ def NOVISUALISATION_FUNCTION():
 
 class SimulationLandscape(SimulationParameterContainer):
     """ The landscape describing the simulation (sources, material, flux planes, etc..)"""
+
     simulation_volume = RestrictedProperty(
         required=True,
         restriction=RestrictType(__SimulationVolume__),
-        doc="The simulation volume.")
+        doc="The simulation volume.",
+    )
     sources = RestrictedProperty(
         required=True,
         restriction=RestrictTypeList(__EMSource__),
-        doc="A list of electromagnetic sources.")
+        doc="A list of electromagnetic sources.",
+    )
     datacollectors = RestrictedProperty(
         required=True,
         restriction=RestrictTypeList(__DataCollector__),
-        doc="A list of datacollectors (e.g. fluxplanes, monitoring points,...)."
+        doc="A list of datacollectors (e.g. fluxplanes, monitoring points,...).",
     )
     pml_thickness = RestrictedProperty(
         default=0.0,
         restriction=RESTRICT_FLOAT,
-        doc=
-        "Specification of the perfectly matching layer (PML) on the boundaries, if any. Set to 0 if no PML."
+        doc="Specification of the perfectly matching layer (PML) on the boundaries, if any. Set to 0 if no PML.",
     )
     pml_direction = RestrictedProperty(
         default=None,
         restriction=RESTRICT_CHAR,
-        doc="When specified, only one pml-direction is used")
+        doc="When specified, only one pml-direction is used",
+    )
     simulation_id = RestrictedProperty(
         required=True,
         restriction=RESTRICT_STRING,
-        doc="A unique ID identifying the simulation.")
+        doc="A unique ID identifying the simulation.",
+    )
     visualize_datacollectors_to_file_function = CallableProperty(
         default=NOVISUALISATION_FUNCTION,
-        doc=
-        "function which creates a plot of the data in the datacollectors and saves this to file (parameter : filename)"
+        doc="function which creates a plot of the data in the datacollectors and saves this to file (parameter : filename)",
     )
 
     def __str__(self):
@@ -460,19 +494,21 @@ class SimulationLandscape(SimulationParameterContainer):
         return self.simulation_id
 
     def get_dimensions(self):
-        '''Return a numpy array with the size dimensions of the dielectric'''
+        """Return a numpy array with the size dimensions of the dielectric"""
         return self.simulation_volume.get_dimensions()
 
     def get_material_dataset(self, resolution=None):
-        '''Get a dataset with the EPS values of the dielectric'''
-        return self.simulation_volume.get_material_dataset(
-            resolution=resolution)
+        """Get a dataset with the EPS values of the dielectric"""
+        return self.simulation_volume.get_material_dataset(resolution=resolution)
 
     def visualize_datacollectors_to_file(self, filename=None):
-        '''Calls the user defined function, which creates a plot of the data in the datacollectors and saves this to file'''
+        """Calls the user defined function, which creates a plot of the data in the datacollectors and saves this to file"""
         if filename == None:
             try:
-                filename = self.default_filename_without_extension + ".datacollectors.pysimul.png"
+                filename = (
+                    self.default_filename_without_extension
+                    + ".datacollectors.pysimul.png"
+                )
             except Exception as e:
                 raise PythonSimulateException(
                     "Could not find a default filename for the 'visualizeDatacollectorsToFile' function. Fatal error."

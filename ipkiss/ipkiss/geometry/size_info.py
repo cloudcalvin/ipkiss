@@ -25,14 +25,18 @@ from . import transformable
 from . import coord
 import numpy
 
-#----------------------------------------------------------------------------
+# ----------------------------------------------------------------------------
 # SizeInfo class
-#----------------------------------------------------------------------------
+# ----------------------------------------------------------------------------
 
 __all__ = [
-    "SizeInfo", "SizeInfoProperty", "EMPTY_SIZE_INFO", "size_info",
-    "size_info_from_coord", "size_info_from_numpyarray",
-    "size_info_from_point_list"
+    "SizeInfo",
+    "SizeInfoProperty",
+    "EMPTY_SIZE_INFO",
+    "size_info",
+    "size_info_from_coord",
+    "size_info_from_numpyarray",
+    "size_info_from_point_list",
 ]
 
 
@@ -47,8 +51,12 @@ class SizeInfo(transformable.Transformable):
 
     def __is_initialized__(self):
         """ checks whether the internal data makes sense """
-        return not ((self.__west is None) or (self.__east is None) or
-                    (self.__north is None) or (self.__south is None))
+        return not (
+            (self.__west is None)
+            or (self.__east is None)
+            or (self.__north is None)
+            or (self.__south is None)
+        )
 
     # internal properties
     def get_west(self):
@@ -97,9 +105,11 @@ class SizeInfo(transformable.Transformable):
 
     # virtual properties
     def get_center(self):
-        if not self.__is_initialized__(): return None
-        return coord.Coord2(0.5 * (self.__west + self.__east),
-                            0.5 * (self.__south + self.__north))
+        if not self.__is_initialized__():
+            return None
+        return coord.Coord2(
+            0.5 * (self.__west + self.__east), 0.5 * (self.__south + self.__north)
+        )
 
     def set_center(self, value):
         # change center but keep height and width
@@ -121,9 +131,9 @@ class SizeInfo(transformable.Transformable):
 
     # virtual properties
     def get_size(self):
-        if not self.__is_initialized__(): return (0.0, 0.0)
-        return coord.Coord2(self.__east - self.__west,
-                            self.__north - self.__south)
+        if not self.__is_initialized__():
+            return (0.0, 0.0)
+        return coord.Coord2(self.__east - self.__west, self.__north - self.__south)
 
     def set_size(self, value):
         # change width and height but keep the center
@@ -139,7 +149,8 @@ class SizeInfo(transformable.Transformable):
     """ size: (width, height)"""
 
     def get_width(self):
-        if not self.__is_initialized__(): return 0.0
+        if not self.__is_initialized__():
+            return 0.0
         return self.__east - self.__west
 
     def set_width(self, value):
@@ -153,7 +164,8 @@ class SizeInfo(transformable.Transformable):
     """ width """
 
     def get_height(self):
-        if not self.__is_initialized__(): return 0.0
+        if not self.__is_initialized__():
+            return 0.0
         return self.__north - self.__south
 
     def set_height(self, value):
@@ -193,6 +205,7 @@ class SizeInfo(transformable.Transformable):
 
     def get_border_on_one_side(self, side):
         from ..constants import NORTH, SOUTH, EAST, WEST
+
         if side == NORTH:
             return self.north
         elif side == SOUTH:
@@ -207,27 +220,42 @@ class SizeInfo(transformable.Transformable):
             )
 
     def get_box(self):
-        if not self.__is_initialized__(): return None
+        if not self.__is_initialized__():
+            return None
         from . import shape
-        return shape.Shape([(self.__west, self.__south), (self.__east,
-                                                          self.__north)])
+
+        return shape.Shape([(self.__west, self.__south), (self.__east, self.__north)])
 
     box = property(get_box)
     """ box: Shape(south_west, north_east) """
 
     def __bounding_box_array__(self):
         """ numpy array with the corner point of the enclosing rectangle """
-        if not self.__is_initialized__(): return None
+        if not self.__is_initialized__():
+            return None
         return numpy.array(
-            [(self.__west, self.__south), (self.__east, self.__south),
-             (self.__east, self.__north), (self.__west, self.__north)])
+            [
+                (self.__west, self.__south),
+                (self.__east, self.__south),
+                (self.__east, self.__north),
+                (self.__west, self.__north),
+            ]
+        )
 
     def get_bounding_box(self):
-        if not self.__is_initialized__(): return None
+        if not self.__is_initialized__():
+            return None
         from . import shape
+
         return shape.Shape(
-            [(self.__west, self.__south), (self.__east, self.__south),
-             (self.__east, self.__north), (self.__west, self.__north)], True)
+            [
+                (self.__west, self.__south),
+                (self.__east, self.__south),
+                (self.__east, self.__north),
+                (self.__west, self.__north),
+            ],
+            True,
+        )
 
     bounding_box = property(get_bounding_box)
     """ shape with enclosing rectangle """
@@ -245,45 +273,62 @@ class SizeInfo(transformable.Transformable):
     def encloses(self, other, inclusive=False):
         """ checks whether point is in bounding box """
         from . import shape
-        if not self.__is_initialized__(): return False
+
+        if not self.__is_initialized__():
+            return False
         if inclusive:
             if isinstance(other, (tuple, coord.Coord2)):
-                return (other[0] <= self.__east) and (
-                    other[0] >= self.__west
-                ) and (other[1] <= self.__north) and (other[1] >= self.__south)
+                return (
+                    (other[0] <= self.__east)
+                    and (other[0] >= self.__west)
+                    and (other[1] <= self.__north)
+                    and (other[1] >= self.__south)
+                )
             elif isinstance(other, shape.Shape):
                 for c in other:
-                    if not self.encloses(c, inclusive): return False
+                    if not self.encloses(c, inclusive):
+                        return False
                 return True
             elif isinstance(other, SizeInfo):
-                return (other.__east <=
-                        self.__east) and (other.__west >= self.__west) and (
-                            other.__north <=
-                            self.__north) and (other.__south >= self.__south)
+                return (
+                    (other.__east <= self.__east)
+                    and (other.__west >= self.__west)
+                    and (other.__north <= self.__north)
+                    and (other.__south >= self.__south)
+                )
             else:
-                raise TypeError("Unsupported type " + str(type(other)) +
-                                " in SizeInfo.encloses()")
+                raise TypeError(
+                    "Unsupported type " + str(type(other)) + " in SizeInfo.encloses()"
+                )
         else:
             if isinstance(other, (tuple, coord.Coord2)):
-                return (other[0] < self.__east) and (
-                    other[0] > self.__west) and (other[1] < self.__north) and (
-                        other[1] > self.__south)
+                return (
+                    (other[0] < self.__east)
+                    and (other[0] > self.__west)
+                    and (other[1] < self.__north)
+                    and (other[1] > self.__south)
+                )
             elif isinstance(other, shape.Shape):
                 for c in other:
-                    if not self.encloses(c, inclusive): return False
+                    if not self.encloses(c, inclusive):
+                        return False
                 return True
             elif isinstance(other, SizeInfo):
-                return (other.__east <
-                        self.__east) and (other.__west > self.__west) and (
-                            other.__north < self.__north) and (other.__south >
-                                                               self.__south)
+                return (
+                    (other.__east < self.__east)
+                    and (other.__west > self.__west)
+                    and (other.__north < self.__north)
+                    and (other.__south > self.__south)
+                )
             else:
-                raise TypeError("Unsupported type " + str(type(other)) +
-                                " in SizeInfo.encloses()")
+                raise TypeError(
+                    "Unsupported type " + str(type(other)) + " in SizeInfo.encloses()"
+                )
 
     def snap_to_grid(self, grids_per_unit=None):
         """ snaps the size_info object to the grid """
-        if not self.__is_initialized__(): return self
+        if not self.__is_initialized__():
+            return self
         if grids_per_unit is None:
             grids_per_unit = constants.get_grids_per_unit()
         self.__west = constants.snap_value(self.__west, grids_per_unit)
@@ -294,7 +339,8 @@ class SizeInfo(transformable.Transformable):
 
     def expand_to_grid(self, grids_per_unit=None):
         """ expands the size_info object to the grid """
-        if not self.__is_initialized__(): return self
+        if not self.__is_initialized__():
+            return self
         if grids_per_unit is None:
             grids_per_unit = constants.get_grids_per_unit()
         self.__west = floor(self.__west * grids_per_unit) / grids_per_unit
@@ -376,12 +422,22 @@ class SizeInfo(transformable.Transformable):
         """ transforms a copy of the size_info box and makes a new cartesian box over it """
         if self.__is_initialized__():
             return size_info_from_numpyarray(
-                transformation.apply_to_array(self.__bounding_box_array__()))
+                transformation.apply_to_array(self.__bounding_box_array__())
+            )
         else:
             return SizeInfo()
 
     def __eq__(self, other):
-        return self.west == other.west and self.east == other.east and self.north == other.north and self.south == other.south and self.center == other.center and self.size == other.size and self.width == other.width and self.height == other.height
+        return (
+            self.west == other.west
+            and self.east == other.east
+            and self.north == other.north
+            and self.south == other.south
+            and self.center == other.center
+            and self.size == other.size
+            and self.width == other.width
+            and self.height == other.height
+        )
 
     def __ne__(self, other):
         return not self.__eq__(other)
@@ -393,15 +449,18 @@ class SizeInfo(transformable.Transformable):
         self.__south = self.__south - growth
 
     def __str__(self):
-        return "west: %f - east: %f - south: %f - north: %f" % (self.west,
-                                                                self.east,
-                                                                self.south,
-                                                                self.north)
+        return "west: %f - east: %f - south: %f - north: %f" % (
+            self.west,
+            self.east,
+            self.south,
+            self.north,
+        )
 
 
 def size_info_from_point_list(point_list):
     """ generate a size info from a point list """
-    if len(point_list) == 0: return SizeInfo()
+    if len(point_list) == 0:
+        return SizeInfo()
     x = [c[0] for c in point_list]
     y = [c[1] for c in point_list]
     return SizeInfo(min(x), max(x), max(y), min(y))
@@ -409,7 +468,8 @@ def size_info_from_point_list(point_list):
 
 def size_info_from_numpyarray(points):
     """ generate a size_info from a numpy array """
-    if len(points) == 0: return SizeInfo()
+    if len(points) == 0:
+        return SizeInfo()
     LB = numpy.min(points, 0)
     TR = numpy.max(points, 0)
     return SizeInfo(LB[0], TR[0], TR[1], LB[1])
@@ -423,6 +483,7 @@ def size_info_from_coord(coord):
 def size_info(shape):
     """ generate a size_info from a shape-like object """
     from . import shape
+
     if isinstance(shape, shape.Shape):
         return shape.size_info()
     elif isinstance(shape, numpy.ndarray):
@@ -435,13 +496,14 @@ def size_info(shape):
         raise TypeError("Invalid type for size_info(): " + str(type(shape)))
 
 
-def SizeInfoProperty(internal_member_name=None,
-                     restriction=RestrictNothing(),
-                     **kwargs):
+def SizeInfoProperty(
+    internal_member_name=None, restriction=RestrictNothing(), **kwargs
+):
     """ SizeInfo property descriptor for a class """
     R = RestrictType(SizeInfo) & restriction
     return RestrictedProperty(
-        internal_member_name=internal_member_name, restriction=R, **kwargs)
+        internal_member_name=internal_member_name, restriction=R, **kwargs
+    )
 
 
 EMPTY_SIZE_INFO = SizeInfo(west=0.0, east=0.0, south=0.0, north=0.0)

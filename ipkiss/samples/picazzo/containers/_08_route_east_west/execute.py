@@ -24,16 +24,17 @@ from ipkiss.all import *
 
 # our basic component that we will use...
 from picazzo.filters.ring import RingRect180DropFilter
+
 my_ring = RingRect180DropFilter(name="My_Ring")
 
 from picazzo.container import RoutePortsEastWest
 
 ## Routing using default parameters
-#my_ring_ew = RoutePortsEastWest(structure = my_ring,
-#ports_to_east = ["E0", "E1", "W1" ],   # ports to be routed eastwards
-#ports_to_west = ["W0"]                 # ports to be routed westwards
-#)
-#my_ring_ew.write_gdsii("route_east_west_1.gds")
+# my_ring_ew = RoutePortsEastWest(structure = my_ring,
+# ports_to_east = ["E0", "E1", "W1" ],   # ports to be routed eastwards
+# ports_to_west = ["W0"]                 # ports to be routed westwards
+# )
+# my_ring_ew.write_gdsii("route_east_west_1.gds")
 
 # customize all parameters
 from ipkiss.geometry.shapes.spline import SplineRoundingAlgorithm
@@ -43,10 +44,11 @@ my_ring_ew_2 = RoutePortsEastWest(
     structure_transformation=Rotation(rotation=-20.0),
     ports_to_east=["E0", "E1", "W1"],
     ports_to_west=["W0"],
-    reference_east="E0",  # Port that serves as y-reference 
+    reference_east="E0",  # Port that serves as y-reference
     reference_west="W0",  # Port that serves as y-reference
     spacing=17.0,  # vertical spacing between outputs
     manhattan=True,  # add suares on corners
     bend_radius=3.0,  # bend radius of the waveguides
-    rounding_algorithm=SplineRoundingAlgorithm(adiabatic_angles=(10.0, 10.0)))
+    rounding_algorithm=SplineRoundingAlgorithm(adiabatic_angles=(10.0, 10.0)),
+)
 my_ring_ew_2.write_gdsii("route_east_west_2.gds")

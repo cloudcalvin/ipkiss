@@ -28,19 +28,43 @@ from math import atan2, pi, sqrt
 from ipkiss.log import IPKISS_LOG as LOG
 
 __all__ = [
-    "shape_point_east", "shape_point_at_angle", "shape_point_between_angles",
-    "shape_south", "shape_south_west", "shape_south_east",
-    "shape_bounding_box", "shape_box", "shape_box_center", "shape_west",
-    "shape_length", "shape_orientation", "shape_east", "shape_size",
-    "shape_north", "shape_north_west", "shape_north_east", "shape_xcoords",
-    "shape_ycoords", "angle_deg", "angle_rad", "distance", "lines_cross",
-    "lines_parallel", "lines_coincide", "intersection", "turn_deg", "turn_rad",
-    "is_west", "midpoint", "sort_points_on_line", "point_in_triangle"
+    "shape_point_east",
+    "shape_point_at_angle",
+    "shape_point_between_angles",
+    "shape_south",
+    "shape_south_west",
+    "shape_south_east",
+    "shape_bounding_box",
+    "shape_box",
+    "shape_box_center",
+    "shape_west",
+    "shape_length",
+    "shape_orientation",
+    "shape_east",
+    "shape_size",
+    "shape_north",
+    "shape_north_west",
+    "shape_north_east",
+    "shape_xcoords",
+    "shape_ycoords",
+    "angle_deg",
+    "angle_rad",
+    "distance",
+    "lines_cross",
+    "lines_parallel",
+    "lines_coincide",
+    "intersection",
+    "turn_deg",
+    "turn_rad",
+    "is_west",
+    "midpoint",
+    "sort_points_on_line",
+    "point_in_triangle",
 ]
 
-#----------------------------------------------------------------------------
-#shape information
-#----------------------------------------------------------------------------
+# ----------------------------------------------------------------------------
+# shape information
+# ----------------------------------------------------------------------------
 
 
 def shape_xcoords(shape):
@@ -154,34 +178,38 @@ def shape_box(shape):
 def shape_bounding_box(coordinates):
     """ returns a rectangle shape enclosing the shape"""
     if len(shape) == 0:
-        return shape.Shape([(0.0, 0.0), (0.0, 0.0), (0.0, 0.0), (0.0, 0.0)],
-                           True)
+        return shape.Shape([(0.0, 0.0), (0.0, 0.0), (0.0, 0.0), (0.0, 0.0)], True)
     else:
         LB = numpy.min(shape.points, 0)
         TR = numpy.max(shape.points, 0)
-        return shape.Shape([(LB[0], LB[1]), (LB[0], TR[1]), (TR[0], TR[1]),
-                            (TR[0], LB[1])], True)
+        return shape.Shape(
+            [(LB[0], LB[1]), (LB[0], TR[1]), (TR[0], TR[1]), (TR[0], LB[1])], True
+        )
 
 
 def shape_orientation(coordinates):
     """ returns true for clockwise orientation """
-    #returns True if the coordinates are clockwise or False if not
+    # returns True if the coordinates are clockwise or False if not
     turn = 0.0
     L = len(coordinates)
     if coordinates[0] == coordinates[-1]:
         L -= 1
     for i in range(L):
-        angle1 = atan2(coordinates[i][1] - coordinates[(i - 1) % L][1],
-                       coordinates[i][0] - coordinates[(i - 1) % L][0])
-        angle2 = atan2(coordinates[(i + 1) % L][1] - coordinates[i][1],
-                       coordinates[(i + 1) % L][0] - coordinates[i][0])
+        angle1 = atan2(
+            coordinates[i][1] - coordinates[(i - 1) % L][1],
+            coordinates[i][0] - coordinates[(i - 1) % L][0],
+        )
+        angle2 = atan2(
+            coordinates[(i + 1) % L][1] - coordinates[i][1],
+            coordinates[(i + 1) % L][0] - coordinates[i][0],
+        )
         turn += ((angle2 - angle1 + pi) % (2 * pi)) - pi
     return turn < 0
 
 
 def distance(coord, origin=(0.0, 0.0)):
     """ distance of coordinate to origin """
-    return sqrt((coord[0] - origin[0])**2 + (coord[1] - origin[1])**2)
+    return sqrt((coord[0] - origin[0]) ** 2 + (coord[1] - origin[1]) ** 2)
 
 
 def angle_rad(coord, origin=(0.0, 0.0)):
@@ -218,8 +246,8 @@ def is_west(point, line_point1, line_point2):
     else:
         return R
 
-        #return ( (line_point2[0] - line_point1[0]) * (point[1]- line_point1[1])
-        #- (point[0] - line_point1[0]) * (line_point2[1] - line_point1[1]) )
+        # return ( (line_point2[0] - line_point1[0]) * (point[1]- line_point1[1])
+        # - (point[0] - line_point1[0]) * (line_point2[1] - line_point1[1]) )
 
 
 def lines_cross(begin1, end1, begin2, end2, inclusive=False):
@@ -234,19 +262,25 @@ def lines_cross(begin1, end1, begin2, end2, inclusive=False):
     B2 = -end2[0] + begin2[0]
     C2 = -(begin2[1] * B2 + begin2[0] * A2)
 
-    if A1 * B2 == A2 * B1:  #parallel
+    if A1 * B2 == A2 * B1:  # parallel
         return False
 
     if inclusive:
-        return ((A1 * begin2[0] + B1 * begin2[1] + C1) *
-                (A1 * end2[0] + B1 * end2[1] + C1) <= 0
-                and (A2 * begin1[0] + B2 * begin1[1] + C2) *
-                (A2 * end1[0] + B2 * end1[1] + C2) <= 0)
+        return (
+            (A1 * begin2[0] + B1 * begin2[1] + C1) * (A1 * end2[0] + B1 * end2[1] + C1)
+            <= 0
+            and (A2 * begin1[0] + B2 * begin1[1] + C2)
+            * (A2 * end1[0] + B2 * end1[1] + C2)
+            <= 0
+        )
     else:
-        return ((A1 * begin2[0] + B1 * begin2[1] + C1) *
-                (A1 * end2[0] + B1 * end2[1] + C1) < 0
-                and (A2 * begin1[0] + B2 * begin1[1] + C2) *
-                (A2 * end1[0] + B2 * end1[1] + C2) < 0)
+        return (
+            (A1 * begin2[0] + B1 * begin2[1] + C1) * (A1 * end2[0] + B1 * end2[1] + C1)
+            < 0
+            and (A2 * begin1[0] + B2 * begin1[1] + C2)
+            * (A2 * end1[0] + B2 * end1[1] + C2)
+            < 0
+        )
 
 
 def lines_parallel(begin1, end1, begin2, end2):
@@ -279,8 +313,11 @@ def lines_coincide(begin1, end1, begin2, end2):
     if (not (A1 or B1)) or (not (A2 or B2)):
         return False  # one segment consists of 2 identical points
 
-    return abs(A1 * B2 - A2 * B1) < 1E-10 and abs(
-        C1 * A2 - C2 * A1) < 1E-10 and abs(C1 * B2 - C2 * B1) < 1E-10
+    return (
+        abs(A1 * B2 - A2 * B1) < 1E-10
+        and abs(C1 * A2 - C2 * A1) < 1E-10
+        and abs(C1 * B2 - C2 * B1) < 1E-10
+    )
 
 
 def intersection(begin1, end1, begin2, end2):
@@ -306,8 +343,7 @@ def intersection(begin1, end1, begin2, end2):
 
 
 def midpoint(P1, P2, ratio=0.5):
-    return ratio * coord.Coord2(P1[0], P1[1]) + (
-        1 - ratio) * coord.Coord2(P2[0], P2[1])
+    return ratio * coord.Coord2(P1[0], P1[1]) + (1 - ratio) * coord.Coord2(P2[0], P2[1])
 
 
 def sort_points_on_line(point_list):
@@ -339,7 +375,7 @@ def point_in_triangle(P, P1, P2, P3):
 
 def shape_length(coordinates):
     """ length of a shape """
-    #returns the length of a shape
+    # returns the length of a shape
     L = 0
     last_c = coordinates[0]
     for c in coordinates[1:]:

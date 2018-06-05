@@ -18,10 +18,10 @@
 # i-depot BBIE 7396, 7556, 7748
 #
 # Contact: ipkiss@intec.ugent.be
-'''
+"""
 Load a pickled SimulationDefinition and run it. Uses first argument as filename.
 
-'''
+"""
 from pysimul.runtime.basic import *
 from pysimul.runtime.definition import *
 from pysimul.runtime.procedure import *

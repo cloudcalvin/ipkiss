@@ -37,7 +37,7 @@ my_phc_map = [
 
 # equivalent, using repeat shorthand
 my_phc_map = [
-    "A/9, A/",  #A, then repeat 9 times the sequence between the comma and the next /
+    "A/9, A/",  # A, then repeat 9 times the sequence between the comma and the next /
     " /9,A /",
     "A/9, A/",
     " /9,A /",
@@ -52,12 +52,13 @@ my_component = DodecPhCLayout(
     pitch=0.45,
     hole_sizes={"A": 0.290},
     map="\n".join(my_phc_map),
-    zero_line_y=5,  #count lines from the top
+    zero_line_y=5,  # count lines from the top
 )
 
 my_component.write_gdsii("example_phc.gds")
 # -------- verify the fabrication materials with a 2D visualization
 from ipkiss.plugins.vfabrication import *
+
 my_component.visualize_2d()
 
 # A cavity
@@ -75,21 +76,23 @@ my_phc_map = [
 
 my_component = DodecPhCLayout(
     pitch=0.45,
-    hole_sizes={"A": 0.290,
-                "B": 0.190},  # two sizes
+    hole_sizes={"A": 0.290, "B": 0.190},  # two sizes
     map="\n".join(my_phc_map),
-    zero_line_y=5,  #count lines from the top
+    zero_line_y=5,  # count lines from the top
     ports_coordinates=[
-        ((-0.5, 0), 180, TECH.WGDEF.WIRE), ((10.5, 0), 0, TECH.WGDEF.WIRE)
-    ]  # coordinates expressed in lattice pitches
+        ((-0.5, 0), 180, TECH.WGDEF.WIRE),
+        ((10.5, 0), 0, TECH.WGDEF.WIRE),
+    ],  # coordinates expressed in lattice pitches
 )
 
 my_component.write_gdsii("example_phc2.gds")
 # -------- verify the fabrication materials with a 2D visualization
 from ipkiss.plugins.vfabrication import *
+
 my_component.visualize_2d()
 
 from picazzo.container.extend_ports import ExtendPorts
+
 my_component_with_wg = ExtendPorts(structure=my_component)
 
 my_component_with_wg.write_gdsii("example_phc3.gds")

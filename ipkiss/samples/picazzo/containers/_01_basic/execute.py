@@ -28,6 +28,7 @@ from picazzo.filters.ring import RingRect180DropFilter
 my_ring = RingRect180DropFilter(name="My_Ring")
 
 from picazzo.container.container import __StructureContainer__
+
 # base class of containers. Does nothing except put a structure in a container.
 # For other predefined container classes, we can use
 # from picazzo.container import *
@@ -37,8 +38,8 @@ my_ring_in_container_1.write_gdsii("container_1.gds")
 
 # put that one in a container with a transformation
 my_ring_in_container_2 = __StructureContainer__(
-    structure=my_ring_in_container_1,
-    structure_transformation=Rotation(rotation=30.0))
+    structure=my_ring_in_container_1, structure_transformation=Rotation(rotation=30.0)
+)
 my_ring_in_container_2.write_gdsii("container_2.gds")
 
 # write this one to gdsii without hierarchy

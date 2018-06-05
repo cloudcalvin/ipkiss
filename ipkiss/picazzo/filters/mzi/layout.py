@@ -20,21 +20,37 @@
 # Contact: ipkiss@intec.ugent.be
 
 from picazzo.wg.splitters import WgY90Splitter, WgY90Combiner
-from ipkiss.plugins.photonics.routing.to_line import RouteToWestAtY, RouteToEastAtY, RouteToEast
+from ipkiss.plugins.photonics.routing.to_line import (
+    RouteToWestAtY,
+    RouteToEastAtY,
+    RouteToEast,
+)
 from ipkiss.plugins.photonics.routing.manhattan import RouteManhattan
 from ipkiss.plugins.photonics.routing.connect import RouteConnector
 from ipkiss.plugins.photonics.wg.basic import WgElDefinition
 from ipkiss.plugins.photonics.wg.definition import WaveguideDefProperty
-from ipkiss.plugins.photonics.wg.connect import WaveguidePointRoundedConnectElementDefinition, WaveguidePointRoundedExpandedConnectElementDefinition
+from ipkiss.plugins.photonics.wg.connect import (
+    WaveguidePointRoundedConnectElementDefinition,
+    WaveguidePointRoundedExpandedConnectElementDefinition,
+)
 from ipkiss.plugins.photonics.port import OpticalPort, InOpticalPort, OutOpticalPort
 from picazzo.wg.tapers.linear import WgElPortTaperLinear
-from ipkiss.plugins.photonics.wg.connect import __RoundedWaveguide__, __RoundedWaveguideManhattan__
+from ipkiss.plugins.photonics.wg.connect import (
+    __RoundedWaveguide__,
+    __RoundedWaveguideManhattan__,
+)
 from picazzo.wg.spiral import WgSpiralFixedLength
 from ipkiss.all import *
 
 __all__ = [
-    "WgMzi", "WgMziY90", "WgMzi1x1Y90", "WgMzi1x1Y90Asymmetric",
-    "WgMzi1x1Y90Symmetric", "WgMziAsymmetric", "WgMziSymmetric", "WgMziGeneric"
+    "WgMzi",
+    "WgMziY90",
+    "WgMzi1x1Y90",
+    "WgMzi1x1Y90Asymmetric",
+    "WgMzi1x1Y90Symmetric",
+    "WgMziAsymmetric",
+    "WgMziSymmetric",
+    "WgMziGeneric",
 ]
 
 
@@ -52,13 +68,15 @@ class WgMzi(Structure):
         return SRef(
             reference=self.splitter,
             position=(0.0, 0.0),
-            transformation=self.splitter_transform)
+            transformation=self.splitter_transform,
+        )
 
     def define_combiner_ref(self):
         return SRef(
             reference=self.combiner,
             position=(0.0, 0.0),
-            transformation=self.combiner_transform)
+            transformation=self.combiner_transform,
+        )
 
     def define_elements(self, elems):
         elems += self.splitter_ref
@@ -81,11 +99,13 @@ class WgMziY90(__RoundedWaveguide__, WgMzi):
 
     def define_splitter(self):
         return WgY90Splitter(
-            bend_radius=self.bend_radius, wg_definition=self.wg_definition)
+            bend_radius=self.bend_radius, wg_definition=self.wg_definition
+        )
 
     def define_combiner(self):
         return WgY90Combiner(
-            bend_radius=self.bend_radius, wg_definition=self.wg_definition)
+            bend_radius=self.bend_radius, wg_definition=self.wg_definition
+        )
 
     def define_splitter_transform(self):
         return IdentityTransform()
@@ -102,7 +122,8 @@ class WgMziY90(__RoundedWaveguide__, WgMzi):
             rounding_algorithm=self.rounding_algorithm,
             min_straight=0.0,
             start_straight=self.straight1,
-            end_straight=self.straight1)
+            end_straight=self.straight1,
+        )
         elems += RouteConnector(route=R, manhattan=self.manhattan)
         R = RouteManhattan(
             input_port=self.splitter_ref.south_ports[0],
@@ -111,7 +132,8 @@ class WgMziY90(__RoundedWaveguide__, WgMzi):
             rounding_algorithm=self.rounding_algorithm,
             min_straight=0.0,
             start_straight=self.straight2,
-            end_straight=self.straight2)
+            end_straight=self.straight2,
+        )
         elems += RouteConnector(route=R, manhattan=self.manhattan)
         return elems
 
@@ -121,6 +143,7 @@ class WgMziY90(__RoundedWaveguide__, WgMzi):
 #####################
 class __MziDelaySimple__(__RoundedWaveguide__, Structure):
     """ a simple 4-bend delay line """
+
     __name_prefix__ = "MZIS_D"
 
     wg_definition = WaveguideDefProperty(default=TECH.WGDEF.WIRE)
@@ -149,17 +172,20 @@ class __MziDelaySimple__(__RoundedWaveguide__, Structure):
             wg_definition=self.wg_definition,
             bend_radius=self.bend_radius,
             rounding_algorithm=self.rounding_algorithm,
-            manhattan=self.manhattan)
+            manhattan=self.manhattan,
+        )
         return [wgdef(shape=s)]
 
     def define_ports(self, ports):
-        ports += self.connectors[0].in_ports.move_copy(
-            (0.0, 0.0)) + self.connectors[-1].out_ports.move_copy((0.0, 0.0))
+        ports += self.connectors[0].in_ports.move_copy((0.0, 0.0)) + self.connectors[
+            -1
+        ].out_ports.move_copy((0.0, 0.0))
         return ports
 
 
 class __MziDelaySpiral__(__RoundedWaveguide__, Structure):
     """ a spiral delay line """
+
     __name_prefix__ = "MZISP_D"
 
     wg_definition = WaveguideDefProperty(default=TECH.WGDEF.WIRE)
@@ -174,13 +200,15 @@ class __MziDelaySpiral__(__RoundedWaveguide__, Structure):
             wg_definition=self.wg_definition,
             bend_radius=self.bend_radius,
             rounding_algorithm=self.rounding_algorithm,
-            manhattan=self.manhattan)
+            manhattan=self.manhattan,
+        )
         connectors = [
             WgSpiralFixedLength(
                 wg_definition=wg_def,
                 total_length=self.total_length,
                 n_o_loops=self.no_loops,
-                spacing=self.spacing)
+                spacing=self.spacing,
+            )
         ]
         return connectors
 
@@ -190,8 +218,9 @@ class __MziDelaySpiral__(__RoundedWaveguide__, Structure):
         return elems
 
     def define_ports(self, ports):
-        ports = self.connectors[0].in_ports.move_copy(
-            (0.0, 0.0)) + self.connectors[-1].out_ports.move_copy((0.0, 0.0))
+        ports = self.connectors[0].in_ports.move_copy((0.0, 0.0)) + self.connectors[
+            -1
+        ].out_ports.move_copy((0.0, 0.0))
         return ports
 
 
@@ -211,41 +240,53 @@ class __MziDelaySpiralFlipped__(__MziDelaySpiral__):
             wg_definition=self.wg_definition,
             bend_radius=self.bend_radius,
             rounding_algorithm=self.rounding_algorithm,
-            manhattan=self.manhattan)
+            manhattan=self.manhattan,
+        )
         spiral = WgSpiralFixedLength(
             wg_definition=wg_def,
             total_length=self.total_length,
             n_o_loops=self.no_loops,
-            spacing=self.spacing)
+            spacing=self.spacing,
+        )
         spiral_ref = SRef(reference=spiral, transformation=VMirror())
         struct = Structure(
-            name=spiral.name + "_flipped",
-            elements=[spiral_ref],
-            ports=spiral_ref.ports)
+            name=spiral.name + "_flipped", elements=[spiral_ref], ports=spiral_ref.ports
+        )
         connectors = [struct]
         return connectors
 
 
 class __MziDelayExpanded__(__MziDelaySimple__):
     """ a simple 4-bend delay line """
+
     __name_prefix__ = "MZIE_D"
     expanded_wg_width = PositiveNumberProperty(default=TECH.WG.EXPANDED_WIDTH)
-    min_expanded_length = PositiveNumberProperty(
-        default=TECH.WG.EXPANDED_STRAIGHT)
+    min_expanded_length = PositiveNumberProperty(default=TECH.WG.EXPANDED_STRAIGHT)
     expanded_taper_length = PositiveNumberProperty(
-        default=TECH.WG.EXPANDED_TAPER_LENGTH)
+        default=TECH.WG.EXPANDED_TAPER_LENGTH
+    )
     delay = NumberProperty(required=True)
     straight = DefinitionProperty(fdef_name="define_straight")
 
     def define_connectors(self):
         bs1, bs2 = self.get_bend90_size()
-        S = self.min_straight + self.min_expanded_length + 2 * self.expanded_taper_length
+        S = (
+            self.min_straight
+            + self.min_expanded_length
+            + 2 * self.expanded_taper_length
+        )
         s = self.min_straight
         D = self.delay / 2.0
         shape = Shape(
-            [(0.0, 0.0), (s + bs1, 0.0), (s + bs1, S + bs1 + bs2 + D),
-             (2 * s + 2 * bs1 + bs2, S + bs1 + bs2 + D),
-             (2 * s + 2 * bs1 + bs2, 0.0), (3 * s + 2 * bs1 + 2 * bs2, 0.0)])
+            [
+                (0.0, 0.0),
+                (s + bs1, 0.0),
+                (s + bs1, S + bs1 + bs2 + D),
+                (2 * s + 2 * bs1 + bs2, S + bs1 + bs2 + D),
+                (2 * s + 2 * bs1 + bs2, 0.0),
+                (3 * s + 2 * bs1 + 2 * bs2, 0.0),
+            ]
+        )
         wgdef = WaveguidePointRoundedExpandedConnectElementDefinition(
             wg_definition=self.wg_definition,
             bend_radius=self.bend_radius,
@@ -254,7 +295,8 @@ class __MziDelayExpanded__(__MziDelaySimple__):
             expanded_taper_length=self.expanded_taper_length,
             min_straight=self.min_straight,
             min_expanded_length=self.min_expanded_length,
-            manhattan=True)
+            manhattan=True,
+        )
         connectors = [wgdef(shape=shape)]
         return connectors
 
@@ -276,27 +318,43 @@ class __MziDelayFlatExpanded__(__MziDelayExpanded__):
 
     def define_connectors(self):
         from numpy import sign
+
         bs1, bs2 = self.get_bend90_size()
-        S = self.min_wire_length + self.min_expanded_length + 2 * self.expanded_taper_length
+        S = (
+            self.min_wire_length
+            + self.min_expanded_length
+            + 2 * self.expanded_taper_length
+        )
         s = self.min_wire_length
         sD = sign(self.delay)
         D = abs(self.delay / 2.0)
 
         if sD <= 0:
-            shape = Shape([(0.0, 0.0), (s + bs1, 0.0), (s + bs1,
-                                                        4 * bs2 + 2 * s),
-                           (3 * s + 5 * bs1 + S + D,
-                            4 * bs2 + 2 * s), (3 * s + 5 * bs1 + S + D,
-                                               2 * bs2 + s), (2 * s + 2 * bs1,
-                                                              2 * bs2 + s),
-                           (2 * s + 2 * bs1, 0.0), (3 * s + 3 * bs1, 0.0)])
+            shape = Shape(
+                [
+                    (0.0, 0.0),
+                    (s + bs1, 0.0),
+                    (s + bs1, 4 * bs2 + 2 * s),
+                    (3 * s + 5 * bs1 + S + D, 4 * bs2 + 2 * s),
+                    (3 * s + 5 * bs1 + S + D, 2 * bs2 + s),
+                    (2 * s + 2 * bs1, 2 * bs2 + s),
+                    (2 * s + 2 * bs1, 0.0),
+                    (3 * s + 3 * bs1, 0.0),
+                ]
+            )
         else:
-            shape = Shape([(0.0, 0.0), (s + bs1, 0.0), (s + bs1, 2 * bs2 + s),
-                           (s - S - D - bs1, 2 * bs2 + s), (s - S - D - bs1,
-                                                            4 * bs2 + 2 * s),
-                           (2 * s + 2 * bs1,
-                            4 * bs2 + 2 * s), (2 * s + 2 * bs1,
-                                               0.0), (3 * s + 3 * bs1, 0.0)])
+            shape = Shape(
+                [
+                    (0.0, 0.0),
+                    (s + bs1, 0.0),
+                    (s + bs1, 2 * bs2 + s),
+                    (s - S - D - bs1, 2 * bs2 + s),
+                    (s - S - D - bs1, 4 * bs2 + 2 * s),
+                    (2 * s + 2 * bs1, 4 * bs2 + 2 * s),
+                    (2 * s + 2 * bs1, 0.0),
+                    (3 * s + 3 * bs1, 0.0),
+                ]
+            )
 
         wgdef = WaveguidePointRoundedExpandedConnectElementDefinition(
             wg_definition=self.wg_definition,
@@ -306,7 +364,8 @@ class __MziDelayFlatExpanded__(__MziDelayExpanded__):
             taper_length=self.expanded_taper_length,
             min_wire_length=self.min_wire_length,
             min_expanded_length=self.min_expanded_length,
-            manhattan=True)
+            manhattan=True,
+        )
         connectors = [wgdef(shape=shape)]
         return connectors
 
@@ -323,6 +382,7 @@ class __MziDelayFlatExpandedFlipped__(__MziDelayFlatExpanded__):
 
 class __MziBase__(Structure):
     """ Generic MZI that consists of an input coupler, output coupler and arm elements """
+
     in_coupler_transform = TransformationProperty()
     out_coupler_transform = TransformationProperty()
     arm1 = StructureProperty(allow_none=True)
@@ -360,6 +420,7 @@ class __MziBase__(Structure):
 
 class __WgMzi__(__RoundedWaveguideManhattan__, __MziBase__, Structure):
     """ Generic MZI that connects its couplers and arm elements with simple waveguides"""
+
     __name_prefix__ = "MZIWG"
 
     wg_definition = WaveguideDefProperty(default=TECH.WGDEF.WIRE)
@@ -368,8 +429,7 @@ class __WgMzi__(__RoundedWaveguideManhattan__, __MziBase__, Structure):
     CPout = DefinitionProperty()
     A1C = DefinitionProperty(fdef_name="define_a1c")
     A2C = DefinitionProperty(fdef_name="define_a2c")
-    in_coupler_pos_R1_R2_R3_R4_arm1_pos_arm2_pos_out_coupler_pos = DefinitionProperty(
-    )
+    in_coupler_pos_R1_R2_R3_R4_arm1_pos_arm2_pos_out_coupler_pos = DefinitionProperty()
     in_coupler_pos = DefinitionProperty()
     out_coupler_pos = DefinitionProperty()
     R1 = DefinitionProperty()
@@ -398,41 +458,53 @@ class __WgMzi__(__RoundedWaveguideManhattan__, __MziBase__, Structure):
                     OpticalPort(
                         position=(0.0, 0.0),
                         wg_definition=self.wg_definition,
-                        angle_deg=180.0),
+                        angle_deg=180.0,
+                    ),
                     OpticalPort(
                         position=(0.0, 0.0),
                         wg_definition=self.wg_definition,
-                        angle_deg=0.0)
-                ])
+                        angle_deg=0.0,
+                    ),
+                ],
+            )
 
         # if widths not identical,add tapers
-        if A.west_ports[0].wg_definition.wg_width == self.CPin[1].wg_definition.wg_width and A.east_ports[0].wg_definition.wg_width == self.CPout[1].wg_definition.wg_width:
+        if (
+            A.west_ports[0].wg_definition.wg_width
+            == self.CPin[1].wg_definition.wg_width
+            and A.east_ports[0].wg_definition.wg_width
+            == self.CPout[1].wg_definition.wg_width
+        ):
             AC = A
         else:
             from picazzo.wg.taper_extended import WgElPortTaperExtended
+
             if self.automatic_taper_west_length is None:
                 T1 = WgElPortTaperExtended(
-                    start_port=A.west_ports[0],
-                    end_wg_def=self.CPin[1].wg_definition)
+                    start_port=A.west_ports[0], end_wg_def=self.CPin[1].wg_definition
+                )
             else:
                 T1 = WgElPortTaperExtended(
                     start_port=A.west_ports[0],
                     end_wg_def=self.CPin[1].wg_definition,
-                    length=self.automatic_taper_west_length)
+                    length=self.automatic_taper_west_length,
+                )
 
             if self.automatic_taper_east_length is None:
                 T2 = WgElPortTaperExtended(
-                    start_port=A.east_ports[0],
-                    end_wg_def=self.CPout[1].wg_definition)
+                    start_port=A.east_ports[0], end_wg_def=self.CPout[1].wg_definition
+                )
             else:
                 T2 = WgElPortTaperExtended(
                     start_port=A.east_ports[0],
                     end_wg_def=self.CPout[1].wg_definition,
-                    length=self.automatic_taper_east_length)
+                    length=self.automatic_taper_east_length,
+                )
 
             AC = Structure(
                 elements=[SRef(A, (0.0, 0.0)), T1, T2],
-                ports=[T1.west_ports[0], T2.east_ports[0]])
+                ports=[T1.west_ports[0], T2.east_ports[0]],
+            )
         return AC
 
     def define_a1c(self):
@@ -441,8 +513,7 @@ class __WgMzi__(__RoundedWaveguideManhattan__, __MziBase__, Structure):
     def define_a2c(self):
         return self.__get_arm_content__(self.arm2)
 
-    def define_in_coupler_pos_R1_R2_R3_R4_arm1_pos_arm2_pos_out_coupler_pos(
-            self):
+    def define_in_coupler_pos_R1_R2_R3_R4_arm1_pos_arm2_pos_out_coupler_pos(self):
         in_coupler_pos = Coord2(0.0, 0.0)
 
         y_1 = self.R1.out_ports[0].position.y
@@ -452,17 +523,19 @@ class __WgMzi__(__RoundedWaveguideManhattan__, __MziBase__, Structure):
             input_port=self.CPout[1],
             y_position=y_1,
             bend_radius=self.bend_radius,
-            rounding_algorithm=self.rounding_algorithm)
+            rounding_algorithm=self.rounding_algorithm,
+        )
         R4 = RouteToWestAtY(
             input_port=self.CPout[0],
             y_position=y_2,
             bend_radius=self.bend_radius,
-            rounding_algorithm=self.rounding_algorithm)
+            rounding_algorithm=self.rounding_algorithm,
+        )
 
-        #S1in = self.R1.size_info
-        #S2in = self.R2.size_info
-        #S1out = R3.size_info
-        #S2out = R4.size_info
+        # S1in = self.R1.size_info
+        # S2in = self.R2.size_info
+        # S1out = R3.size_info
+        # S2out = R4.size_info
         R1w = abs(self.R1.ports[0].x - self.R1.ports[1].x)
         R2w = abs(self.R2.ports[0].x - self.R2.ports[1].x)
         R3w = abs(R3.ports[0].x - R3.ports[1].x)
@@ -470,7 +543,7 @@ class __WgMzi__(__RoundedWaveguideManhattan__, __MziBase__, Structure):
 
         L1 = self.A1C.east_ports[0].x - self.A1C.west_ports[0].x
         L2 = self.A2C.east_ports[0].x - self.A2C.west_ports[0].x
-        #L = max(L1 + S1in.width + S1out.width , L2 + S2in.width + S2out.width) + 0.5
+        # L = max(L1 + S1in.width + S1out.width , L2 + S2in.width + S2out.width) + 0.5
         L = max(L1 + R1w + R3w, L2 + R2w + R4w) + 0.5
 
         OPin_max = max(self.R1.out_ports[0].x, self.R2.out_ports[0].x)
@@ -482,8 +555,16 @@ class __WgMzi__(__RoundedWaveguideManhattan__, __MziBase__, Structure):
         R3.move(out_coupler_pos)
         R4.move(out_coupler_pos)
 
-        return (in_coupler_pos, self.R1, self.R2, R3, R4, arm1_pos, arm2_pos,
-                out_coupler_pos)
+        return (
+            in_coupler_pos,
+            self.R1,
+            self.R2,
+            R3,
+            R4,
+            arm1_pos,
+            arm2_pos,
+            out_coupler_pos,
+        )
 
     def define_in_coupler_pos(self):
         return Coord2(0.0, 0.0)
@@ -491,128 +572,127 @@ class __WgMzi__(__RoundedWaveguideManhattan__, __MziBase__, Structure):
     def define_R1(self):
         if self.separation is None:
             return RouteToEast(
-                input_port=self.CPin[1],  #.move_copy(in_coupler_pos), 
+                input_port=self.CPin[1],  # .move_copy(in_coupler_pos),
                 bend_radius=self.bend_radius,
-                rounding_algorithm=self.rounding_algorithm)
+                rounding_algorithm=self.rounding_algorithm,
+            )
         else:
             return RouteToEastAtY(
-                input_port=self.CPin[1],  #.move_copy(in_coupler_pos), 
+                input_port=self.CPin[1],  # .move_copy(in_coupler_pos),
                 y_position=0.5 * self.separation,
                 bend_radius=self.bend_radius,
-                rounding_algorithm=self.rounding_algorithm)
+                rounding_algorithm=self.rounding_algorithm,
+            )
 
     def define_R2(self):
         if self.separation is None:
             return RouteToEast(
-                input_port=self.CPin[0],  #.move_copy(in_coupler_pos), 
+                input_port=self.CPin[0],  # .move_copy(in_coupler_pos),
                 bend_radius=self.bend_radius,
-                rounding_algorithm=self.rounding_algorithm)
+                rounding_algorithm=self.rounding_algorithm,
+            )
         else:
             return RouteToEastAtY(
-                input_port=self.CPin[0],  #.move_copy(in_coupler_pos), 
+                input_port=self.CPin[0],  # .move_copy(in_coupler_pos),
                 y_position=-0.5 * self.separation,
                 bend_radius=self.bend_radius,
-                rounding_algorithm=self.rounding_algorithm)
+                rounding_algorithm=self.rounding_algorithm,
+            )
 
     def define_R3(self):
-        return self.in_coupler_pos_R1_R2_R3_R4_arm1_pos_arm2_pos_out_coupler_pos[
-            3]
+        return self.in_coupler_pos_R1_R2_R3_R4_arm1_pos_arm2_pos_out_coupler_pos[3]
 
     def define_R4(self):
-        return self.in_coupler_pos_R1_R2_R3_R4_arm1_pos_arm2_pos_out_coupler_pos[
-            4]
+        return self.in_coupler_pos_R1_R2_R3_R4_arm1_pos_arm2_pos_out_coupler_pos[4]
 
     def define_arm1_pos(self):
-        return self.in_coupler_pos_R1_R2_R3_R4_arm1_pos_arm2_pos_out_coupler_pos[
-            5]
+        return self.in_coupler_pos_R1_R2_R3_R4_arm1_pos_arm2_pos_out_coupler_pos[5]
 
     def define_arm2_pos(self):
-        return self.in_coupler_pos_R1_R2_R3_R4_arm1_pos_arm2_pos_out_coupler_pos[
-            6]
+        return self.in_coupler_pos_R1_R2_R3_R4_arm1_pos_arm2_pos_out_coupler_pos[6]
 
     def define_out_coupler_pos(self):
-        return self.in_coupler_pos_R1_R2_R3_R4_arm1_pos_arm2_pos_out_coupler_pos[
-            7]
+        return self.in_coupler_pos_R1_R2_R3_R4_arm1_pos_arm2_pos_out_coupler_pos[7]
 
-    #def define_in_coupler_pos_R1_R2_R3_R4_arm1_pos_arm2_pos_out_coupler_pos (self):
-    #in_coupler_pos = Coord2(0.0, 0.0)
+    # def define_in_coupler_pos_R1_R2_R3_R4_arm1_pos_arm2_pos_out_coupler_pos (self):
+    # in_coupler_pos = Coord2(0.0, 0.0)
 
-    #if self.separation is None:
-    #R1 = RouteToEast(input_port = self.CPin[1],#.move_copy(in_coupler_pos),
-    #bend_radius=self.bend_radius,
-    #rounding_algorithm = self.rounding_algorithm)
-    #R2 = RouteToEast(input_port = self.CPin[0],#.move_copy(in_coupler_pos),
-    #bend_radius=self.bend_radius,
-    #rounding_algorithm = self.rounding_algorithm)
-    #else:
-    #R1 = RouteToEastAtY(input_port = self.CPin[1],#.move_copy(in_coupler_pos),
-    #y_position = 0.5*self.separation,
-    #bend_radius=self.bend_radius,
-    #rounding_algorithm = self.rounding_algorithm)
-    #R2 = RouteToEastAtY(input_port = self.CPin[0],#.move_copy(in_coupler_pos),
-    #y_position = -0.5*self.separation,
-    #bend_radius=self.bend_radius,
-    #rounding_algorithm = self.rounding_algorithm)
-    #y_1 = R1.out_ports[0].position.y
-    #y_2 = R2.out_ports[0].position.y
+    # if self.separation is None:
+    # R1 = RouteToEast(input_port = self.CPin[1],#.move_copy(in_coupler_pos),
+    # bend_radius=self.bend_radius,
+    # rounding_algorithm = self.rounding_algorithm)
+    # R2 = RouteToEast(input_port = self.CPin[0],#.move_copy(in_coupler_pos),
+    # bend_radius=self.bend_radius,
+    # rounding_algorithm = self.rounding_algorithm)
+    # else:
+    # R1 = RouteToEastAtY(input_port = self.CPin[1],#.move_copy(in_coupler_pos),
+    # y_position = 0.5*self.separation,
+    # bend_radius=self.bend_radius,
+    # rounding_algorithm = self.rounding_algorithm)
+    # R2 = RouteToEastAtY(input_port = self.CPin[0],#.move_copy(in_coupler_pos),
+    # y_position = -0.5*self.separation,
+    # bend_radius=self.bend_radius,
+    # rounding_algorithm = self.rounding_algorithm)
+    # y_1 = R1.out_ports[0].position.y
+    # y_2 = R2.out_ports[0].position.y
 
-    #R3 = RouteToWestAtY(input_port = self.CPout[1],
-    #y_position = y_1,
-    #bend_radius=self.bend_radius,
-    #rounding_algorithm = self.rounding_algorithm)
-    #R4 = RouteToWestAtY(input_port = self.CPout[0],
-    #y_position = y_2,
-    #bend_radius=self.bend_radius,
-    #rounding_algorithm = self.rounding_algorithm)
+    # R3 = RouteToWestAtY(input_port = self.CPout[1],
+    # y_position = y_1,
+    # bend_radius=self.bend_radius,
+    # rounding_algorithm = self.rounding_algorithm)
+    # R4 = RouteToWestAtY(input_port = self.CPout[0],
+    # y_position = y_2,
+    # bend_radius=self.bend_radius,
+    # rounding_algorithm = self.rounding_algorithm)
 
-    #S1in = R1.size_info
-    #S2in = R2.size_info
-    #S1out = R3.size_info
-    #S2out = R4.size_info
+    # S1in = R1.size_info
+    # S2in = R2.size_info
+    # S1out = R3.size_info
+    # S2out = R4.size_info
     ##R1w = abs(R1.ports[0].x-R1.ports[1].x)
     ##R2w = abs(R2.ports[0].x-R2.ports[1].x)
     ##R3w = abs(R3.ports[0].x-R3.ports[1].x)
     ##R4w = abs(R4.ports[0].x-R4.ports[1].x)
 
-    #L1 = self.A1C.east_ports[0].x - self.A1C.west_ports[0].x
-    #L2 = self.A2C.east_ports[0].x - self.A2C.west_ports[0].x
-    #L = max(L1 + S1in.width + S1out.width , L2 + S2in.width + S2out.width) + 0.5
+    # L1 = self.A1C.east_ports[0].x - self.A1C.west_ports[0].x
+    # L2 = self.A2C.east_ports[0].x - self.A2C.west_ports[0].x
+    # L = max(L1 + S1in.width + S1out.width , L2 + S2in.width + S2out.width) + 0.5
     ##L = max(L1 + R1w + R3w , L2 + R2w + R4w) + 0.5
 
-    #OPin_max = max(R1.out_ports[0].x, R2.out_ports[0].x)
-    #OPout_max = min(R3.out_ports[0].x, R4.out_ports[0].x)
-    #arm1_pos = Coord2(OPin_max , y_1) - self.A1C.west_ports[0].position
-    #arm2_pos = Coord2(OPin_max  , y_2) - self.A2C.west_ports[0].position
+    # OPin_max = max(R1.out_ports[0].x, R2.out_ports[0].x)
+    # OPout_max = min(R3.out_ports[0].x, R4.out_ports[0].x)
+    # arm1_pos = Coord2(OPin_max , y_1) - self.A1C.west_ports[0].position
+    # arm2_pos = Coord2(OPin_max  , y_2) - self.A2C.west_ports[0].position
 
-    #out_coupler_pos = Coord2(max(L1, L2) + OPin_max - OPout_max, 0.0)
-    #R3.move(out_coupler_pos)
-    #R4.move(out_coupler_pos)
+    # out_coupler_pos = Coord2(max(L1, L2) + OPin_max - OPout_max, 0.0)
+    # R3.move(out_coupler_pos)
+    # R4.move(out_coupler_pos)
 
-    #return (in_coupler_pos,R1,R2,R3,R4,arm1_pos,arm2_pos,out_coupler_pos)
+    # return (in_coupler_pos,R1,R2,R3,R4,arm1_pos,arm2_pos,out_coupler_pos)
 
-    #def define_in_coupler_pos(self):
-    #return self.in_coupler_pos_R1_R2_R3_R4_arm1_pos_arm2_pos_out_coupler_pos[0]
+    # def define_in_coupler_pos(self):
+    # return self.in_coupler_pos_R1_R2_R3_R4_arm1_pos_arm2_pos_out_coupler_pos[0]
 
-    #def define_R1(self):
-    #return self.in_coupler_pos_R1_R2_R3_R4_arm1_pos_arm2_pos_out_coupler_pos[1]
+    # def define_R1(self):
+    # return self.in_coupler_pos_R1_R2_R3_R4_arm1_pos_arm2_pos_out_coupler_pos[1]
 
-    #def define_R2(self):
-    #return self.in_coupler_pos_R1_R2_R3_R4_arm1_pos_arm2_pos_out_coupler_pos[2]
+    # def define_R2(self):
+    # return self.in_coupler_pos_R1_R2_R3_R4_arm1_pos_arm2_pos_out_coupler_pos[2]
 
-    #def define_R3(self):
-    #return self.in_coupler_pos_R1_R2_R3_R4_arm1_pos_arm2_pos_out_coupler_pos[3]
+    # def define_R3(self):
+    # return self.in_coupler_pos_R1_R2_R3_R4_arm1_pos_arm2_pos_out_coupler_pos[3]
 
-    #def define_R4(self):
-    #return self.in_coupler_pos_R1_R2_R3_R4_arm1_pos_arm2_pos_out_coupler_pos[4]
+    # def define_R4(self):
+    # return self.in_coupler_pos_R1_R2_R3_R4_arm1_pos_arm2_pos_out_coupler_pos[4]
 
-    #def define_arm1_pos(self):
-    #return self.in_coupler_pos_R1_R2_R3_R4_arm1_pos_arm2_pos_out_coupler_pos[5]
+    # def define_arm1_pos(self):
+    # return self.in_coupler_pos_R1_R2_R3_R4_arm1_pos_arm2_pos_out_coupler_pos[5]
 
-    #def define_arm2_pos(self):
-    #return self.in_coupler_pos_R1_R2_R3_R4_arm1_pos_arm2_pos_out_coupler_pos[6]
+    # def define_arm2_pos(self):
+    # return self.in_coupler_pos_R1_R2_R3_R4_arm1_pos_arm2_pos_out_coupler_pos[6]
 
-    #def define_out_coupler_pos(self):
-    #return self.in_coupler_pos_R1_R2_R3_R4_arm1_pos_arm2_pos_out_coupler_pos[7]
+    # def define_out_coupler_pos(self):
+    # return self.in_coupler_pos_R1_R2_R3_R4_arm1_pos_arm2_pos_out_coupler_pos[7]
 
     def define_elements(self, elems):
         elems += SRef(self.in_coupler, self.in_coupler_pos)
@@ -637,9 +717,11 @@ class __WgMzi__(__RoundedWaveguideManhattan__, __MziBase__, Structure):
 
     def define_ports(self, ports):
         ports += self.in_coupler.in_ports.transform_copy(
-            self.in_coupler_transform).translate(self.in_coupler_pos)
+            self.in_coupler_transform
+        ).translate(self.in_coupler_pos)
         ports += self.out_coupler.out_ports.transform_copy(
-            self.out_coupler_transform).translate(self.out_coupler_pos)
+            self.out_coupler_transform
+        ).translate(self.out_coupler_pos)
         return ports
 
 
@@ -656,11 +738,13 @@ class __Mzi11Y90__(__MziBase__):
 
     def define_in_coupler(self):
         return WgY90Splitter(
-            bend_radius=self.bend_radius, wg_definition=self.wg_definition)
+            bend_radius=self.bend_radius, wg_definition=self.wg_definition
+        )
 
     def define_out_coupler(self):
         return WgY90Combiner(
-            bend_radius=self.bend_radius, wg_definition=self.wg_definition)
+            bend_radius=self.bend_radius, wg_definition=self.wg_definition
+        )
 
     def define_in_coupler_transform(self):
         return IdentityTransform()
@@ -681,12 +765,14 @@ class __WgMziAutoArms__(__WgMzi__):
 
 class __WgMziSymmetric__(__WgMziAutoArms__):
     """ abstract base for symmetric MZI with simple waveguides """
+
     __name_prefix__ = "MZIWG_symm"
     arm_length = PositiveNumberProperty(default=TECH.WG.SHORT_STRAIGHT)
 
     def define_arm1(self):
         arm_name = self.name + "_arm1"
         from ipkiss.plugins.photonics.wg.basic import WgElDefinition
+
         wg_def = WgElDefinition()
         wg = wg_def(shape=[(0.0, 0.0), (self.arm_length, 0.0)])
         wg_struct = Structure(name=arm_name, elements=[wg], ports=wg.ports)
@@ -698,6 +784,7 @@ class __WgMziSymmetric__(__WgMziAutoArms__):
 
 class __WgMziAsymmetric__(__WgMziAutoArms__):
     """ abstract base for asymmetric MZI with simple delay waveguides """
+
     __name_prefix__ = "MZIWG_asymm"
     straight1 = PositiveNumberProperty(default=TECH.WG.SHORT_STRAIGHT)
     straight2 = PositiveNumberProperty(default=TECH.WG.SHORT_STRAIGHT)
@@ -708,7 +795,8 @@ class __WgMziAsymmetric__(__WgMziAutoArms__):
             bend_radius=self.bend_radius,
             rounding_algorithm=self.rounding_algorithm,
             wg_definition=self.wg_definition,
-            manhattan=self.manhattan)
+            manhattan=self.manhattan,
+        )
 
     def define_arm2(self):
         return __MziDelaySimpleFlipped__(
@@ -716,11 +804,13 @@ class __WgMziAsymmetric__(__WgMziAutoArms__):
             bend_radius=self.bend_radius,
             rounding_algorithm=self.rounding_algorithm,
             wg_definition=self.wg_definition,
-            manhattan=self.manhattan)
+            manhattan=self.manhattan,
+        )
 
 
 class __WgMziSpiralAsymmetric__(__WgMziAutoArms__):
     """ abstract base for asymmetric MZI with spiral delay waveguides """
+
     __name_prefix__ = "MZISPIRAL_asymm"
     total_length1 = NumberProperty(required=True)
     total_length2 = NumberProperty(required=True)
@@ -733,7 +823,8 @@ class __WgMziSpiralAsymmetric__(__WgMziAutoArms__):
             bend_radius=self.bend_radius,
             spacing=TECH.WG.SPACING,
             wg_definition=self.wg_definition,
-            manhattan=self.manhattan)
+            manhattan=self.manhattan,
+        )
 
     def define_arm2(self):
         return __MziDelaySpiralFlipped__(
@@ -742,29 +833,35 @@ class __WgMziSpiralAsymmetric__(__WgMziAutoArms__):
             bend_radius=self.bend_radius,
             spacing=TECH.WG.SPACING,
             wg_definition=self.wg_definition,
-            manhattan=self.manhattan)
+            manhattan=self.manhattan,
+        )
 
 
 class WgMzi1x1Y90(__Mzi11Y90__, __WgMzi__):
     """ 1x1 MZI with simple waveguides and Y splitters. Container for given arms. """
+
     __name_prefix__ = "MZI11WG_Y90"
 
 
 class WgMzi1x1Y90Symmetric(__Mzi11Y90__, __WgMziSymmetric__):
     """ symmetric 1x1 MZI with Y splitters and simple waveguides """
+
     __name_prefix__ = "MZI11WG_Y90_symm"
 
 
 class WgMzi1x1Y90Asymmetric(__Mzi11Y90__, __WgMziAsymmetric__):
     """ asymmetric 1x1 MZI with Y splitters and simple delay waveguides """
+
     __name_prefix__ = "MZI11WG_Y90_asymm"
 
 
 class WgMziSymmetric(__WgMziSymmetric__, WgMziGeneric):
     """ symmetric MZI with arbitrary couplers """
+
     __name_prefix__ = "MZIWG_sym"
 
 
 class WgMziAsymmetric(__WgMziAsymmetric__, WgMziGeneric):
     """ asymmetric MZI with arbitrary couplers """
+
     __name_prefix__ = "MZIWG_asym"

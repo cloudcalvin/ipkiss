@@ -23,8 +23,15 @@ from ...geometry import size_info
 from ...geometry import transformable
 import copy
 from ..layer import LayerProperty, Layer
-from ipcore.properties.initializer import StrongPropertyInitializer, MetaPropertyInitializer
-from ipcore.properties.descriptor import FunctionProperty, DefinitionProperty, RestrictedProperty
+from ipcore.properties.initializer import (
+    StrongPropertyInitializer,
+    MetaPropertyInitializer,
+)
+from ipcore.properties.descriptor import (
+    FunctionProperty,
+    DefinitionProperty,
+    RestrictedProperty,
+)
 from ipcore.properties.restrictions import RestrictType, RestrictList
 from ipcore.mixin.mixin import MixinBowl
 from ipcore.types_list import TypedList
@@ -38,16 +45,16 @@ __all__ = ["ElementList", "ElementListProperty", "ElementProperty"]
 ##########################################################
 
 
-class __Element__(transformable.StoredNoDistortTransformable,
-                  StrongPropertyInitializer):
+class __Element__(
+    transformable.StoredNoDistortTransformable, StrongPropertyInitializer
+):
     def __init__(self, transformation=None, **kwargs):
-        super(__Element__, self).__init__(
-            transformation=transformation, **kwargs)
+        super(__Element__, self).__init__(transformation=transformation, **kwargs)
 
     def dependencies(self):
         return None
-        #from .. import structure
-        #return structure.StructureList()
+        # from .. import structure
+        # return structure.StructureList()
 
     def __add__(self, other):
         if isinstance(other, list):
@@ -58,8 +65,9 @@ class __Element__(transformable.StoredNoDistortTransformable,
             return ElementList([self, other])
         else:
             raise TypeError(
-                "Wrong type of argument for addition in __Element__: " + str(
-                    type(other)))
+                "Wrong type of argument for addition in __Element__: "
+                + str(type(other))
+            )
 
     def __radd__(self, other):
         if isinstance(other, list):
@@ -70,8 +78,9 @@ class __Element__(transformable.StoredNoDistortTransformable,
             return ElementList([other, self])
         else:
             raise TypeError(
-                "Wrong type of argument for addition in __Element__: " + str(
-                    type(other)))
+                "Wrong type of argument for addition in __Element__: "
+                + str(type(other))
+            )
 
 
 ##########################################################
@@ -83,17 +92,19 @@ class __LayerElement__(__Element__, MixinBowl):
 
     def __init__(self, layer=0, transformation=None, **kwargs):
         super(__LayerElement__, self).__init__(
-            transformation=transformation, layer=layer, **kwargs)
+            transformation=transformation, layer=layer, **kwargs
+        )
 
     def __eq__(self, other):
         if other == None:
             return False
-        if (not isinstance(other, __LayerElement__)):
+        if not isinstance(other, __LayerElement__):
             return False
-        if (other.layer.id() != self.layer.id()):
+        if other.layer.id() != self.layer.id():
             return False
-        if (self.shape.transform_copy(self.transformation) !=
-                other.shape.transform_copy(other.transformation)):
+        if self.shape.transform_copy(self.transformation) != other.shape.transform_copy(
+            other.transformation
+        ):
             return False
         return True
 
@@ -109,6 +120,7 @@ class ElementList(TypedList, transformable.NoDistortTransformable):
 
     def dependencies(self):
         from .. import structure
+
         d = structure.StructureList()
         for e in self:
             d.add(e.dependencies())
@@ -125,6 +137,7 @@ class ElementList(TypedList, transformable.NoDistortTransformable):
 
     def convex_hull(self):
         from ...geometry.shape import Shape
+
         if len(self) == 0:
             return Shape()
         else:
@@ -150,20 +163,25 @@ class ElementList(TypedList, transformable.NoDistortTransformable):
         return el
 
     def is_empty(self):
-        if (len(self) == 0): return True
+        if len(self) == 0:
+            return True
         for e in self:
-            if not e.is_empty(): return False
+            if not e.is_empty():
+                return False
         return True
 
     def append(
-            self, item
-    ):  #FIXME - TEMPORARY FUNCTION, TO BE REMOVED ONCE THE EXCEPTION ABOUT 'Structure' IS NO LONGER REQUIRED -- DEPRECATED
+        self, item
+    ):  # FIXME - TEMPORARY FUNCTION, TO BE REMOVED ONCE THE EXCEPTION ABOUT 'Structure' IS NO LONGER REQUIRED -- DEPRECATED
         from ipkiss.primitives.structure import Structure
+
         if isinstance(item, Structure):
             LOG.display_warning(
                 "You are trying to add a structure to an ElementList. This is not allowed : only elements can be added to an ElementList",
-                3)
+                3,
+            )
             import sys
+
             sys.exit(-1)
         elif isinstance(item, self.__item_type__):
             list.append(self, item)
@@ -179,33 +197,35 @@ class ElementList(TypedList, transformable.NoDistortTransformable):
 
 
 class ElementListProperty(DefinitionProperty):
-    __allowed_keyword_arguments__ = [
-        "required", "restriction", "default", "fdef_name"
-    ]
+    __allowed_keyword_arguments__ = ["required", "restriction", "default", "fdef_name"]
 
     def __init__(self, **kwargs):
         super(ElementListProperty, self).__init__(**kwargs)
-        if ("restriction" in kwargs):
+        if "restriction" in kwargs:
             R = kwargs["restriction"]
             self.restriction = (
-                (RestrictType(ElementList)
-                 | RestrictList(restriction=RestrictType(__Element__))) & R)
+                RestrictType(ElementList)
+                | RestrictList(restriction=RestrictType(__Element__))
+            ) & R
         else:
             self.restriction = RestrictType(ElementList) | RestrictList(
-                restriction=RestrictType(__Element__))
+                restriction=RestrictType(__Element__)
+            )
 
     def __call_getter_function__(self, obj):
         f = self.__get_getter_function__(obj)
         value = f(ElementList())
         if value is None:
             raise IpkissException(
-                "Function '%s' returned None : this is invalid." %
-                (f.__name__))
+                "Function '%s' returned None : this is invalid." % (f.__name__)
+            )
         new_value = self.__cache_property_value_on_object__(obj, value)
         return new_value
 
 
-ElementsDefinitionProperty = ElementListProperty  #DEPRECATED - for backwards compatibility only
+ElementsDefinitionProperty = (
+    ElementListProperty
+)  # DEPRECATED - for backwards compatibility only
 
 
 def ElementProperty(internal_member_name=None, restriction=None, **kwargs):

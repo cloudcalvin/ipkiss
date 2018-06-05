@@ -31,6 +31,7 @@ __all__ = ["StarCoupler"]
 
 class StarCouplerBase(Structure):
     """ Abstract base class for star couplers """
+
     __name_prefix__ = "STAR"
     transformation_in = TransformationProperty(default=None)
     transformation_out = TransformationProperty(default=None)
@@ -38,14 +39,15 @@ class StarCouplerBase(Structure):
     def define_elements(self, elems):
         if not self.aperture_in is None:
             E = SRef(self.aperture_in, (0.0, 0.0), self.transformation_in)
-            if self.transformation_in is None or self.transformation_in.is_orthogonal(
-            ):
+            if self.transformation_in is None or self.transformation_in.is_orthogonal():
                 elems += E
             else:
                 elems += E.flat_copy()
         if not self.aperture_out is None:
             E = SRef(self.aperture_out, (0.0, 0.0), self.transformation_out)
-            if self.transformation_out is None or self.transformation_out.is_orthogonal(
+            if (
+                self.transformation_out is None
+                or self.transformation_out.is_orthogonal()
             ):
                 elems += E
             else:
@@ -54,19 +56,19 @@ class StarCouplerBase(Structure):
 
     def define_ports(self, P):
         if not self.aperture_in is None:
-            for p in self.aperture_in.ports.transform_copy(
-                    self.transformation_in):
+            for p in self.aperture_in.ports.transform_copy(self.transformation_in):
                 P += InOpticalPort(
                     position=p.position,
                     angle=p.angle_deg,
-                    wg_definition=p.wg_definition)
+                    wg_definition=p.wg_definition,
+                )
         if not self.aperture_out is None:
-            for p in self.aperture_out.ports.transform_copy(
-                    self.transformation_out):
+            for p in self.aperture_out.ports.transform_copy(self.transformation_out):
                 P += OutOpticalPort(
                     position=p.position,
                     angle=p.angle_deg,
-                    wg_definition=p.wg_definition)
+                    wg_definition=p.wg_definition,
+                )
         return P
 
 
@@ -77,18 +79,16 @@ class __StarCouplerHull__(object):
 
     # Cache this!
     def get_hull_shape(self):
-        if self.aperture_in is None or self.aperture_out is None: return
+        if self.aperture_in is None or self.aperture_out is None:
+            return
 
-        hull_shape1 = self.aperture_in.convex_hull().transform(
-            self.transformation_in)
-        hull_shape2 = self.aperture_out.convex_hull().transform(
-            self.transformation_out)
+        hull_shape1 = self.aperture_in.convex_hull().transform(self.transformation_in)
+        hull_shape2 = self.aperture_out.convex_hull().transform(self.transformation_out)
 
         hull_center1 = hull_shape1.size_info.center
         hull_center2 = hull_shape2.size_info.center
 
-        line_through_centers = straight_line_from_two_points(
-            hull_center1, hull_center2)
+        line_through_centers = straight_line_from_two_points(hull_center1, hull_center2)
         d1_1 = 0.0
         # find closest point on one side of hull 1
         for p in hull_shape1:
@@ -124,43 +124,45 @@ class __StarCouplerHull__(object):
         d_max = max(d1_1, d1_2, d2_1, d2_2)
 
         a = line_through_centers.angle_deg
-        extra_points = Shape([
-            p1_1.move_polar_copy(d_max - d1_1 + self.hull_extension, a + 90.0),
-            p1_1.move_polar_copy(d_max - d1_1 + self.hull_extension, a - 90.0),
-            p1_2.move_polar_copy(d_max - d1_2 + self.hull_extension, a + 90.0),
-            p1_2.move_polar_copy(d_max - d1_2 + self.hull_extension, a - 90.0),
-            p2_1.move_polar_copy(d_max - d2_1 + self.hull_extension, a + 90.0),
-            p2_1.move_polar_copy(d_max - d2_1 + self.hull_extension, a - 90.0),
-            p2_2.move_polar_copy(d_max - d2_2 + self.hull_extension, a + 90.0),
-            p2_2.move_polar_copy(d_max - d2_2 + self.hull_extension, a - 90.0)
-        ])
+        extra_points = Shape(
+            [
+                p1_1.move_polar_copy(d_max - d1_1 + self.hull_extension, a + 90.0),
+                p1_1.move_polar_copy(d_max - d1_1 + self.hull_extension, a - 90.0),
+                p1_2.move_polar_copy(d_max - d1_2 + self.hull_extension, a + 90.0),
+                p1_2.move_polar_copy(d_max - d1_2 + self.hull_extension, a - 90.0),
+                p2_1.move_polar_copy(d_max - d2_1 + self.hull_extension, a + 90.0),
+                p2_1.move_polar_copy(d_max - d2_1 + self.hull_extension, a - 90.0),
+                p2_2.move_polar_copy(d_max - d2_2 + self.hull_extension, a + 90.0),
+                p2_2.move_polar_copy(d_max - d2_2 + self.hull_extension, a - 90.0),
+            ]
+        )
 
         hull = (hull_shape1 + hull_shape2 + extra_points).convex_hull()
         hull = ShapeStub(
-            original_shape=ShapeGrow(
-                original_shape=hull, amount=self.hull_growth),
-            stub_width=TECH.TECH.MINIMUM_LINE)
+            original_shape=ShapeGrow(original_shape=hull, amount=self.hull_growth),
+            stub_width=TECH.TECH.MINIMUM_LINE,
+        )
         return hull
 
     def define_elements(self, elems):
         hull = self.get_hull_shape()
         elems += Boundary(PPLayer(self.process, TECH.PURPOSE.DF_AREA), hull)
-        elems += Boundary(
-            PPLayer(TECH.PROCESS.NONE, TECH.PURPOSE.NO_FILL), hull)
+        elems += Boundary(PPLayer(TECH.PROCESS.NONE, TECH.PURPOSE.NO_FILL), hull)
         super(__StarCouplerHull__, self).define_elements(elems)
         return elems
 
 
 class StarCoupler(__StarCouplerHull__, StarCouplerBase):
     """ Most generic star coupler component. It takes 2 apertures (can be multi_apertures) """
+
     __name_prefix__ = "STAR"
     aperture_in = ApertureProperty(allow_none=True)
     aperture_out = ApertureProperty(allow_none=True)
 
-    #def __init__(self, aperture_in, aperture_out, transformation_in = None, transformation_out = None, library=None, **kwargs):
-    #super(StarCoupler, self).__init__(
-    #aperture_in = aperture_in,
-    #aperture_out = aperture_out,
-    #transformation_in = transformation_in,
-    #transformation_out = transformation_out,
-    #**kwargs)
+    # def __init__(self, aperture_in, aperture_out, transformation_in = None, transformation_out = None, library=None, **kwargs):
+    # super(StarCoupler, self).__init__(
+    # aperture_in = aperture_in,
+    # aperture_out = aperture_out,
+    # transformation_in = transformation_in,
+    # transformation_out = transformation_out,
+    # **kwargs)

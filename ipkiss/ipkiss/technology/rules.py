@@ -21,7 +21,15 @@
 
 from ipkiss.technology import get_technology
 from ipkiss.primitives.layer import Layer, LayerProperty, LayerList, __GeneratedLayer__
-from ipcore.all import StrongPropertyInitializer, StringProperty, PositiveNumberProperty, MixinBowl, RestrictedProperty, RestrictType, ListProperty
+from ipcore.all import (
+    StrongPropertyInitializer,
+    StringProperty,
+    PositiveNumberProperty,
+    MixinBowl,
+    RestrictedProperty,
+    RestrictType,
+    ListProperty,
+)
 from ipcore.properties.predefined import RESTRICT_NUMBER, RESTRICT_POSITIVE
 
 TECH = get_technology()
@@ -29,6 +37,7 @@ TECH = get_technology()
 
 class __DesignRule__(StrongPropertyInitializer, MixinBowl):
     """ Design rule base class """
+
     doc = StringProperty(default="", doc="Documentation of design rule")
     name = StringProperty(default="")
 
@@ -43,6 +52,7 @@ def DesignRuleProperty(internal_member_name=None, restriction=None, **kwargs):
 
 class __LayerDesignRule__(__DesignRule__):
     """ Layer rule applying to one layer """
+
     layer = LayerProperty(required=True, doc="Layer the rule applies to")
 
     def __str__(self):
@@ -59,10 +69,9 @@ class __LayerDesignRule__(__DesignRule__):
 
 class __TwoLayerDesignRule__(__DesignRule__):
     """ Layer rule applying to two layers """
-    layer1 = LayerProperty(
-        required=True, doc="First layer the rule applies to")
-    layer2 = LayerProperty(
-        required=True, doc="Second layer the rule applies to")
+
+    layer1 = LayerProperty(required=True, doc="First layer the rule applies to")
+    layer2 = LayerProperty(required=True, doc="Second layer the rule applies to")
 
     def get_layers(self):
         l = LayerList()
@@ -82,53 +91,53 @@ class __TwoLayerDesignRule__(__DesignRule__):
 
 class MinimumSpaceDesignRule(__LayerDesignRule__):
     """ Minimum allowed space between two edges or vertices in a single layer """
+
     minimum_space = PositiveNumberProperty(required=True)
 
     def __str__(self):
-        return "Minimum space %.3f on layer %s" % (self.minimum_space,
-                                                   self.layer)
+        return "Minimum space %.3f on layer %s" % (self.minimum_space, self.layer)
 
 
 class MaximumSpaceDesignRule(__LayerDesignRule__):
     """ Maximum allowed space between two edges or vertices in a single layer """
+
     maximum_space = PositiveNumberProperty(required=True)
 
     def __str__(self):
-        return "Maximum space %.3f on layer %s" % (self.maximum_space,
-                                                   self.layer)
+        return "Maximum space %.3f on layer %s" % (self.maximum_space, self.layer)
 
 
 class MinimumWidthDesignRule(__LayerDesignRule__):
     """ Minimum allowed width between two edges or vertices in a single layer """
+
     minimum_width = PositiveNumberProperty(required=True)
 
     def __str__(self):
-        return "Minimum width %.3f on layer %s" % (self.minimum_width,
-                                                   self.layer)
+        return "Minimum width %.3f on layer %s" % (self.minimum_width, self.layer)
 
 
 class MinimumDiameterDesignRule(__LayerDesignRule__):
     """ Minimum allowed width between two edges or vertices in a single layer """
+
     minimum_diameter = PositiveNumberProperty(required=True)
 
     def __str__(self):
-        return "Minimum diameter %.3f on layer %s" % (self.minimum_diameter,
-                                                      self.layer)
+        return "Minimum diameter %.3f on layer %s" % (self.minimum_diameter, self.layer)
 
 
 class MaximumWidthDesignRule(__LayerDesignRule__):
     """ Maximum allowed width between two edges or vertices in a single layer """
+
     maximum_width = PositiveNumberProperty(required=True)
 
     def __str__(self):
-        return "Maximum width %.3f on layer %s" % (self.maximum_width,
-                                                   self.layer)
+        return "Maximum width %.3f on layer %s" % (self.maximum_width, self.layer)
 
 
 class AllowedWidthsDesignRule(__LayerDesignRule__):
     """ Allowed width between two edges or vertices in a single layer """
-    allowed_widths = ListProperty(
-        restriction=RESTRICT_NUMBER & RESTRICT_POSITIVE)
+
+    allowed_widths = ListProperty(restriction=RESTRICT_NUMBER & RESTRICT_POSITIVE)
 
     def __str__(self):
         a = ["Width must be one of "]
@@ -139,8 +148,8 @@ class AllowedWidthsDesignRule(__LayerDesignRule__):
 
 class AllowedDiameterDesignRule(__LayerDesignRule__):
     """ Allowed width between two edges or vertices in a single layer """
-    allowed_diameters = ListProperty(
-        restriction=RESTRICT_NUMBER & RESTRICT_POSITIVE)
+
+    allowed_diameters = ListProperty(restriction=RESTRICT_NUMBER & RESTRICT_POSITIVE)
 
     def __str__(self):
         a = ["Diameters must be one of "]
@@ -161,8 +170,7 @@ class OverlapDesignRule(__TwoLayerDesignRule__):
 
 class InsideDesignRule(__TwoLayerDesignRule__):
     def __str__(self):
-        return "Layer %s must be fully covered by layer %s" % (self.layer1,
-                                                               self.layer2)
+        return "Layer %s must be fully covered by layer %s" % (self.layer1, self.layer2)
 
 
 class MinimumEnclosureDesignRule(__TwoLayerDesignRule__):
@@ -170,7 +178,10 @@ class MinimumEnclosureDesignRule(__TwoLayerDesignRule__):
 
     def __str__(self):
         return "Layer %s must be enclosed by layer %s by at least %.3f micron" % (
-            self.layer1, self.layer2, self.minimum_enclosure)
+            self.layer1,
+            self.layer2,
+            self.minimum_enclosure,
+        )
 
 
 class Rule(StrongPropertyInitializer):

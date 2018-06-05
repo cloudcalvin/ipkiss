@@ -29,8 +29,8 @@ __all__ = []
 #############################################################
 class BaseWaveguideDefinition(StrongPropertyInitializer, Transformable):
     """base class for waveguide definitions"""
-    path_definition_class = FunctionNameProperty(
-        fget_name="get_path_definition_class")
+
+    path_definition_class = FunctionNameProperty(fget_name="get_path_definition_class")
     name = StringProperty()
 
     def get_path_definition_class(self):
@@ -40,16 +40,22 @@ class BaseWaveguideDefinition(StrongPropertyInitializer, Transformable):
             return getattr(self.__class__, path_definition_class_name)
         except AttributeError:
             import inspect
+
             for C in inspect.getmro(type(self)):
                 path_definition_class_name = "__" + C.__name__ + "PathDefinition__"
                 if hasattr(self.__class__, path_definition_class_name):
                     return getattr(self.__class__, path_definition_class_name)
-            raise Exception("Type " + self.__class__ + " has no inner class " +
-                            "__" + class_name +
-                            "PathDefinition__ for the path definition")
+            raise Exception(
+                "Type "
+                + self.__class__
+                + " has no inner class "
+                + "__"
+                + class_name
+                + "PathDefinition__ for the path definition"
+            )
 
     def __call__(self, *args, **kwargs):
-        kwargs['wg_definition'] = self
+        kwargs["wg_definition"] = self
         return self.path_definition_class(*args, **kwargs)
 
     def __ne__(self, other):
@@ -70,27 +76,23 @@ class BaseWaveguideDefinition(StrongPropertyInitializer, Transformable):
 
 class WaveguideDefCrossSectionProperty(DefinitionProperty):
     def __init__(self, internal_member_name=None, **kwargs):
-        kwargs["restriction"] = RestrictType(
-            allowed_types=[BaseWaveguideDefinition])
+        kwargs["restriction"] = RestrictType(allowed_types=[BaseWaveguideDefinition])
         super(WaveguideDefCrossSectionProperty, self).__init__(
-            internal_member_name=internal_member_name, **kwargs)
+            internal_member_name=internal_member_name, **kwargs
+        )
 
     def __set__(self, obj, value):
         wg_def_cross_section = value.get_wg_definition_cross_section()
-        self.__externally_set_property_value_on_object__(
-            obj, wg_def_cross_section)
+        self.__externally_set_property_value_on_object__(obj, wg_def_cross_section)
         return
 
 
-def WaveguideDefProperty(internal_member_name=None, restriction=None,
-                         **kwargs):
+def WaveguideDefProperty(internal_member_name=None, restriction=None, **kwargs):
     R = RestrictType(BaseWaveguideDefinition) & restriction
     return RestrictedProperty(internal_member_name, restriction=R, **kwargs)
 
 
-def WaveguideDefListProperty(internal_member_name=None,
-                             restriction=None,
-                             **kwargs):
+def WaveguideDefListProperty(internal_member_name=None, restriction=None, **kwargs):
     R = RestrictTypeList(BaseWaveguideDefinition) & restriction
     return RestrictedProperty(internal_member_name, restriction=R, **kwargs)
 
@@ -102,6 +104,7 @@ def WaveguideDefListProperty(internal_member_name=None,
 
 class __BaseWaveguideElement__(Group):
     """ base class for a definition which produces waveguide elements """
+
     wg_definition = WaveguideDefProperty(required=True)
 
 
@@ -112,7 +115,8 @@ class SingleShapeWaveguideElement(__BaseWaveguideElement__):
 
     def __init__(self, shape, wg_definition, **kwargs):
         super(SingleShapeWaveguideElement, self).__init__(
-            shape=shape, wg_definition=wg_definition, **kwargs)
+            shape=shape, wg_definition=wg_definition, **kwargs
+        )
 
     def definition(self):
         return self.wg_definition
@@ -127,12 +131,14 @@ class SingleShapeWaveguideElement(__BaseWaveguideElement__):
     def __get_shape_list__(self):
         if self.shape.closed:
             return cut_open_shape_in_n_sections_with_overlap(
-                shape=self.shape, n_o_sections=2, overlap=0)
+                shape=self.shape, n_o_sections=2, overlap=0
+            )
         else:
             return [self.shape]
 
     def define_ports(self, ports):
         from ipkiss.plugins.photonics.port.port import InOpticalPort, OutOpticalPort
+
         if len(self.shape) == 0:
             self.ports = []
             return
@@ -140,11 +146,13 @@ class SingleShapeWaveguideElement(__BaseWaveguideElement__):
             InOpticalPort(
                 position=self.shape[0],
                 angle=angle_deg(self.shape[0], self.shape[1]),
-                wg_definition=self.definition()),
+                wg_definition=self.definition(),
+            ),
             OutOpticalPort(
                 position=self.shape[-1],
                 angle=angle_deg(self.shape[-1], self.shape[-2]),
-                wg_definition=self.definition())
+                wg_definition=self.definition(),
+            ),
         ]
         return ports
 
@@ -153,11 +161,12 @@ class TwoShapeWaveguideElement(SingleShapeWaveguideElement):
     """ generic waveguide element based on two shapes """
 
     # shape is the only parameter that is waveguide dependent
-    trench_shape = ShapeProperty(fdef_name='define_trench_shape')
+    trench_shape = ShapeProperty(fdef_name="define_trench_shape")
 
     def __init__(self, shape, trench_shape=None, **kwargs):
         super(TwoShapeWaveguideElement, self).__init__(
-            shape=shape, trench_shape=trench_shape, **kwargs)
+            shape=shape, trench_shape=trench_shape, **kwargs
+        )
 
     def define_trench_shape(self):
         return self.shape
@@ -171,6 +180,7 @@ class TwoShapeWaveguideElement(SingleShapeWaveguideElement):
 
         if T_shape.closed:
             return cut_open_shape_in_n_sections_with_overlap(
-                shape=T_shape, n_o_sections=2, overlap=0)
+                shape=T_shape, n_o_sections=2, overlap=0
+            )
         else:
             return [T_shape]

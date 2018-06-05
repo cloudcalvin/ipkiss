@@ -31,22 +31,24 @@ class __Procedure__(StrongPropertyInitializer):
 
     # procedure before, during and after
     init_procedure = CallableProperty(
-        default=None,
-        doc="initialization procedure before the procedure starts")
-    step_procedure = CallableProperty(
-        default=None, doc="procedure for each step")
+        default=None, doc="initialization procedure before the procedure starts"
+    )
+    step_procedure = CallableProperty(default=None, doc="procedure for each step")
     fini_procedure = CallableProperty(
-        default=None, doc="finalization procedure after the procedure")
+        default=None, doc="finalization procedure after the procedure"
+    )
 
     # processing of data during and after
     step_processor = RestrictedProperty(
         default=__Processor__(),
         restriction=RestrictType(__Processor__),
-        doc="Processor called in every step of the procedure.")
+        doc="Processor called in every step of the procedure.",
+    )
     post_processor = RestrictedProperty(
         default=__Processor__(),
         restriction=RestrictType(__Processor__),
-        doc="Data processor after the procedure (e.g. visualize)")
+        doc="Data processor after the procedure (e.g. visualize)",
+    )
 
     def __call__(self):
         return self.run()

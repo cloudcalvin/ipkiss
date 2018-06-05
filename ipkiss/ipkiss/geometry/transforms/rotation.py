@@ -31,26 +31,30 @@ from ..coord import Coord2, Coord2Property, Coord2
 from ipcore.mixin import mixin
 from ... import constants
 from math import cos, sin
+
 __all__ = ["Rotation"]
 
 
 class Rotation(__SpecialNoDistortTransform__):
     """ rotation around point over a given angle (degrees) """
 
-    def __init__(self,
-                 rotation_center=(0.0, 0.0),
-                 rotation=0.0,
-                 absolute_rotation=False,
-                 **kwargs):
-        if not 'translation' in kwargs:
-            kwargs['translation'] = SUPPRESSED
+    def __init__(
+        self,
+        rotation_center=(0.0, 0.0),
+        rotation=0.0,
+        absolute_rotation=False,
+        **kwargs
+    ):
+        if not "translation" in kwargs:
+            kwargs["translation"] = SUPPRESSED
         super(Rotation, self).__init__(
             rotation_center=rotation_center,
             rotation=rotation,
             absolute_rotation=absolute_rotation,
-            **kwargs)
+            **kwargs
+        )
 
-    absolute_rotation = getattr(NoDistortTransform, 'absolute_rotation')
+    absolute_rotation = getattr(NoDistortTransform, "absolute_rotation")
 
     def set_rotation(self, value):
         self.__rotation__ = value % 360.0
@@ -75,7 +79,8 @@ class Rotation(__SpecialNoDistortTransform__):
             center = self.__rotation_center__
             self.translation = Coord2(
                 center.x * (1 - self.__ca__) + center.y * self.__sa__,
-                center.y * (1 - self.__ca__) - center.x * self.__sa__)
+                center.y * (1 - self.__ca__) - center.x * self.__sa__,
+            )
 
     rotation = SetFunctionProperty("__rotation__", set_rotation, default=0.0)
 
@@ -86,14 +91,16 @@ class Rotation(__SpecialNoDistortTransform__):
         if hasattr(self, "__ca__"):
             self.translation = Coord2(
                 center.x * (1 - self.__ca__) + center.y * self.__sa__,
-                center.y * (1 - self.__ca__) - center.x * self.__sa__)
+                center.y * (1 - self.__ca__) - center.x * self.__sa__,
+            )
 
     rotation_center = SetFunctionProperty(
         "__rotation_center__",
         set_rotation_center,
         restriction=RestrictType(Coord2),
         preprocess=ProcessorTypeCast(Coord2),
-        default=(0.0, 0.0))
+        default=(0.0, 0.0),
+    )
 
     # overloading for efficiency
     def apply_to_coord(self, coord):
@@ -146,7 +153,7 @@ class Rotation(__SpecialNoDistortTransform__):
 
     def is_identity(self):
         """ returns True if the transformation does nothing """
-        return (self.rotation == 0.0)
+        return self.rotation == 0.0
 
 
 def shape_rotate(shape, origin=(0.0, 0.0), angle=90.0):
@@ -155,21 +162,17 @@ def shape_rotate(shape, origin=(0.0, 0.0), angle=90.0):
 
 
 class __RotationMixin__(object):
-    def rotate(self,
-               rotation_center=(0.0, 0.0),
-               rotation=0.0,
-               absolute_rotation=False):
+    def rotate(self, rotation_center=(0.0, 0.0), rotation=0.0, absolute_rotation=False):
         """rotates this object """
-        return self.transform(
-            Rotation(rotation_center, rotation, absolute_rotation))
+        return self.transform(Rotation(rotation_center, rotation, absolute_rotation))
 
-    def rotate_copy(self,
-                    rotation_center=(0.0, 0.0),
-                    rotation=0.0,
-                    absolute_rotation=False):
+    def rotate_copy(
+        self, rotation_center=(0.0, 0.0), rotation=0.0, absolute_rotation=False
+    ):
         """rotates a copy of this object """
         return self.transform_copy(
-            Rotation(rotation_center, rotation, absolute_rotation))
+            Rotation(rotation_center, rotation, absolute_rotation)
+        )
 
 
 transformable.Transformable_basic.mixin(__RotationMixin__)

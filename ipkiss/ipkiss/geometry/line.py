@@ -33,14 +33,18 @@ from ipcore.properties.predefined import NumberProperty
 from ipcore.properties.initializer import StrongPropertyInitializer
 
 __all__ = [
-    "StraightLine", "straight_line_from_point_angle",
-    "straight_line_from_slope_intercept", "straight_line_from_two_points",
-    "straight_line_from_vector", "LineProperty"
+    "StraightLine",
+    "straight_line_from_point_angle",
+    "straight_line_from_slope_intercept",
+    "straight_line_from_two_points",
+    "straight_line_from_vector",
+    "LineProperty",
 ]
 
 
 class StraightLine(transformable.Transformable, StrongPropertyInitializer):
     """ creates a line ax + by + c = 0 """
+
     a = NumberProperty(required=True)
     b = NumberProperty(required=True)
     c = NumberProperty(required=True)
@@ -57,8 +61,7 @@ class StraightLine(transformable.Transformable, StrongPropertyInitializer):
 
     def is_on_line(self, coordinate):
         """ returns True if point is on line """
-        return abs(self.a * coordinate[0] + self.b * coordinate[1] +
-                   self.c) < 1E-10
+        return abs(self.a * coordinate[0] + self.b * coordinate[1] + self.c) < 1E-10
 
     def get_angle_rad(self):
         return atan2(-self.a, self.b)
@@ -76,8 +79,8 @@ class StraightLine(transformable.Transformable, StrongPropertyInitializer):
         return -self.c / -self.b
 
     y_intercept = property(
-        get_y_intercept,
-        doc="gives y-intercept of line (None if parallel to Y)")
+        get_y_intercept, doc="gives y-intercept of line (None if parallel to Y)"
+    )
 
     def get_x_intercept(self):
         if self.a == 0.0:
@@ -85,22 +88,23 @@ class StraightLine(transformable.Transformable, StrongPropertyInitializer):
         return -self.c / -self.a
 
     x_intercept = property(
-        get_x_intercept,
-        doc="gives x-intercept of line (None if parallel to X)")
+        get_x_intercept, doc="gives x-intercept of line (None if parallel to X)"
+    )
 
     def distance(self, coordinate):
         """ gives distance of point to line """
-        return abs(self.a * coordinate[0] + self.b * coordinate[1] + self.c
-                   ) / sqrt(self.a**2 + self.b**2)
+        return abs(self.a * coordinate[0] + self.b * coordinate[1] + self.c) / sqrt(
+            self.a ** 2 + self.b ** 2
+        )
 
     def intersection(self, line):
         """ gives intersection of line with other line """
         if (self.b * line.a - self.a * line.b) == 0.0:
             return None
-        return Coord2(-(self.b * line.c - line.b * self.c) /
-                      (self.b * line.a - self.a * line.b),
-                      (self.a * line.c - line.a * self.c) /
-                      (self.b * line.a - self.a * line.b))
+        return Coord2(
+            -(self.b * line.c - line.b * self.c) / (self.b * line.a - self.a * line.b),
+            (self.a * line.c - line.a * self.c) / (self.b * line.a - self.a * line.b),
+        )
 
     def closest_point(self, point):
         """ gives closest point on line """
@@ -109,38 +113,35 @@ class StraightLine(transformable.Transformable, StrongPropertyInitializer):
 
     def is_on_same_side(self, point1, point2):
         """ returns True is both points are on the same side of the line """
-        return numpy.sign(self.a * point1[0] +
-                          self.b * point1[1] + self.c) == numpy.sign(
-                              self.a * point2[0] + self.b * point2[1] + self.c)
+        return numpy.sign(
+            self.a * point1[0] + self.b * point1[1] + self.c
+        ) == numpy.sign(self.a * point2[0] + self.b * point2[1] + self.c)
 
     def is_parallel(self, other):
         """ returns True is lines are parallel """
         return abs(self.a * other.b - self.b * other.a) < 1E-10
 
     def __eq__(self, other):
-        return abs(self.a * other.b - self.b * other.a) < 1E-10 and abs(
-            self.c * other.b - self.b * other.c) < 1E-10 and abs(
-                self.a * other.c - self.c * other.a) < 1E-10
+        return (
+            abs(self.a * other.b - self.b * other.a) < 1E-10
+            and abs(self.c * other.b - self.b * other.c) < 1E-10
+            and abs(self.a * other.c - self.c * other.a) < 1E-10
+        )
 
     def __ne__(self, other):
-        return (not self.__eq__(other))
+        return not self.__eq__(other)
 
     def __get_2_points__(self):
         """ returns 2 points on the line. If a horizontal or vertical, it returns one point on the axis, and another 1.0 further.
             If the line is oblique, it returns the intersects with the axes """
         from .shape import Shape
+
         if b == 0:
-            return Shape(
-                [Coord2(-self.c / self.a, 0.0),
-                 Coord2(-self.c / self.a, 1.0)])
+            return Shape([Coord2(-self.c / self.a, 0.0), Coord2(-self.c / self.a, 1.0)])
         elif a == 0:
-            return Shape(
-                [Coord2(0.0, -self.c / self.b),
-                 Coord2(1.0, -self.c / self.b)])
+            return Shape([Coord2(0.0, -self.c / self.b), Coord2(1.0, -self.c / self.b)])
         else:
-            return Shape(
-                [Coord2(-self.c / self.a, 0.0),
-                 Coord2(0.0, -self.c / self.b)])
+            return Shape([Coord2(-self.c / self.a, 0.0), Coord2(0.0, -self.c / self.b)])
 
     def transform(self, transformation):
         """ transforms the straight line with a given transformation """
@@ -180,9 +181,8 @@ def straight_line_from_vector(vector):
     return straight_line_from_point_angle(vector.position, vector.angle_deg)
 
 
-def LineProperty(internal_member_name=None,
-                 restriction=None,
-                 preprocess=None,
-                 **kwargs):
+def LineProperty(
+    internal_member_name=None, restriction=None, preprocess=None, **kwargs
+):
     R = RestrictType(StraightLine) & restriction
     return RestrictedProperty(internal_member_name, restriction=R, **kwargs)

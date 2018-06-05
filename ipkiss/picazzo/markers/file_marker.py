@@ -21,7 +21,11 @@
 
 from ipkiss.all import *
 from ipkiss.io.gds_layer import GdsiiLayerInputMap, AutoGdsiiLayerInputMap
-from ipkiss.process.layer_map import GdsiiPurposeInputMap, GdsiiPPLayerInputMap, GenericGdsiiPPLayerInputMap
+from ipkiss.process.layer_map import (
+    GdsiiPurposeInputMap,
+    GdsiiPPLayerInputMap,
+    GenericGdsiiPPLayerInputMap,
+)
 import os
 
 
@@ -29,18 +33,25 @@ class FileMarker(Structure):
     __name_prefix__ = "FILEMARK"
     filename = FilenameProperty(required=True)
     layer_map = RestrictedProperty(
-        restriction=RestrictType(allowed_types=[
-            GdsiiLayerInputMap, AutoGdsiiLayerInputMap, GdsiiPPLayerInputMap,
-            GenericGdsiiPPLayerInputMap
-        ]),
-        required=True)
+        restriction=RestrictType(
+            allowed_types=[
+                GdsiiLayerInputMap,
+                AutoGdsiiLayerInputMap,
+                GdsiiPPLayerInputMap,
+                GenericGdsiiPPLayerInputMap,
+            ]
+        ),
+        required=True,
+    )
     toplevel = StringProperty(default="")
     prefix = StringProperty(default="")
 
     def define_name(self):
         return "%s_%s%s" % (
-            self.__name_prefix__, self.prefix,
-            os.path.splitext(os.path.split(self.filename)[1])[0])
+            self.__name_prefix__,
+            self.prefix,
+            os.path.splitext(os.path.split(self.filename)[1])[0],
+        )
 
     @cache()
     def get_file_library(self):
@@ -49,15 +60,14 @@ class FileMarker(Structure):
         LOG.info("size: %d KB" % (filesize / 1024))
         if os.path.exists(self.filename):
             F = open(self.filename, "rb")
-            input = InputGdsii(
-                F, stop_on_unknown_gds_layer=False, log_bufsize=filesize)
+            input = InputGdsii(F, stop_on_unknown_gds_layer=False, log_bufsize=filesize)
             input.layer_map = self.layer_map
             L = input.read()
             F.close()
         else:
             raise IpkissException(
-                "ImportStructure:: Could not find " + self.filename +
-                " for import.")  #FIXME - should be PicazzoException
+                "ImportStructure:: Could not find " + self.filename + " for import."
+            )  # FIXME - should be PicazzoException
         return L
 
     @cache()
@@ -83,8 +93,10 @@ class SingleProcessFileMarker(FileMarker):
     process = ProcessProperty(required=True)
 
     def define_name(self):
-        return "%s_%s" % (super(SingleProcessFileMarker, self).define_name(),
-                          self.process.extension)
+        return "%s_%s" % (
+            super(SingleProcessFileMarker, self).define_name(),
+            self.process.extension,
+        )
 
     def define_elements(self, elems):
         f = open(self.filename, "rb")

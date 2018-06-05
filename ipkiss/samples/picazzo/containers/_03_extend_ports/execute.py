@@ -24,9 +24,12 @@ from ipkiss.all import *
 
 # our basic component that we will use...
 from picazzo.filters.ring import RingRect180DropFilter
+
 my_ring = RingRect180DropFilter(name="My_Ring")
 
 from picazzo.container import ExtendPorts
+
 my_ring_tapered = ExtendPorts(
-    structure=my_ring, port_labels=["W0", "E0", "E1"], extension_length=6.0)
+    structure=my_ring, port_labels=["W0", "E0", "E1"], extension_length=6.0
+)
 my_ring_tapered.write_gdsii("extend_ports_1.gds")

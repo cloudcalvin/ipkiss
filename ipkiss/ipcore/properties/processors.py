@@ -44,7 +44,8 @@ class PropertyProcessor(object):
             return self
         else:
             raise ProcessorException(
-                "Cannot add %s to PropertyProcessor " % type(other))
+                "Cannot add %s to PropertyProcessor " % type(other)
+            )
 
     def __iadd__(self, other):
         C = self.__add__(other)
@@ -69,14 +70,13 @@ class __CompoundPropertyProcessor__(PropertyProcessor):
 
     def __add__(self, other):
         if isinstance(other, __CompoundPropertyProcessor__):
-            return __CompoundPropertyProcessor__(self.__sub_processors +
-                                                 other.__sub_processors)
+            return __CompoundPropertyProcessor__(
+                self.__sub_processors + other.__sub_processors
+            )
         elif isinstance(other, PropertyProcessor):
-            return __CompoundPropertyProcessor__(self.__sub_processors +
-                                                 [other])
+            return __CompoundPropertyProcessor__(self.__sub_processors + [other])
         else:
-            raise ProcessorException(
-                "Cannot add %s to PropertyProcessor" % type(other))
+            raise ProcessorException("Cannot add %s to PropertyProcessor" % type(other))
 
     def __iadd__(self, other):
         if isinstance(other, __CompoundPropertyProcessor__):
@@ -86,8 +86,7 @@ class __CompoundPropertyProcessor__(PropertyProcessor):
             self.__sub_processors += [other]
             return self
         else:
-            raise ProcessorException(
-                "Cannot add %s to PropertyProcessor" % type(other))
+            raise ProcessorException("Cannot add %s to PropertyProcessor" % type(other))
 
     def process(self, value, obj=None):
         """ processes the value """
@@ -111,7 +110,8 @@ class ProcessorTypeCast(PropertyProcessor):
         if not isinstance(cast_type, type):
             raise ProcessorException(
                 "cast_type argument %s in TypeCast Processor should be of type 'type'"
-                % cast_type)
+                % cast_type
+            )
         self.cast_type = cast_type
 
     def process(self, value, obj=None):
@@ -153,10 +153,11 @@ class ProcessorRange(PropertyProcessor):
 
         if lower is None and upper is None:
             raise ProcessorException(
-                "Range Processor should have an upper or lower limit")
+                "Range Processor should have an upper or lower limit"
+            )
 
         if not upper is None and not lower is None:
-            if lower > upper:  #FIXME: what about >= ??
+            if lower > upper:  # FIXME: what about >= ??
                 raise ProcessorException(
                     "lower limit should be smaller than upper limit in Range Processor"
                 )

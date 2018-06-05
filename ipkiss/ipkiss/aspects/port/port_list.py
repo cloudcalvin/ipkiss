@@ -101,18 +101,18 @@ class PortList(TypedList, Transformable):
     def angle_sorted(self, reference_angle=0.0):
         """ sorts ports by angle, using angles between the reference_angle and reference_angle+360 """
         return self.__class__(
-            sorted(
-                self, key=lambda f: ((f.angle_deg - reference_angle) % 360.0)))
+            sorted(self, key=lambda f: ((f.angle_deg - reference_angle) % 360.0))
+        )
 
     def angle_sorted_backward(self, reference_angle=0.0):
         """ sorts ports by angle, using angles between the reference_angle and reference_angle+360 """
         return self.__class__(
-            sorted(
-                self,
-                key=lambda f: (-(f.angle_deg - reference_angle) % 360.0)))
+            sorted(self, key=lambda f: (-(f.angle_deg - reference_angle) % 360.0))
+        )
 
     def get_in_ports(self):
         from .port import __InPort__
+
         pl = self.__class__()
         for p in self:
             if isinstance(p, __InPort__):
@@ -123,6 +123,7 @@ class PortList(TypedList, Transformable):
 
     def get_out_ports(self):
         from .port import __OutPort__
+
         pl = self.__class__()
         for p in self:
             if isinstance(p, __OutPort__):
@@ -140,19 +141,22 @@ class PortList(TypedList, Transformable):
             if isinstance(p, __OutOfPlanePort__):
                 continue
             a = (p.angle_deg - sa) % 360.0
-            if a <= aspread: pl.append(p)
+            if a <= aspread:
+                pl.append(p)
         return pl
 
     def get_ports_on_domain(self, domain):
         pl = self.__class__()
         for p in self:
-            if p.domain == domain: pl.append(p)
+            if p.domain == domain:
+                pl.append(p)
         return pl
 
     def get_ports_on_process(self, process):
         pl = self.__class__()
         for p in self:
-            if p.process == process: pl.append(p)
+            if p.process == process:
+                pl.append(p)
         return pl
 
     def get_ports_from_labels(self, labels):
@@ -202,27 +206,30 @@ class PortList(TypedList, Transformable):
     def get_west_ports(self):
         return self.get_ports_within_angles(
             180.0 - 0.5 * self.port_angle_decision,
-            180.0 + 0.5 * self.port_angle_decision)
+            180.0 + 0.5 * self.port_angle_decision,
+        )
 
     west_ports = property(get_west_ports)
 
     def get_east_ports(self):
-        return self.get_ports_within_angles(-0.5 * self.port_angle_decision,
-                                            +0.5 * self.port_angle_decision)
+        return self.get_ports_within_angles(
+            -0.5 * self.port_angle_decision, +0.5 * self.port_angle_decision
+        )
 
     east_ports = property(get_east_ports)
 
     def get_north_ports(self):
         return self.get_ports_within_angles(
-            90.0 - 0.5 * self.port_angle_decision,
-            90.0 + 0.5 * self.port_angle_decision)
+            90.0 - 0.5 * self.port_angle_decision, 90.0 + 0.5 * self.port_angle_decision
+        )
 
     north_ports = property(get_north_ports)
 
     def get_south_ports(self):
         return self.get_ports_within_angles(
             270.0 - 0.5 * self.port_angle_decision,
-            270.0 + 0.5 * self.port_angle_decision)
+            270.0 + 0.5 * self.port_angle_decision,
+        )
 
     south_ports = property(get_south_ports)
 
@@ -238,15 +245,15 @@ class PortListProperty(DefinitionProperty):
     """Property type for storing a list of Ports."""
 
     def __init__(self, internal_member_name=None, **kwargs):
-        kwargs["restriction"] = RestrictType(
-            allowed_types=[self.__list_type__])
+        kwargs["restriction"] = RestrictType(allowed_types=[self.__list_type__])
         super(PortListProperty, self).__init__(
-            internal_member_name=internal_member_name, **kwargs)
+            internal_member_name=internal_member_name, **kwargs
+        )
 
     def __call_getter_function__(self, obj):
         f = self.__get_getter_function__(obj)
         value = f(self.__list_type__())
-        if (value is None):
+        if value is None:
             value = self.__list_type__()
         self.__cache_property_value_on_object__(obj, value)
         value = self.__get_property_value_of_object__(obj)
@@ -254,24 +261,27 @@ class PortListProperty(DefinitionProperty):
 
     def __cache_property_value_on_object__(self, obj, ports):
         if isinstance(ports, self.__list_type__):
-            super(PortListProperty, self).__cache_property_value_on_object__(
-                obj, ports)
+            super(PortListProperty, self).__cache_property_value_on_object__(obj, ports)
         elif isinstance(ports, list):
             super(PortListProperty, self).__cache_property_value_on_object__(
-                obj, self.__list_type__(ports))
+                obj, self.__list_type__(ports)
+            )
         else:
             raise TypeError(
                 "Invalid type in setting value of PortListProperty (expected PortList), but generated : "
-                + str(type(ports)))
+                + str(type(ports))
+            )
 
     def __set__(self, obj, ports):
         if isinstance(ports, self.__list_type__):
             self.__externally_set_property_value_on_object__(obj, ports)
         elif isinstance(ports, list):
             self.__externally_set_property_value_on_object__(
-                obj, self.__list_type__(ports))
+                obj, self.__list_type__(ports)
+            )
         else:
             raise TypeError(
                 "Invalid type in setting value of PortListProperty (expected PortList): "
-                + str(type(ports)))
+                + str(type(ports))
+            )
         return

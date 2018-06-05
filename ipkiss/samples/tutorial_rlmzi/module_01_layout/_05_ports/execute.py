@@ -30,7 +30,6 @@ my_ring = RingResonator(ring_radius=5.0)
 
 print(my_ring.ports)
 print(my_ring.ports.east_ports)  # ports pointing east
-print(my_ring.ports.east_ports.y_sorted(
-))  # ports pointing east, sorted south to north
+print(my_ring.ports.east_ports.y_sorted())  # ports pointing east, sorted south to north
 print(my_ring.ports.north_ports)  # ports pointing north (none)
-print(my_ring.ports["E0"])  #first port in the list east_ports.y_sorted()
+print(my_ring.ports["E0"])  # first port in the list east_ports.y_sorted()

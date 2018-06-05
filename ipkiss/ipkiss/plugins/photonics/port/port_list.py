@@ -25,8 +25,10 @@ from .port import OpticalPort, VerticalOpticalPort
 from ipkiss.aspects.port.port_list import PortList, PortListProperty
 
 __all__ = [
-    "OpticalPortList", "VerticalOpticalPortList", "OpticalPortListProperty",
-    "VerticalOpticalPortListProperty"
+    "OpticalPortList",
+    "VerticalOpticalPortList",
+    "OpticalPortListProperty",
+    "VerticalOpticalPortListProperty",
 ]
 
 
@@ -36,6 +38,7 @@ class OpticalPortList(PortList):
 
     def get_in_ports(self):
         from .port import InOpticalPort
+
         pl = self.__class__()
         for p in self:
             if isinstance(p, InOpticalPort):
@@ -46,6 +49,7 @@ class OpticalPortList(PortList):
 
     def get_out_ports(self):
         from .port import OutOpticalPort
+
         pl = self.__class__()
         for p in self:
             if isinstance(p, OutOpticalPort):

@@ -35,46 +35,54 @@ __all__ = ["Magnification"]
 class Magnification(__SpecialNoDistortTransform__):
     """ scaling transformation with respect to a given point """
 
-    def __init__(self,
-                 magnification_center=(0.0, 0.0),
-                 magnification=1.0,
-                 absolute_magnification=False,
-                 **kwargs):
+    def __init__(
+        self,
+        magnification_center=(0.0, 0.0),
+        magnification=1.0,
+        absolute_magnification=False,
+        **kwargs
+    ):
         if not "translation" in kwargs:
-            kwargs['translation'] = SUPPRESSED
+            kwargs["translation"] = SUPPRESSED
         super(Magnification, self).__init__(
             magnification_center=magnification_center,
             magnification=magnification,
             absolute_magnification=absolute_magnification,
-            **kwargs)
+            **kwargs
+        )
 
-    absolute_magnification = getattr(NoDistortTransform,
-                                     'absolute_magnification')
+    absolute_magnification = getattr(NoDistortTransform, "absolute_magnification")
 
     def set_magnification(self, value):
         self.__magnification__ = value
         if hasattr(self, "__magnification_center__"):
             center = self.__magnification_center__
-            self.translation = Coord2((1 - self.__magnification__) * center.x,
-                                      (1 - self.__magnification__) * center.y)
+            self.translation = Coord2(
+                (1 - self.__magnification__) * center.x,
+                (1 - self.__magnification__) * center.y,
+            )
 
     magnification = SetFunctionProperty(
-        "__magnification__", set_magnification, default=1.0)
+        "__magnification__", set_magnification, default=1.0
+    )
 
     def set_magnification_center(self, center):
         if not isinstance(center, Coord2):
             center = Coord2(center[0], center[1])
         self.__magnification_center__ = center
         if hasattr(self, "__magnification__"):
-            self.translation = Coord2((1 - self.__magnification__) * center.x,
-                                      (1 - self.__magnification__) * center.y)
+            self.translation = Coord2(
+                (1 - self.__magnification__) * center.x,
+                (1 - self.__magnification__) * center.y,
+            )
 
     magnification_center = SetFunctionProperty(
         "__magnification_center__",
         set_magnification_center,
         restriction=RestrictType(Coord2),
         preprocess=ProcessorTypeCast(Coord2),
-        default=(0.0, 0.0))
+        default=(0.0, 0.0),
+    )
 
     # overloading for efficiency
     def apply_to_coord(self, coord):
@@ -111,36 +119,39 @@ class Magnification(__SpecialNoDistortTransform__):
 
     def __neg__(self):
         """ returns reverse transformation """
-        return Magnification(self.magnification_center,
-                             1.0 / self.magnification)
+        return Magnification(self.magnification_center, 1.0 / self.magnification)
 
     def is_identity(self):
         """ returns True if the transformation does nothing """
-        return (self.magnification == 1.0)
+        return self.magnification == 1.0
 
     def is_isometric(self):
         """ returns True if the transformation does nothing """
-        return (self.magnification == 1.0)
+        return self.magnification == 1.0
 
 
 class __MagnificationMixin__(object):
-    def magnify(self,
-                magnification_center=(0.0, 0.0),
-                magnification=1.0,
-                absolute_magnification=False):
+    def magnify(
+        self,
+        magnification_center=(0.0, 0.0),
+        magnification=1.0,
+        absolute_magnification=False,
+    ):
         """magnifies this object """
         return self.transform(
-            Magnification(magnification_center, magnification,
-                          absolute_magnification))
+            Magnification(magnification_center, magnification, absolute_magnification)
+        )
 
-    def magnify_copy(self,
-                     magnification_center=(0.0, 0.0),
-                     magnification=1.0,
-                     absolute_magnification=False):
+    def magnify_copy(
+        self,
+        magnification_center=(0.0, 0.0),
+        magnification=1.0,
+        absolute_magnification=False,
+    ):
         """magnifies a copy of this object """
         return self.transform_copy(
-            Magnification(magnification_center, magnification,
-                          absolute_magnification))
+            Magnification(magnification_center, magnification, absolute_magnification)
+        )
 
 
 transformable.Transformable_basic.mixin(__MagnificationMixin__)

@@ -64,7 +64,8 @@ class TypedList(StrongPropertyInitializer, list):
     def __raise_invalid_type_exception__(self, item):
         raise Exception(
             "You are trying to add an element of type %s to %s. This is not allowed. You can only add elements of type %s."
-            % (str(type(item)), str(self.__class__), str(self.__item_type__)))
+            % (str(type(item)), str(self.__class__), str(self.__item_type__))
+        )
 
     def append(self, item):
         if isinstance(item, self.__item_type__):
@@ -78,15 +79,16 @@ class TypedList(StrongPropertyInitializer, list):
             list.extend(self, items)
         elif isinstance(items, list) or isinstance(items, set):
             for i in items:
-                list.append(self,
-                            i)  # type will be checked in the 'append' function
+                list.append(self, i)  # type will be checked in the 'append' function
         else:
             raise Exception(
                 "TypedList::extend should be used with a list as argument. Current argument if of type %s, which is not a list."
-                % str(type(item)))
+                % str(type(item))
+            )
 
     def __deepcopy__(self, memo):
         from copy import deepcopy
+
         L = self.__class__()
         for item in self:
             L.append(deepcopy(item))
@@ -98,15 +100,15 @@ class TypedListProperty(DefinitionProperty):
     """Property type for storing a typed list."""
 
     def __init__(self, internal_member_name=None, **kwargs):
-        kwargs["restriction"] = RestrictType(
-            allowed_types=[self.__list_type__])
+        kwargs["restriction"] = RestrictType(allowed_types=[self.__list_type__])
         super(TypedListProperty, self).__init__(
-            internal_member_name=internal_member_name, **kwargs)
+            internal_member_name=internal_member_name, **kwargs
+        )
 
     def __call_getter_function__(self, obj):
         f = self.__get_getter_function__(obj)
         value = f(self.__list_type__())
-        if (value is None):
+        if value is None:
             value = self.__list_type__()
         self.__cache_property_value_on_object__(obj, value)
         value = self.__get_property_value_of_object__(obj)
@@ -115,23 +117,28 @@ class TypedListProperty(DefinitionProperty):
     def __cache_property_value_on_object__(self, obj, objects):
         if isinstance(objects, self.__list_type__):
             super(TypedListProperty, self).__cache_property_value_on_object__(
-                obj, objects)
+                obj, objects
+            )
         elif isinstance(objects, list):
             super(TypedListProperty, self).__cache_property_value_on_object__(
-                obj, self.__list_type__(objects))
+                obj, self.__list_type__(objects)
+            )
         else:
             raise TypeError(
                 "Invalid type in setting value of %s (expected %s), but generated : %s"
-                % (self.__class__, self.__list_type__, str(type(objects))))
+                % (self.__class__, self.__list_type__, str(type(objects)))
+            )
 
     def __set__(self, obj, objects):
         if isinstance(objects, self.__list_type__):
             self.__externally_set_property_value_on_object__(obj, objects)
         elif isinstance(objects, list):
             self.__externally_set_property_value_on_object__(
-                obj, self.__list_type__(objects))
+                obj, self.__list_type__(objects)
+            )
         else:
             raise TypeError(
-                "Invalid type in setting value of %s (expected %s): %s" %
-                (self.__class_, self.__list_type__, str(type(objects))))
+                "Invalid type in setting value of %s (expected %s): %s"
+                % (self.__class_, self.__list_type__, str(type(objects)))
+            )
         return

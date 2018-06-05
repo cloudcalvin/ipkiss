@@ -24,8 +24,11 @@ from ipkiss.plugins.photonics.port import VerticalOpticalPort
 from ipkiss.all import *
 
 __all__ = [
-    "FiberCoupler", "FiberCouplerGrating", "FiberCoupler2dGrating",
-    "FiberCouplerGratingAuto", "FiberCoupler2dGratingAuto"
+    "FiberCoupler",
+    "FiberCouplerGrating",
+    "FiberCoupler2dGrating",
+    "FiberCouplerGratingAuto",
+    "FiberCoupler2dGratingAuto",
 ]
 
 ##############################################################
@@ -63,8 +66,7 @@ class __Grating__(StrongPropertyInitializer):
 
 class __AutoGrating__(__Grating__):
     grating = DefinitionProperty(fdef_name="define_grating")
-    grating_transform = DefinitionProperty(
-        fdef_name="define_grating_transform")
+    grating_transform = DefinitionProperty(fdef_name="define_grating_transform")
 
     def define_grating_transform(self):
         (grating, grating_transform) = self.__get_grating__()
@@ -77,16 +79,15 @@ class __AutoGrating__(__Grating__):
 
 class FiberCouplerGrating(__Socket__, __Grating__, FiberCoupler):
     """ fiber coupler grating base class, which combines a grating on top of a socket """
+
     __name_prefix__ = "FIBCOUPG"
 
     def define_elements(self, elems):
         elems += SRef(self.socket, self.socket_position)
         E = SRef(
-            self.grating,
-            position=(0.0, 0.0),
-            transformation=self.grating_transform)
-        if self.grating_transform is None or self.grating_transform.is_orthogonal(
-        ):
+            self.grating, position=(0.0, 0.0), transformation=self.grating_transform
+        )
+        if self.grating_transform is None or self.grating_transform.is_orthogonal():
             elems += E
         else:
             elems += E.flat_copy()
@@ -99,9 +100,9 @@ class FiberCouplerGrating(__Socket__, __Grating__, FiberCoupler):
             fibcoup_pos.transform(self.grating_transform)
         ports.append(
             VerticalOpticalPort(
-                position=(fibcoup_pos.x, fibcoup_pos.y, 0.0),
-                inclination=0.0,
-                angle=0.0))  # FIXME: use port given by the grating
+                position=(fibcoup_pos.x, fibcoup_pos.y, 0.0), inclination=0.0, angle=0.0
+            )
+        )  # FIXME: use port given by the grating
         return ports
 
 
@@ -113,8 +114,7 @@ class FiberCouplerGratingAuto(__AutoGrating__, FiberCouplerGrating):
 
     def __get_grating__(self):
         """ this function should be overloaded """
-        raise NotImplementedError(
-            "Function __get_grating__ should be overloaded.")
+        raise NotImplementedError("Function __get_grating__ should be overloaded.")
 
 
 class FiberCoupler2dGrating(FiberCouplerGrating):
@@ -125,5 +125,4 @@ class FiberCoupler2dGratingAuto(__AutoGrating__, FiberCoupler2dGrating):
     """abstract base class for 2D gratings"""
 
     def __get_grating__(self):
-        raise NotImplementedError(
-            "Function __get_grating__ should be overloaded.")
+        raise NotImplementedError("Function __get_grating__ should be overloaded.")

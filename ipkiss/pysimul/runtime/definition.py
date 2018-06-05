@@ -25,23 +25,27 @@ from pysimul.runtime.procedure import *
 import pickle
 import glob
 
-__all__ = ['SimulationDefinition']
+__all__ = ["SimulationDefinition"]
 
 
 class SimulationDefinition(StrongPropertyInitializer):
     simul_params = RestrictedProperty(
         default=dict(),
         restriction=RestrictType(dict),
-        doc="A set of parameters for the simulation")
+        doc="A set of parameters for the simulation",
+    )
     landscape = DefinitionProperty(fdef_name="define_landscape")
     procedure = DefinitionProperty(fdef_name="define_procedure")
     saveDatacollectorsImageToFileFunction = DefinitionProperty(
-        fdef_name="define_SaveDatacollectorsImageToFileFunction")
+        fdef_name="define_SaveDatacollectorsImageToFileFunction"
+    )
 
     def save_default_landscape_to_file(self, filename=None):
-        '''create an image of the landscape in accord with the default parameter values and save it to file'''
+        """create an image of the landscape in accord with the default parameter values and save it to file"""
         if filename == None:
-            filename = "./%s_default_landscape.pysimul.png" % self.landscape.simulation_id
+            filename = (
+                "./%s_default_landscape.pysimul.png" % self.landscape.simulation_id
+            )
         self.procedure.visualizeLandscapeToFile(filename)
         return filename
 
@@ -63,40 +67,39 @@ class SimulationDefinition(StrongPropertyInitializer):
         )
 
     def __cleanUpFiles(self):
-        '''clean up older files that could possibly exist for an earlier run of this simulation'''
-        for f in glob.glob(
-                './%s*' % self.__get_default_filename_without_extension()):
+        """clean up older files that could possibly exist for an earlier run of this simulation"""
+        for f in glob.glob("./%s*" % self.__get_default_filename_without_extension()):
             os.remove(f)
 
     def persist_to_file(self, filename=None):
-        '''serialize a SimulationDefinition to file'''
+        """serialize a SimulationDefinition to file"""
         self.__cleanUpFiles()
         self.landscape.set_default_filename_without_extension(
-            self.__get_default_filename_without_extension())
+            self.__get_default_filename_without_extension()
+        )
         if filename == None:
-            filename = self.__get_default_filename_without_extension(
-            ) + '.def.pysimul'
-        f = open(filename, 'wb')
+            filename = self.__get_default_filename_without_extension() + ".def.pysimul"
+        f = open(filename, "wb")
         LOG.debug("Persisting simulation definition to file : %s" % filename)
         pickle.dump(self, f)
         f.close()
         return filename
 
     def save_datacollectors_to_file(self, filename=None):
-        '''save the datacollectors to file and also trigger the function that creates a graph and save this to file'''
+        """save the datacollectors to file and also trigger the function that creates a graph and save this to file"""
         if filename == None:
             filename = self.__get_default_filename_without_extension()
-            filename = filename + '.datacollectors.pysimul'
-        f = open(filename, 'wb')
+            filename = filename + ".datacollectors.pysimul"
+        f = open(filename, "wb")
         pickle.dump(self.landscape.datacollectors, f)
         f.close()
         self.save_datacollectors_to_file_function(filename + ".png")
 
     @classmethod
     def load_from_file(cls, filename):
-        '''deserialize a SimulationDefinition from file'''
+        """deserialize a SimulationDefinition from file"""
         LOG.debug("Loading simulation definition from file : %s" % filename)
-        f = open(filename, 'rb')
+        f = open(filename, "rb")
         simul_def = pickle.load(f)
         f.close()
         return simul_def

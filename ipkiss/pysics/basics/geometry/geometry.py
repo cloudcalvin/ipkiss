@@ -25,8 +25,10 @@ from ..environment import EnvironmentProperty, DEFAULT_ENVIRONMENT
 from ipkiss.geometry.size_info import SizeInfoProperty
 
 __all__ = [
-    "GeometryProperty", "CartesianGeometry1D", "CartesianGeometry2D",
-    "CartesianGeometry3D"
+    "GeometryProperty",
+    "CartesianGeometry1D",
+    "CartesianGeometry2D",
+    "CartesianGeometry3D",
 ]
 
 # Geometry Classes
@@ -39,16 +41,24 @@ class __Geometry__(StrongPropertyInitializer):
     """ abstract Geometry base class """
 
     def get_material(self, coordinate):
-        raise AssertionError("__Geometry__ instance or subclass should have material(self, coordinate) method")
+        raise AssertionError(
+            "__Geometry__ instance or subclass should have material(self, coordinate) method"
+        )
 
     def get_environment(self, coordinate):
-        raise AssertionError("__Geometry__ instance or subclass should have environment(self, coordinate) method")
+        raise AssertionError(
+            "__Geometry__ instance or subclass should have environment(self, coordinate) method"
+        )
 
     def size_info(self):
-        raise AssertionError("__Geometry__ instance or subclass should have size_info() method")
+        raise AssertionError(
+            "__Geometry__ instance or subclass should have size_info() method"
+        )
 
     def get_material_array(self, **kwargs):
-        raise AssertionError("__Geometry__ instance or subclass should have get_material_array(self) method")
+        raise AssertionError(
+            "__Geometry__ instance or subclass should have get_material_array(self) method"
+        )
 
     def __repr__(self):
         return "<Geometry %s>" % self.name
@@ -58,7 +68,7 @@ class Geometry(__Geometry__):
     """ Base class for new geometries """
 
 
-#FIXME - SUBKLASSEN CARTESIAN + POLAR
+# FIXME - SUBKLASSEN CARTESIAN + POLAR
 class __Geometry1D__(__Geometry__):
     """ abstract 1D Geometry base class """
 
@@ -117,14 +127,14 @@ class __UniformEnvironmentGeometry__(__Geometry__):
 RESTRICT_GEOMETRY = RestrictType(Geometry)
 
 
-def GeometryProperty(internal_member_name=None,
-                     restriction=None,
-                     preprocess=None,
-                     **kwargs):
+def GeometryProperty(
+    internal_member_name=None, restriction=None, preprocess=None, **kwargs
+):
     """ Geometry property descriptor for a class """
     R = RESTRICT_GEOMETRY & restriction
     return RestrictedProperty(
         internal_member_name=internal_member_name,
         restriction=R,
         preprocess=preprocess,
-        **kwargs)
+        **kwargs
+    )

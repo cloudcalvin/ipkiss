@@ -25,12 +25,17 @@ Directional couplers
 
 from ipkiss.plugins.photonics.port.port_list import OpticalPortList
 from ipkiss.all import *
-from ipkiss.plugins.photonics.wg.connect import WaveguidePointRoundedConnectElementDefinition, __RoundedWaveguideManhattan__, __RoundedWaveguide__
+from ipkiss.plugins.photonics.wg.connect import (
+    WaveguidePointRoundedConnectElementDefinition,
+    __RoundedWaveguideManhattan__,
+    __RoundedWaveguide__,
+)
 from ipkiss.plugins.photonics.wg.definition import WaveguideDefProperty
 
 __all__ = [
-    "StraightDirectionalCoupler", "Bend90SDirectionalCoupler",
-    "Bend90DirectionalCoupler"
+    "StraightDirectionalCoupler",
+    "Bend90SDirectionalCoupler",
+    "Bend90DirectionalCoupler",
 ]
 
 # TODO: Include rounding algorithm in here. (From connect.__RoundedWaveguide__)
@@ -66,16 +71,17 @@ class StraightDirectionalCoupler(__DirectionalCoupler__):
 
     def define_waveguides(self):
         waveguides = [
-            self.wg_definition1([(0.0, -0.5 * self.spacing),
-                                 (self.length, -0.5 * self.spacing)]),
-            self.wg_definition2([(0.0, +0.5 * self.spacing),
-                                 (self.length, 0.5 * self.spacing)])
+            self.wg_definition1(
+                [(0.0, -0.5 * self.spacing), (self.length, -0.5 * self.spacing)]
+            ),
+            self.wg_definition2(
+                [(0.0, +0.5 * self.spacing), (self.length, 0.5 * self.spacing)]
+            ),
         ]
         return waveguides
 
 
-class Bend90DirectionalCoupler(__RoundedWaveguideManhattan__,
-                               __DirectionalCoupler__):
+class Bend90DirectionalCoupler(__RoundedWaveguideManhattan__, __DirectionalCoupler__):
     __name_prefix__ = "GDircoup_90_"
 
     def define_waveguides(self):
@@ -83,23 +89,33 @@ class Bend90DirectionalCoupler(__RoundedWaveguideManhattan__,
             wg_definition=self.wg_definition1,
             bend_radius=self.bend_radius,
             manhattan=self.manhattan,
-            rounding_algorithm=self.rounding_algorithm)
+            rounding_algorithm=self.rounding_algorithm,
+        )
         wgdef2 = WaveguidePointRoundedConnectElementDefinition(
             wg_definition=self.wg_definition2,
             bend_radius=self.bend_radius,
             manhattan=self.manhattan,
-            rounding_algorithm=self.rounding_algorithm)
+            rounding_algorithm=self.rounding_algorithm,
+        )
         bs1, bs2 = self.get_bend90_size()
 
         waveguides = [
-            wgdef1([(-bs2, -0.5 * self.spacing - bs1),
-                    (-bs2, -0.5 * self.spacing), (self.length + bs1,
-                                                  -0.5 * self.spacing),
-                    (self.length + bs1, -0.5 * self.spacing - bs2)]),
-            wgdef2([(-bs2, 0.5 * self.spacing + bs1),
-                    (-bs2, +0.5 * self.spacing), (self.length + bs1,
-                                                  +0.5 * self.spacing),
-                    (self.length + bs1, +0.5 * self.spacing + bs2)])
+            wgdef1(
+                [
+                    (-bs2, -0.5 * self.spacing - bs1),
+                    (-bs2, -0.5 * self.spacing),
+                    (self.length + bs1, -0.5 * self.spacing),
+                    (self.length + bs1, -0.5 * self.spacing - bs2),
+                ]
+            ),
+            wgdef2(
+                [
+                    (-bs2, 0.5 * self.spacing + bs1),
+                    (-bs2, +0.5 * self.spacing),
+                    (self.length + bs1, +0.5 * self.spacing),
+                    (self.length + bs1, +0.5 * self.spacing + bs2),
+                ]
+            ),
         ]
         return waveguides
 
@@ -113,30 +129,48 @@ class Bend90SDirectionalCoupler(Bend90DirectionalCoupler):
             wg_definition=self.wg_definition1,
             bend_radius=self.bend_radius,
             manhattan=self.manhattan,
-            rounding_algorithm=self.rounding_algorithm)
+            rounding_algorithm=self.rounding_algorithm,
+        )
 
         wgdef2 = WaveguidePointRoundedConnectElementDefinition(
             wg_definition=self.wg_definition2,
             bend_radius=self.bend_radius,
             manhattan=self.manhattan,
-            rounding_algorithm=self.rounding_algorithm)
+            rounding_algorithm=self.rounding_algorithm,
+        )
         bs1, bs2 = self.get_bend90_size()
         waveguides = [
-            wgdef1(shape=[(
-                -bs1 - bs2, -0.5 * self.spacing - bs1 - bs2 - self.min_straight
-            ), (-bs2, -0.5 * self.spacing - bs1 - bs2 - self.min_straight), (
-                -bs2, -0.5 * self.spacing
-            ), (self.length + bs1, -0.5 * self.spacing), (
-                self.length + bs1, -0.5 * self.spacing - bs1 - bs2 - self.
-                min_straight), (self.length + bs1 + bs2, -0.5 * self.spacing -
-                                bs1 - bs2 - self.min_straight)]),
-            wgdef2(shape=[(
-                -bs1 - bs2, 0.5 * self.spacing + bs1 + bs2 + self.min_straight
-            ), (-bs2, 0.5 * self.spacing + bs1 + bs2 + self.min_straight), (
-                -bs2, +0.5 * self.spacing
-            ), (self.length + bs1, +0.5 * self.spacing), (
-                self.length + bs1, +0.5 * self.spacing + bs1 + bs2 + self.
-                min_straight), (self.length + bs1 + bs2, +0.5 * self.spacing +
-                                bs1 + bs2 + self.min_straight)])
+            wgdef1(
+                shape=[
+                    (-bs1 - bs2, -0.5 * self.spacing - bs1 - bs2 - self.min_straight),
+                    (-bs2, -0.5 * self.spacing - bs1 - bs2 - self.min_straight),
+                    (-bs2, -0.5 * self.spacing),
+                    (self.length + bs1, -0.5 * self.spacing),
+                    (
+                        self.length + bs1,
+                        -0.5 * self.spacing - bs1 - bs2 - self.min_straight,
+                    ),
+                    (
+                        self.length + bs1 + bs2,
+                        -0.5 * self.spacing - bs1 - bs2 - self.min_straight,
+                    ),
+                ]
+            ),
+            wgdef2(
+                shape=[
+                    (-bs1 - bs2, 0.5 * self.spacing + bs1 + bs2 + self.min_straight),
+                    (-bs2, 0.5 * self.spacing + bs1 + bs2 + self.min_straight),
+                    (-bs2, +0.5 * self.spacing),
+                    (self.length + bs1, +0.5 * self.spacing),
+                    (
+                        self.length + bs1,
+                        +0.5 * self.spacing + bs1 + bs2 + self.min_straight,
+                    ),
+                    (
+                        self.length + bs1 + bs2,
+                        +0.5 * self.spacing + bs1 + bs2 + self.min_straight,
+                    ),
+                ]
+            ),
         ]
         return waveguides

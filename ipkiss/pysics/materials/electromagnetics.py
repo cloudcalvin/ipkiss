@@ -43,8 +43,9 @@ def get_epsilon_for_material_id(id):
 
 
 def transform_material_matrix_in_epsilon_matrix(material_matrix):
-    #convert the material matrix to a matrix with epsilon values (doubles)
+    # convert the material matrix to a matrix with epsilon values (doubles)
     from numpy import vectorize
+
     f = vectorize(get_epsilon_for_material_id, otypes=[float])
     eps_matrix = f(material_matrix)
     return eps_matrix
@@ -55,13 +56,13 @@ def transform_material_matrix_in_epsilon_matrix(material_matrix):
 material_stack_id_to_effective_index_epsilon = dict()
 
 
-def fill_material_stack_id_to_effective_index_epsilon_map(
-        material_stack_factory):
+def fill_material_stack_id_to_effective_index_epsilon_map(material_stack_factory):
     reference_height = None
     material_stack_id_to_effective_index_epsilon.clear()
     for id, material_stack in material_stack_factory:
         material_stack_id_to_effective_index_epsilon[
-            id] = material_stack.effective_index_epsilon
+            id
+        ] = material_stack.effective_index_epsilon
 
 
 def fill_material_stack_id_to_chi3_map(material_stack_factory):
@@ -80,22 +81,24 @@ def get_chi3_for_material_stack_id(id):
 
 
 def transform_material_stack_matrix_in_effective_index_epsilon_matrix(
-        material_stack_matrix, material_stack_factory):
-    #convert the material_stack matrix to a matrix with effective_index_epsilon values (doubles)
-    fill_material_stack_id_to_effective_index_epsilon_map(
-        material_stack_factory)
+    material_stack_matrix, material_stack_factory
+):
+    # convert the material_stack matrix to a matrix with effective_index_epsilon values (doubles)
+    fill_material_stack_id_to_effective_index_epsilon_map(material_stack_factory)
     from numpy import vectorize
-    f = vectorize(
-        get_effective_index_epsilon_for_material_stack_id, otypes=[float])
+
+    f = vectorize(get_effective_index_epsilon_for_material_stack_id, otypes=[float])
     effective_index_epsilon_matrix = f(material_stack_matrix)
     return effective_index_epsilon_matrix
 
 
-def transform_material_stack_matrix_in_chi3_matrix(material_stack_matrix,
-                                                   material_stack_factory):
-    #convert the material_stack matrix to a matrix with effective_index_epsilon values (doubles)
+def transform_material_stack_matrix_in_chi3_matrix(
+    material_stack_matrix, material_stack_factory
+):
+    # convert the material_stack matrix to a matrix with effective_index_epsilon values (doubles)
     fill_material_stack_id_to_chi3_map(material_stack_factory)
     from numpy import vectorize
+
     f = vectorize(get_chi3_for_material_stack_id, otypes=[float])
     chi3_matrix = f(material_stack_matrix)
     return chi3_matrix
@@ -103,8 +106,8 @@ def transform_material_stack_matrix_in_chi3_matrix(material_stack_matrix,
 
 # ---------------------------------------
 
-material_stack_id_to_epsilon_map = dict()  #must be available in global scope
-material_stack_id_to_chi3_map = dict()  #must be available in global scope
+material_stack_id_to_epsilon_map = dict()  # must be available in global scope
+material_stack_id_to_chi3_map = dict()  # must be available in global scope
 
 
 def get_epsilon_for_material_stack_id(id):
@@ -112,11 +115,13 @@ def get_epsilon_for_material_stack_id(id):
 
 
 def transform_material_stack_matrix_in_epsilon_matrix(
-        material_stack_matrix, z_coord, material_stack_factory):
-    #make a slice with epsilon-values for a certain z-coordinate
+    material_stack_matrix, z_coord, material_stack_factory
+):
+    # make a slice with epsilon-values for a certain z-coordinate
     from numpy import vectorize
+
     f = vectorize(get_epsilon_for_material_stack_id, otypes=[float])
-    #re-initialize the mapping : for every material stack, store the epsilon value that corresponds to the z_coord
+    # re-initialize the mapping : for every material stack, store the epsilon value that corresponds to the z_coord
     material_stack_id_to_epsilon_map.clear()
     for id, material_stack in material_stack_factory:
         epsilon = material_stack.get_epsilon_at_z(z_coord)

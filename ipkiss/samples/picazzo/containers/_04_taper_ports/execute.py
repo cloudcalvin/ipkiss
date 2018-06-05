@@ -24,28 +24,32 @@ from ipkiss.all import *
 
 # our basic component that we will use...
 from picazzo.filters.ring import RingRect180DropFilter
+
 my_ring = RingRect180DropFilter(name="My_Ring")
 
 from picazzo.container import TaperDeepPorts
 from ipkiss.plugins.photonics.wg import WgElDefinition
+
 my_ring_tapered = TaperDeepPorts(
     structure=my_ring,
     port_labels=["W0", "E0", "E1"],
-    end_wg_def=WgElDefinition(wg_width=0.7))
+    end_wg_def=WgElDefinition(wg_width=0.7),
+)
 my_ring_tapered.write_gdsii("taper_ports_1.gds")
 
 from picazzo.wg.wgdefs.wg_fc import ShallowWgElDefinition
-my_shallow_wg = ShallowWgElDefinition(
-    wg_width=0.6)  # a shallow etched waveguide
+
+my_shallow_wg = ShallowWgElDefinition(wg_width=0.6)  # a shallow etched waveguide
 my_shallow_ring = RingRect180DropFilter(
     name="My_Shallow_Ring",
     ring_wg_definition=my_shallow_wg,
     coupler_wg_definitions=[my_shallow_wg, my_shallow_wg],
-    coupler_spacings=[0.8, 0.8])
+    coupler_spacings=[0.8, 0.8],
+)
 
 from picazzo.container import TaperShallowPorts
+
 my_shallow_ring_tapered = TaperShallowPorts(
-    structure=my_shallow_ring,
-    port_labels=["W0", "E0", "E1"],
+    structure=my_shallow_ring, port_labels=["W0", "E0", "E1"]
 )
 my_shallow_ring_tapered.write_gdsii("taper_ports_2.gds")

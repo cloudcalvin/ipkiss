@@ -31,9 +31,11 @@ TECH = get_technology()
 class NameScrambleFilter(Filter):
     """ Filter for scrambling a Structure's name.
     """
+
     scramble_all = BoolProperty(default=False)
     max_name_length = PositiveIntProperty(
-        allow_none=True, default=TECH.GDSII.MAX_NAME_LENGTH)
+        allow_none=True, default=TECH.GDSII.MAX_NAME_LENGTH
+    )
 
     def __filter_str__(self, item):
         if item is None:
@@ -58,10 +60,12 @@ class NameScrambleFilter(Filter):
                 if L > self.max_name_length + 1:
                     raise ValueError(
                         "max_name_length %d in NameScrambleFilter is too short for hash algorithm"
-                        % (self.max_name_length))
-                name = name[0:self.max_name_length - L - 1] + "_" + hashval
-                LOG.warning("Too long name encountered. Current length = %d" %
-                            len(name))
+                        % (self.max_name_length)
+                    )
+                name = name[0 : self.max_name_length - L - 1] + "_" + hashval
+                LOG.warning(
+                    "Too long name encountered. Current length = %d" % len(name)
+                )
         return [name]
 
     def __repr__(self):

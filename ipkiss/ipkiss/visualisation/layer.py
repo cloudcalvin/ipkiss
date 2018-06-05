@@ -22,7 +22,16 @@
 from .display_style import DisplayStyleProperty, DisplayStyle
 from ipcore.mixin.mixin import MixinIngredient
 from ..primitives.layer import Layer
-from .color import COLOR_BLACK, COLOR_BLUE, COLOR_CYAN, COLOR_GREEN, COLOR_MAGENTA, COLOR_RED, COLOR_WHITE, COLOR_YELLOW
+from .color import (
+    COLOR_BLACK,
+    COLOR_BLUE,
+    COLOR_CYAN,
+    COLOR_GREEN,
+    COLOR_MAGENTA,
+    COLOR_RED,
+    COLOR_WHITE,
+    COLOR_YELLOW,
+)
 
 
 class DisplayLayer(MixinIngredient):
@@ -31,9 +40,15 @@ class DisplayLayer(MixinIngredient):
 
 Layer.mixin(DisplayLayer)
 cycle_colors = [
-    COLOR_BLACK, COLOR_RED, COLOR_GREEN, COLOR_BLUE, COLOR_MAGENTA,
-    COLOR_YELLOW, COLOR_CYAN
+    COLOR_BLACK,
+    COLOR_RED,
+    COLOR_GREEN,
+    COLOR_BLUE,
+    COLOR_MAGENTA,
+    COLOR_YELLOW,
+    COLOR_CYAN,
 ]
-DEFAULT_DISPLAY_LAYER_SET = [(D, DisplayStyle(
-    color=cycle_colors[D % len(cycle_colors)], alpha=0.5))
-                             for D in range(256)]
+DEFAULT_DISPLAY_LAYER_SET = [
+    (D, DisplayStyle(color=cycle_colors[D % len(cycle_colors)], alpha=0.5))
+    for D in range(256)
+]

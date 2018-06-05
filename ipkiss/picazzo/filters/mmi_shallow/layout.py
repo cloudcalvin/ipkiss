@@ -24,33 +24,41 @@ from ipkiss.plugins.photonics.wg.basic import WgElDefinition
 from picazzo.container.taper_ports import TaperDeepPorts, TaperShallowPorts
 
 __all__ = [
-    "ShallowMmi", "ShallowMmi1x2Tapered", "ShallowMmi2x1Tapered",
-    "ShallowMmi2x2Tapered", "ShallowMmiTapered", "ShallowMmiTaperPorts",
-    "ShallowMmiTaperedBasic"
+    "ShallowMmi",
+    "ShallowMmi1x2Tapered",
+    "ShallowMmi2x1Tapered",
+    "ShallowMmi2x2Tapered",
+    "ShallowMmiTapered",
+    "ShallowMmiTaperPorts",
+    "ShallowMmiTaperedBasic",
 ]
 
 
-def ShallowMmiTaperedBasic(width,
-                           length,
-                           input_y_positions,
-                           output_y_positions,
-                           input_taper_widths,
-                           output_taper_widths,
-                           taper_length,
-                           wg_definition=TECH.WGDEF.FC_WIRE,
-                           **kwargs):
+def ShallowMmiTaperedBasic(
+    width,
+    length,
+    input_y_positions,
+    output_y_positions,
+    input_taper_widths,
+    output_taper_widths,
+    taper_length,
+    wg_definition=TECH.WGDEF.FC_WIRE,
+    **kwargs
+):
     """ a shallow-etch rectangular MMI with tapers  """
     mmi_wg_definition = WgElDefinition(
         wg_width=width,
         process=wg_definition.process,
-        trench_width=wg_definition.trench_width)
+        trench_width=wg_definition.trench_width,
+    )
     input_taper_definitions = []
     for i in range(len(input_taper_widths)):
         input_taper_definitions += [
             WgElDefinition(
                 wg_width=input_taper_widths[i],
                 process=wg_definition.process,
-                trench_width=wg_definition.trench_width)
+                trench_width=wg_definition.trench_width,
+            )
         ]
     output_taper_definitions = []
     for i in range(len(output_taper_widths)):
@@ -58,9 +66,11 @@ def ShallowMmiTaperedBasic(width,
             WgElDefinition(
                 wg_width=output_taper_widths[i],
                 process=wg_definition.process,
-                trench_width=wg_definition.trench_width)
+                trench_width=wg_definition.trench_width,
+            )
         ]
     from picazzo.filters.mmi.layout import MmiBasic
+
     M = MmiBasic(
         mmi_wg_definition=mmi_wg_definition,
         length=length,
@@ -68,9 +78,11 @@ def ShallowMmiTaperedBasic(width,
         output_y_positions=output_y_positions,
         input_wg_definitions=input_taper_definitions,
         output_wg_definitions=output_taper_definitions,
-        **kwargs)
+        **kwargs
+    )
     return ShallowMmiTaperPorts(
-        structure=M, taper_length=taper_length, end_wg_def=wg_definition)
+        structure=M, taper_length=taper_length, end_wg_def=wg_definition
+    )
 
 
 from picazzo.filters.mmi import MmiUniformWgWidth
@@ -81,13 +93,15 @@ class ShallowMmi(MmiUniformWgWidth):
     width = NonNegativeNumberProperty(required=True)
     wg_definition = WaveguideDefProperty(default=TECH.WGDEF.FC_WIRE)
     mmi_wg_definition = WaveguideDefProperty(
-        doc="waveguide definition used to define the MMI core")
+        doc="waveguide definition used to define the MMI core"
+    )
 
     def define_mmi_wg_definition(self):
         return WgElDefinition(
             wg_width=self.width,
             process=self.wg_definition.process,
-            trench_width=self.wg_definition.trench_width)
+            trench_width=self.wg_definition.trench_width,
+        )
 
 
 class ShallowMmiTaperPorts(TaperShallowPorts):
@@ -96,43 +110,53 @@ class ShallowMmiTaperPorts(TaperShallowPorts):
     def define_elements(self, elems):
         super(ShallowMmiTaperPorts, self).define_elements(elems)
         # WG: corrections for sharp angles...
-        E = max(self.straight_extension[0],
-                TECH.TECH.MINIMUM_LINE)  # deep taper extension
+        E = max(
+            self.straight_extension[0], TECH.TECH.MINIMUM_LINE
+        )  # deep taper extension
         TL = 0.5 * self.taper_length  # deep taper length
 
         i_y = [p.position.y for p in self.structure.in_ports.y_sorted()]
         x_i = -TL + E
         for (y1, y2) in zip(i_y[:-1], i_y[1:]):
-            y_excess = self.deep_only_width + TECH.TECH.MINIMUM_SPACE - (
-                y2 - y1)
+            y_excess = self.deep_only_width + TECH.TECH.MINIMUM_SPACE - (y2 - y1)
             if y_excess > 0:
                 average = 0.5 * (y1 + y2)
-                L = y_excess * TL / (
-                    self.deep_only_width - self.end_wg_def.wg_width) + E
+                L = (
+                    y_excess * TL / (self.deep_only_width - self.end_wg_def.wg_width)
+                    + E
+                )
                 elems += Line(
-                    PPLayer(self.deep_process,
-                            TECH.PURPOSE.LF.LINE), (x_i, average),
-                    (x_i - L, average), TECH.TECH.MINIMUM_SPACE + 0.14)
+                    PPLayer(self.deep_process, TECH.PURPOSE.LF.LINE),
+                    (x_i, average),
+                    (x_i - L, average),
+                    TECH.TECH.MINIMUM_SPACE + 0.14,
+                )
 
         x_o = self.structure.length + TL - E
         o_y = [p.position.y for p in self.structure.out_ports.y_sorted()]
         for (y1, y2) in zip(o_y[:-1], o_y[1:]):
-            y_excess = self.deep_only_width + TECH.TECH.MINIMUM_SPACE - (
-                y2 - y1)
+            y_excess = self.deep_only_width + TECH.TECH.MINIMUM_SPACE - (y2 - y1)
             if y_excess > 0:
                 average = 0.5 * (y1 + y2)
-                L = y_excess * TL / (
-                    self.deep_only_width - self.end_wg_def.wg_width) + E
+                L = (
+                    y_excess * TL / (self.deep_only_width - self.end_wg_def.wg_width)
+                    + E
+                )
                 elems += Line(
-                    PPLayer(self.deep_process,
-                            TECH.PURPOSE.LF.LINE), (x_o, average),
-                    (x_o + L, average), TECH.TECH.MINIMUM_SPACE + 0.14)
+                    PPLayer(self.deep_process, TECH.PURPOSE.LF.LINE),
+                    (x_o, average),
+                    (x_o + L, average),
+                    TECH.TECH.MINIMUM_SPACE + 0.14,
+                )
 
         # Light field inversion layer
         elems += Line(
-            PPLayer(self.deep_process, TECH.PURPOSE.DF_AREA), (x_i, 0),
-            (x_o, 0), self.structure.mmi_wg_definition.wg_width +
-            self.structure.mmi_wg_definition.trench_width)
+            PPLayer(self.deep_process, TECH.PURPOSE.DF_AREA),
+            (x_i, 0),
+            (x_o, 0),
+            self.structure.mmi_wg_definition.wg_width
+            + self.structure.mmi_wg_definition.trench_width,
+        )
         return elems
 
 
@@ -146,14 +170,16 @@ class ShallowMmiTapered(__MmiTaperPorts__, ShallowMmiTaperPorts):
         twg = WgElDefinition(
             wg_width=self.taper_width,
             process=self.shallow_wg_definition.process,
-            trench_width=self.shallow_wg_definition.trench_width)
+            trench_width=self.shallow_wg_definition.trench_width,
+        )
 
         return ShallowMmi(
             width=self.width,
             length=self.length,
             input_y_positions=self.input_y_positions,
             output_y_positions=self.output_y_positions,
-            wg_definition=twg)
+            wg_definition=twg,
+        )
 
 
 from ..mmi import __MmiSymmetric__

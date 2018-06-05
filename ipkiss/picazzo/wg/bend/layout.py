@@ -26,7 +26,10 @@ Not yet based on waveguide definitions
 from ipkiss.all import *
 from ipkiss.plugins.photonics.port.port import InOpticalPort, OutOpticalPort
 from ipkiss.plugins.photonics.wg.definition import WaveguideDefProperty
-from ipkiss.plugins.photonics.wg.connect import WaveguidePointRoundedConnectElementDefinition, __RoundedWaveguide__
+from ipkiss.plugins.photonics.wg.connect import (
+    WaveguidePointRoundedConnectElementDefinition,
+    __RoundedWaveguide__,
+)
 from math import cos, sin, tan
 
 __all__ = ["WgElBend", "Wg90Bend"]
@@ -38,30 +41,30 @@ __all__ = ["WgElBend", "Wg90Bend"]
 
 class __WgElBend__(__RoundedWaveguide__, Group):
     """ Base class for bend elements """
-    start_point = Coord2Property(
-        default=(0.0, 0.0), doc="start coordinate of the bend")
+
+    start_point = Coord2Property(default=(0.0, 0.0), doc="start coordinate of the bend")
     start_angle = AngleProperty(default=0.0, doc="start angle of the bend")
     wg_definition = WaveguideDefProperty(
-        default=TECH.WGDEF.WIRE, doc="waveguide definition of the bend")
+        default=TECH.WGDEF.WIRE, doc="waveguide definition of the bend"
+    )
     angle = AngleProperty(
         default=90.0,
         restriction=RestrictRange(
-            lower=-180.0, upper=+180.0, lower_inc=False, upper_inc=False),
-        doc="angle of arc span by bend")
+            lower=-180.0, upper=+180.0, lower_inc=False, upper_inc=False
+        ),
+        doc="angle of arc span by bend",
+    )
     center_shape = DefinitionProperty(
-        fdef_name="define_center_shape")  # should be read_only
-    center = DefinitionProperty(
-        fdef_name="define_center")  # should be read_only
-    end_angle = DefinitionProperty(
-        fdef_name="define_end_angle")  # should be read_only
-    end_point = DefinitionProperty(
-        fdef_name="define_end_point")  # should be read_only
+        fdef_name="define_center_shape"
+    )  # should be read_only
+    center = DefinitionProperty(fdef_name="define_center")  # should be read_only
+    end_angle = DefinitionProperty(fdef_name="define_end_angle")  # should be read_only
+    end_point = DefinitionProperty(fdef_name="define_end_point")  # should be read_only
     manhattan = BoolProperty(default=False)
 
     def define_center_shape(self):
         RA = self.rounding_algorithm
-        return RA(
-            original_shape=self.get_control_shape(), radius=self.bend_radius)
+        return RA(original_shape=self.get_control_shape(), radius=self.bend_radius)
 
     def define_center(self):
         return self.center_shape.center
@@ -77,11 +80,13 @@ class __WgElBend__(__RoundedWaveguide__, Group):
             InOpticalPort(
                 position=self.start_point,
                 wg_definition=self.wg_definition,
-                angle=self.start_angle + 180.0),
+                angle=self.start_angle + 180.0,
+            ),
             OutOpticalPort(
                 position=self.end_point,
                 wg_definition=self.wg_definition,
-                angle=self.end_angle)
+                angle=self.end_angle,
+            ),
         ]
         return ports
 
@@ -91,7 +96,8 @@ class __WgElBend__(__RoundedWaveguide__, Group):
             wg_definition=self.wg_definition,
             bend_radius=self.bend_radius,
             rounding_algorithm=self.rounding_algorithm,
-            manhattan=self.manhattan)
+            manhattan=self.manhattan,
+        )
 
     def define_elements(self, elems):
         rwd = self.get_connect_wg_definition()
@@ -103,9 +109,13 @@ class WgElBend(__WgElBend__):
     @cache()
     def get_control_shape(self):
         bs1, bs2 = self.get_bend_size(self.angle)
-        cs = Shape([(-bs1, 0.0), (0.0, 0.0),
-                    (bs2 * cos(self.angle * DEG2RAD),
-                     bs2 * sin(self.angle * DEG2RAD))])
+        cs = Shape(
+            [
+                (-bs1, 0.0),
+                (0.0, 0.0),
+                (bs2 * cos(self.angle * DEG2RAD), bs2 * sin(self.angle * DEG2RAD)),
+            ]
+        )
 
         cs.move(-cs[0])
         cs.rotate(rotation=self.start_angle)
@@ -121,14 +131,18 @@ class WgElBend(__WgElBend__):
 # 90 degree bend in structure (abstract)
 class Wg90Bend(__RoundedWaveguide__, Structure):
     """ 90 degree bend structure """
+
     __name_prefix__ = "bend_w90i"
     wg_definition = WaveguideDefProperty(
-        default=TECH.WGDEF.WIRE, doc="waveguide definition of the bend")
+        default=TECH.WGDEF.WIRE, doc="waveguide definition of the bend"
+    )
     quadrant = IntProperty(
-        restriction=(RestrictRange(-4, -1, True, True)
-                     | RestrictRange(1, 4, True, True)),
+        restriction=(
+            RestrictRange(-4, -1, True, True) | RestrictRange(1, 4, True, True)
+        ),
         required=True,
-        doc="quadrant of the bend (-4=>4)")
+        doc="quadrant of the bend (-4=>4)",
+    )
     manhattan = BoolProperty(default=False)
 
     @cache()
@@ -151,7 +165,8 @@ class Wg90Bend(__RoundedWaveguide__, Structure):
             angle=angle,
             wg_definition=self.wg_definition,
             rounding_algorithm=self.rounding_algorithm,
-            manhattan=self.manhattan)
+            manhattan=self.manhattan,
+        )
 
     def define_elements(self, elems):
         elems += self.get_bend()

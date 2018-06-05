@@ -41,7 +41,8 @@ def STANDARD_GRATING_1550_TE(process=TECH.PROCESS.FC):
         line_width=std1550_grating_trench,
         n_o_periods=std1550_grating_n_o_periods,
         wg_definition=wg_def,
-        process=process)
+        process=process,
+    )
     return G
 
 
@@ -63,7 +64,8 @@ def STANDARD_GRATING_1300_TE(process=TECH.PROCESS.FC):
         line_width=std1300_grating_trench,
         n_o_periods=std1300_grating_n_o_periods,
         wg_definition=wg_def,
-        process=process)
+        process=process,
+    )
 
 
 ###############################################################################
@@ -84,4 +86,5 @@ def STANDARD_GRATING_1550_TM(process=TECH.PROCESS.FC):
         line_width=std1550tm_grating_trench,
         n_o_periods=std1550tm_grating_n_o_periods,
         wg_definition=wg_def,
-        process=process)
+        process=process,
+    )

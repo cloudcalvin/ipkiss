@@ -28,9 +28,11 @@ class ExampleStacking(Structure):
     def define_elements(self, elems):
         # define a column
         from picazzo.io.column import IoColumnGroup
+
         my_column = IoColumnGroup(south_east=(2000.0, 0.0), y_spacing=25.0)
 
         from picazzo.filters.ring import RingRect180DropFilter
+
         for r in [5.0, 6.0, 7.0]:
             my_ring = RingRect180DropFilter(bend_radius=r)
             my_column.add(my_ring)
@@ -50,10 +52,12 @@ class ExampleStacking2(Structure):
     def define_elements(self, elems):
         # define a column
         from picazzo.io.column import IoColumnGroup
+
         my_column = IoColumnGroup(south_east=(2000.0, 0.0), y_spacing=25.0)
 
         from picazzo.filters.ring import RingRect180DropFilter
         from picazzo.container import RoutePortsAroundCorner
+
         for r in [5.0, 6.0, 7.0]:
             my_ring = RingRect180DropFilter(bend_radius=r)
             my_ring_routed = RoutePortsAroundCorner(
@@ -80,10 +84,12 @@ class ExampleStackAndStraighten(Structure):
     def define_elements(self, elems):
         # define a column
         from picazzo.io.column import IoColumnGroup
+
         my_column = IoColumnGroup(south_east=(2000.0, 0.0), y_spacing=25.0)
 
         from picazzo.filters.ring import RingRect180DropFilter
         from picazzo.container import RoutePortsAroundCorner
+
         for r in [5.0, 6.0, 7.0]:
             my_ring = RingRect180DropFilter(bend_radius=r)
             my_ring_routed = RoutePortsAroundCorner(
@@ -111,10 +117,12 @@ class ExampleStackAndStraighten2(Structure):
     def define_elements(self, elems):
         # define a column
         from picazzo.io.column import IoColumnGroup
+
         my_column = IoColumnGroup(south_east=(2000.0, 0.0), y_spacing=25.0)
 
         from picazzo.filters.ring import RingRect180DropFilter
         from picazzo.container import RoutePortsAroundCorner
+
         for r in [5.0, 6.0, 7.0]:
             my_ring = RingRect180DropFilter(bend_radius=r)
             my_ring_routed = RoutePortsAroundCorner(
@@ -140,10 +148,12 @@ class ExampleStackAndStraighten3(Structure):
     def define_elements(self, elems):
         # define a column
         from picazzo.io.column import IoColumnGroup
+
         my_column = IoColumnGroup(south_east=(2000.0, 0.0), y_spacing=25.0)
 
         from picazzo.filters.ring import RingRect180DropFilter
         from picazzo.container import RoutePortsAroundCorner
+
         for r in [25.0, 30.0, 35.0]:  # we make the rings 5 times larger
             my_ring = RingRect180DropFilter(bend_radius=r)
             my_ring_routed = RoutePortsAroundCorner(
@@ -154,8 +164,7 @@ class ExampleStackAndStraighten3(Structure):
                 spacing=5.0,
             )  # routes add port to the east
             my_column.add(my_ring_routed)
-            my_column.straighten_to_north(
-            )  # levels out both sides, taking into account the
+            my_column.straighten_to_north()  # levels out both sides, taking into account the
             # size of the last structure in the middle
 
         my_column.add_blocktitle("RING")

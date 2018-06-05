@@ -23,14 +23,14 @@ from .standard import TEXT_FONT_STANDARD
 from .compact import TEXT_FONT_COMPACT
 from .simple import TEXT_FONT_SIMPLE
 
-#----------------------------------------------------------------------------
-#List of all Fonts
-#----------------------------------------------------------------------------
+# ----------------------------------------------------------------------------
+# List of all Fonts
+# ----------------------------------------------------------------------------
 
 TEXT_FONTS = {
     TEXT_FONT_STANDARD.ID: TEXT_FONT_STANDARD,
     TEXT_FONT_COMPACT.ID: TEXT_FONT_COMPACT,
-    TEXT_FONT_SIMPLE.ID: TEXT_FONT_SIMPLE
+    TEXT_FONT_SIMPLE.ID: TEXT_FONT_SIMPLE,
 }
 
 TEXT_FONT_DEFAULT = TEXT_FONT_STANDARD.ID

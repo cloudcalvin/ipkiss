@@ -68,27 +68,30 @@ class OpticalPortAspect(PortAspect):
     def define_optical_west_ports(self):
         return self.get_optical_ports_within_angles(
             180.0 - 0.5 * self.port_angle_decision,
-            180.0 + 0.5 * self.port_angle_decision)
+            180.0 + 0.5 * self.port_angle_decision,
+        )
 
     optical_west_ports = OpticalPortListProperty(locked=True)
 
     def define_optical_east_ports(self, ports):
         return self.get_optical_ports_within_angles(
-            -0.5 * self.port_angle_decision, +0.5 * self.port_angle_decision)
+            -0.5 * self.port_angle_decision, +0.5 * self.port_angle_decision
+        )
 
     optical_east_ports = OpticalPortListProperty(locked=True)
 
     def define_optical_north_ports(self):
         return self.get_optical_ports_within_angles(
-            90.0 - 0.5 * self.port_angle_decision,
-            90.0 + 0.5 * self.port_angle_decision)
+            90.0 - 0.5 * self.port_angle_decision, 90.0 + 0.5 * self.port_angle_decision
+        )
 
     optical_north_ports = OpticalPortListProperty(locked=True)
 
     def define_optical_south_ports(self):
         return self.get_optical_ports_within_angles(
             270.0 - 0.5 * self.port_angle_decision,
-            270.0 + 0.5 * self.port_angle_decision)
+            270.0 + 0.5 * self.port_angle_decision,
+        )
 
     optical_south_ports = OpticalPortListProperty(locked=True)
 
@@ -116,22 +119,28 @@ class OpticalPortListAspect(__Aspect__):
 class TransformableOpticalPortAspect(OpticalPortAspect, StoredTransformable):
     def define_optical_ports(self, ports):
         return OpticalPortAspect.define_optical_ports(ports).transform_copy(
-            self.transformation)
+            self.transformation
+        )
 
 
 class SRefOpticalPortAspect(TransformableOpticalPortAspect):
     def define_optical_ports(self, ports):
-        ports = self.reference.optical_ports.transform_copy(
-            self.transformation).move(
-                self.position).transform(-self.transformation)
+        ports = (
+            self.reference.optical_ports.transform_copy(self.transformation)
+            .move(self.position)
+            .transform(-self.transformation)
+        )
         return ports
 
 
 class ARefOpticalPortAspect(TransformablePortAspect):
     def define_optical_ports(self, ports):
         for p in self.positions:
-            port_list = self.reference.optical_ports.transform_copy(
-                self.transformation).move(p).transform(-self.transformation)
+            port_list = (
+                self.reference.optical_ports.transform_copy(self.transformation)
+                .move(p)
+                .transform(-self.transformation)
+            )
             ports.extend(port_list)
         return ports
 

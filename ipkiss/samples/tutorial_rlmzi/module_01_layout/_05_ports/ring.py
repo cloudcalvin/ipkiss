@@ -39,12 +39,14 @@ class RingResonator(Structure):
     bus_wg_def = WaveguideDefProperty(default=TECH.WGDEF.WIRE)
     coupler_spacing = PositiveNumberProperty(
         default=TECH.WG.DC_SPACING,
-        doc="spacing between centerline of bus waveguide and ring waveguide")
+        doc="spacing between centerline of bus waveguide and ring waveguide",
+    )
 
     def validate_properties(self):
         """ check whether the combination of properties is valid """
         if self.coupler_spacing <= 0.5 * (
-                self.ring_wg_def.wg_width + self.bus_wg_def.wg_width):
+            self.ring_wg_def.wg_width + self.bus_wg_def.wg_width
+        ):
             return False  # waveguides would touch: Not OK
         if self.ring_radius < self.ring_wg_def.wg_width:
             return False  # ring would become a disc
@@ -55,10 +57,10 @@ class RingResonator(Structure):
         # define shapes for the waveguides. This can be in the form of
         # predefined shape objects, but also as a list of Tuples
         shape_ring = ShapeCircle(center=(0, 0), radius=self.ring_radius)
-        shape_bus = [(-self.ring_radius,
-                      -self.ring_radius - self.coupler_spacing),
-                     (self.ring_radius,
-                      -self.ring_radius - self.coupler_spacing)]
+        shape_bus = [
+            (-self.ring_radius, -self.ring_radius - self.coupler_spacing),
+            (self.ring_radius, -self.ring_radius - self.coupler_spacing),
+        ]
 
         # Add the layout elements based on those shapes: two paths on
         # the same layer, with the right width
@@ -69,15 +71,15 @@ class RingResonator(Structure):
     def define_ports(self, prts):
         prts += [
             OpticalPort(
-                position=(-self.ring_radius,
-                          -self.ring_radius - self.coupler_spacing),
+                position=(-self.ring_radius, -self.ring_radius - self.coupler_spacing),
                 angle=180.0,  # outward pointing
-                wg_definition=self.bus_wg_def),
+                wg_definition=self.bus_wg_def,
+            ),
             OpticalPort(
-                position=(self.ring_radius,
-                          -self.ring_radius - self.coupler_spacing),
+                position=(self.ring_radius, -self.ring_radius - self.coupler_spacing),
                 angle=0.0,  # outward pointing
-                wg_definition=self.bus_wg_def)
+                wg_definition=self.bus_wg_def,
+            ),
         ]
         return prts
 

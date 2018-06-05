@@ -37,7 +37,8 @@ from ..primitives.elements.box import Box
 from ..primitives.elements.reference import SRef, ARef
 from .gds_layer import GdsiiLayer
 import sys
-#from ipkiss.log import IPKISS_LOG as LOG
+
+# from ipkiss.log import IPKISS_LOG as LOG
 from ipkiss.exceptions.exc import IpkissException
 
 import numpy
@@ -55,7 +56,7 @@ class MyHandler(logging.StreamHandler):
 
 IPKISS_INPUT_GDSII_LOGGING_HANDLER = MyHandler(sys.stderr)
 
-LOG = logging.getLogger("%s.INPUT_GDSII" % 'IPKISS')
+LOG = logging.getLogger("%s.INPUT_GDSII" % "IPKISS")
 LOG.propagate = False
 LOG.addHandler(IPKISS_INPUT_GDSII_LOGGING_HANDLER)
 IPKISS_INPUT_GDSII_LOG = LOG
@@ -75,15 +76,15 @@ class InputGdsiiHeader(InputBasic):
     def __init__(self, i_stream=sys.stdin, **kwargs):
         super(InputGdsiiHeader, self).__init__(i_stream=i_stream, **kwargs)
         self.__current_structure__ = None
-        #self.__stop_on_unknown_gds_layer__ = stop_on_unknown_gds_layer
+        # self.__stop_on_unknown_gds_layer__ = stop_on_unknown_gds_layer
 
     def __parse_library__(self):
         self.__istream__ = self.i_stream
         self.__scaling__ = self.scaling
         while 1:
             r = self.__parse_record__()
-            t = r.rtype  #type
-            l = r.length  #datalength
+            t = r.rtype  # type
+            l = r.length  # datalength
             if t == gds_records.BgnStr:
                 break
             elif t == gds_records.Header:
@@ -106,16 +107,14 @@ class InputGdsiiHeader(InputBasic):
                 LOG.warning("FONTS is not supported. This will be ignored.")
                 self.__istream__.read(l)
             elif t == gds_records.AttrTable:
-                LOG.warning(
-                    "ATTRTABLE is not supported. This will be ignored.")
+                LOG.warning("ATTRTABLE is not supported. This will be ignored.")
                 self.__istream__.read(l)
             elif t == gds_records.Generations:
-                LOG.warning(
-                    "GENERATIONS is not supported. This will be ignored.")
+                LOG.warning("GENERATIONS is not supported. This will be ignored.")
                 self.__istream__.read(l)
             else:
                 LOG.error("Unsupported record type in File: %s" % hex(t))
-                #FIXME -- to be investigated further -- raise SystemExit
+                # FIXME -- to be investigated further -- raise SystemExit
         return self.library
 
     def __parse_record__(self):
@@ -127,26 +126,27 @@ class InputGdsiiHeader(InputBasic):
         except Exception as e:
             msg = "Could not read record : %s" % str(e)
             from ipkiss.exceptions.exc import IpkissException
+
             raise IpkissException(msg)
         return GdsiiRecord(rtype, datalen)
 
     def __parse_real8__(self):
-        #value = (mantissa/(2^56)) * (16^(exponent-64))
+        # value = (mantissa/(2^56)) * (16^(exponent-64))
         try:
             data = unpack(">BBHL", self.__istream__.read(8))
         except:
             LOG.error("Could not read REAL8")
             raise SystemError
-        if (data[0] == 0 and data[1] == 0 and data[2] == 0 and data[3] == 0):
+        if data[0] == 0 and data[1] == 0 and data[2] == 0 and data[3] == 0:
             return 0.0
         if data[0] > 128:
             sign = -1
         else:
             sign = 1
-        exponent = (data[0] % 128 - 78)
+        exponent = data[0] % 128 - 78
         m1 = float(data[1] * 65536 + data[2])
         m2 = float(data[3])
-        return sign * (m1 * (16**8) + m2) * (16**exponent)
+        return sign * (m1 * (16 ** 8) + m2) * (16 ** exponent)
 
     def __parse_string__(self, length):
         s = ""
@@ -185,12 +185,10 @@ class InputGdsiiHeader(InputBasic):
 
 class InputGdsiiTree(InputGdsiiHeader):
     """ Parses a GDSII file but extracts only the hierarchy """
+
     log_bufsize = LongIntProperty(default=0)
 
-    def __init__(self,
-                 i_stream=sys.stdin,
-                 stop_on_unknown_gds_layer=True,
-                 **kwargs):
+    def __init__(self, i_stream=sys.stdin, stop_on_unknown_gds_layer=True, **kwargs):
         super(InputGdsiiTree, self).__init__(i_stream=i_stream, **kwargs)
         self.__current_structure__ = None
         self.__stop_on_unknown_gds_layer__ = stop_on_unknown_gds_layer
@@ -203,14 +201,14 @@ class InputGdsiiTree(InputGdsiiHeader):
             percentile = self.log_bufsize / 10
         while 1:
             r = self.__parse_record__()
-            t = r.rtype  #type
-            l = r.length  #datalength
+            t = r.rtype  # type
+            l = r.length  # datalength
             if t == gds_records.BgnStr:
                 created = self.__parse_time__()
                 modified = self.__parse_time__()
                 self.__parse_structure__(created, modified)
             elif t == gds_records.Header:
-                self.__istream__.read(l)  #header is not parsed in an import
+                self.__istream__.read(l)  # header is not parsed in an import
             elif t == gds_records.BgnLib:
                 self.library.modified = self.__parse_time__()
                 self.library.accessed = self.__parse_time__()
@@ -229,16 +227,14 @@ class InputGdsiiTree(InputGdsiiHeader):
                 LOG.warning("FONTS is not supported. This will be ignored.")
                 self.__istream__.read(l)
             elif t == gds_records.AttrTable:
-                LOG.warning(
-                    "ATTRTABLE is not supported. This will be ignored.")
+                LOG.warning("ATTRTABLE is not supported. This will be ignored.")
                 self.__istream__.read(l)
             elif t == gds_records.Generations:
-                LOG.warning(
-                    "GENERATIONS is not supported. This will be ignored.")
+                LOG.warning("GENERATIONS is not supported. This will be ignored.")
                 self.__istream__.read(l)
             else:
                 LOG.error("Unsupported record type in File: %s" % hex(t))
-                #FIXME -- to be investigated further -- raise SystemExit
+                # FIXME -- to be investigated further -- raise SystemExit
             if self.log_bufsize > 0:
                 pos = self.__istream__.tell()
                 if pos > (percentile * cur_percentile):
@@ -247,15 +243,15 @@ class InputGdsiiTree(InputGdsiiHeader):
                         continued = dict(continued=True)
                     else:
                         continued = dict(continued=False)
-                    LOG.info('%d%% ' % (cur_percentile * 10), extra=continued)
+                    LOG.info("%d%% " % (cur_percentile * 10), extra=continued)
 
         return self.library
 
     def __parse_structure__(self, created, modified):
         while 1:
             r = self.__parse_record__()
-            t = r.rtype  #type
-            l = r.length  #datalength
+            t = r.rtype  # type
+            l = r.length  # datalength
             if t == gds_records.Boundary:
                 el = self.__parse_boundary_element__()
                 if not (el is None):
@@ -297,37 +293,37 @@ class InputGdsiiTree(InputGdsiiHeader):
                 self.__istream__.read(l)
             else:
                 LOG.error("Unsupported element type in Structure: %s" % hex(t))
-                #FIXME -- to be investigated further -- raise IpkissException?
+                # FIXME -- to be investigated further -- raise IpkissException?
         return S
 
     def __parse_length__(self):
         ### Solve unit problem!!!
-        return self.__parse_int4__(
-        ) * self.__scaling__ / self.library.grids_per_unit
+        return self.__parse_int4__() * self.__scaling__ / self.library.grids_per_unit
 
     def __parse_coordinate__(self):
         s = self.__scaling__ / self.library.grids_per_unit
         return (self.__parse_int4__() * s, self.__parse_int4__() * s)
 
     def __parse_shape__(self, n_o_points):
-        #return Shape( [ self.__parse_coordinate__() for i in range(n_o_points)])
+        # return Shape( [ self.__parse_coordinate__() for i in range(n_o_points)])
         s = self.__scaling__ / self.library.grids_per_unit
-        #p = self.__parse_int4__
-        #c_list = numpy.array([(p(), p()) for i in range(n_o_points)]) * s
+        # p = self.__parse_int4__
+        # c_list = numpy.array([(p(), p()) for i in range(n_o_points)]) * s
         coords = self.__parse_int4pairlist__(n_o_points)
         c_list = coords * s
         return Shape(c_list)
 
     def __parse_int4pairlist__(self, length):
         return numpy.fromfile(
-            file=self.__istream__, dtype=numpy.dtype('2>i4'), count=length)
+            file=self.__istream__, dtype=numpy.dtype("2>i4"), count=length
+        )
 
     def __parse_boundary_element__(self):
         # Skip: no tree info
         while 1:
             r = self.__parse_record__()
-            t = r.rtype  #type
-            l = r.length  #datalength
+            t = r.rtype  # type
+            l = r.length  # datalength
             self.__istream__.read(l)
             if t == gds_records.EndEl:
                 break
@@ -337,8 +333,8 @@ class InputGdsiiTree(InputGdsiiHeader):
         # Skip: no tree info
         while 1:
             r = self.__parse_record__()
-            t = r.rtype  #type
-            l = r.length  #datalength
+            t = r.rtype  # type
+            l = r.length  # datalength
             self.__istream__.read(l)
             if t == gds_records.EndEl:
                 break
@@ -348,8 +344,8 @@ class InputGdsiiTree(InputGdsiiHeader):
         name = ""
         while 1:
             r = self.__parse_record__()
-            t = r.rtype  #type
-            l = r.length  #datalength
+            t = r.rtype  # type
+            l = r.length  # datalength
             if t == gds_records.SName:
                 name = self.__parse_string__(l)
             elif t == gds_records.EndEl:
@@ -368,7 +364,7 @@ class InputGdsiiTree(InputGdsiiHeader):
         else:
             # add dummy structure (which will be overwritten later)
             S = Structure(name, [], self.library)
-            #S.__make_static__()
+            # S.__make_static__()
         if not S in self.__current_structure__.child_structures:
             V = SRef(S, (0, 0))
             self.__current_structure__.child_structures += [S]
@@ -383,8 +379,8 @@ class InputGdsiiTree(InputGdsiiHeader):
         # Skip: no tree info
         while 1:
             r = self.__parse_record__()
-            t = r.rtype  #type
-            l = r.length  #datalength
+            t = r.rtype  # type
+            l = r.length  # datalength
             self.__istream__.read(l)
             if t == gds_records.EndEl:
                 break
@@ -394,8 +390,8 @@ class InputGdsiiTree(InputGdsiiHeader):
         # Skip: no tree info
         while 1:
             r = self.__parse_record__()
-            t = r.rtype  #type
-            l = r.length  #datalength
+            t = r.rtype  # type
+            l = r.length  # datalength
             self.__istream__.read(l)
             if t == gds_records.EndEl:
                 break
@@ -410,11 +406,11 @@ class InputGdsiiTree(InputGdsiiHeader):
 
     def __parse_transformation__(self, T):
         bits = self.__parse_int2__()
-        T.v_mirror = (bits < 0)
+        T.v_mirror = bits < 0
         bits = bits % 8
-        T.absolute_magnification = (bits >= 4)
+        T.absolute_magnification = bits >= 4
         bits = bits % 4
-        T.absolute_rotation = (bits >= 2)
+        T.absolute_rotation = bits >= 2
         return
 
     def __parse_int4__(self):
@@ -435,8 +431,8 @@ class InputGdsii(InputGdsiiTree):
         coords = []
         while 1:
             r = self.__parse_record__()
-            t = r.rtype  #type
-            l = r.length  #datalength
+            t = r.rtype  # type
+            l = r.length  # datalength
             if t == gds_records.Layer:
                 layer_number = self.__parse_int2__()
             elif t == gds_records.DataType:
@@ -450,12 +446,14 @@ class InputGdsii(InputGdsiiTree):
             elif t == gds_records.ElFlags:
                 LOG.warning(
                     "ELFLAGS in BOUNDARY is not supported (structure %s). This will be ignored."
-                    % self.__current_structure__.name)
+                    % self.__current_structure__.name
+                )
                 self.__istream__.read(l)
             elif t == gds_records.Plex:
                 LOG.warning(
                     "PLEX in BOUNDARY is not supported (structure %s). This will be ignored."
-                    % self.__current_structure__.name)
+                    % self.__current_structure__.name
+                )
                 self.__istream__.read(l)
             else:
                 LOG.error("Unsupported type in BOUNDARY: %s" % hex(t))
@@ -464,7 +462,9 @@ class InputGdsii(InputGdsiiTree):
         L = self.map_layer(layer)
         if L is None:
             err_msg = "Could not map GDS layer %d:%d in InputGdsii." % (
-                layer.number, layer.datatype)
+                layer.number,
+                layer.datatype,
+            )
             if self.__stop_on_unknown_gds_layer__:
                 raise IpkissException(err_msg)
             else:
@@ -481,8 +481,8 @@ class InputGdsii(InputGdsiiTree):
         coords = []
         while 1:
             r = self.__parse_record__()
-            t = r.rtype  #type
-            l = r.length  #datalength
+            t = r.rtype  # type
+            l = r.length  # datalength
             if t == gds_records.Layer:
                 layer_number = self.__parse_int2__()
             elif t == gds_records.DataType:
@@ -498,12 +498,10 @@ class InputGdsii(InputGdsiiTree):
                 self.__istream__.read(l)
                 break
             elif t == gds_records.ElFlags:
-                LOG.warning(
-                    "ELFLAGS in PATH is not supported. This will be ignored.")
+                LOG.warning("ELFLAGS in PATH is not supported. This will be ignored.")
                 self.__istream__.read(l)
             elif t == gds_records.Plex:
-                LOG.warning(
-                    "PLEX in PATH is not supported. This will be ignored.")
+                LOG.warning("PLEX in PATH is not supported. This will be ignored.")
                 self.__istream__.read(l)
             else:
                 LOG.error("Unsupported type in PATH: %s" % hex(t))
@@ -525,8 +523,8 @@ class InputGdsii(InputGdsiiTree):
         transform = NoDistortTransform()
         while 1:
             r = self.__parse_record__()
-            t = r.rtype  #type
-            l = r.length  #datalength
+            t = r.rtype  # type
+            l = r.length  # datalength
             if t == gds_records.SName:
                 name = self.__parse_string__(l)
             elif t == gds_records.XY:
@@ -538,12 +536,10 @@ class InputGdsii(InputGdsiiTree):
             elif t == gds_records.EndEl:
                 break
             elif t == gds_records.ElFlags:
-                LOG.warning(
-                    "ELFLAGS in SREF is not supported. This will be ignored.")
+                LOG.warning("ELFLAGS in SREF is not supported. This will be ignored.")
                 self.__istream__.read(l)
             elif t == gds_records.Plex:
-                LOG.warning(
-                    "PLEX in SREF is not supported. This will be ignored.")
+                LOG.warning("PLEX in SREF is not supported. This will be ignored.")
                 self.__istream__.read(l)
             elif t == gds_records.STrans:
                 self.__parse_transformation__(transform)
@@ -581,8 +577,8 @@ class InputGdsii(InputGdsiiTree):
         transform = NoDistortTransform()
         while 1:
             r = self.__parse_record__()
-            t = r.rtype  #type
-            l = r.length  #datalength
+            t = r.rtype  # type
+            l = r.length  # datalength
             if t == gds_records.ColRow:
                 col = self.__parse_int2__()
                 row = self.__parse_int2__()
@@ -594,9 +590,7 @@ class InputGdsii(InputGdsiiTree):
             elif t == gds_records.XY:
                 nxy = l / 8
                 if not nxy == 3:
-                    LOG.error(
-                        "gdsii_error: AREF supports exactly three coordinates."
-                    )
+                    LOG.error("gdsii_error: AREF supports exactly three coordinates.")
                     raise SystemExit
                 coord_zero = self.__parse_coordinate__()
                 coord_x = self.__parse_coordinate__()
@@ -604,12 +598,10 @@ class InputGdsii(InputGdsiiTree):
             elif t == gds_records.EndEl:
                 break
             elif t == gds_records.ElFlags:
-                LOG.warning(
-                    "ELFLAGS in AREF is not supported. This will be ignored.")
+                LOG.warning("ELFLAGS in AREF is not supported. This will be ignored.")
                 self.__istream__.read(l)
             elif t == gds_records.Plex:
-                LOG.warning(
-                    "PLEX in AREF is not supported. This will be ignored.")
+                LOG.warning("PLEX in AREF is not supported. This will be ignored.")
                 self.__istream__.read(l)
             elif t == gds_records.STrans:
                 self.__parse_transformation__(transform)
@@ -623,12 +615,13 @@ class InputGdsii(InputGdsiiTree):
 
         coordinates = Shape([coord_zero, coord_x, coord_y])
         cc = self.library.snap_shape(
-            transform.reverse(
-                coordinates.move_copy((-coord_zero[0], -coord_zero[1]))))
+            transform.reverse(coordinates.move_copy((-coord_zero[0], -coord_zero[1])))
+        )
         if (not cc[1][1] == 0.0) or (not cc[2][0] == 0.0):
             LOG.error(
                 "Coordinates in AREF do not match Transformation STRANS, MAG, ANGLE in structure %s "
-                % self.__current_structure__.name)
+                % self.__current_structure__.name
+            )
 
         if name == "":
             LOG.error("AREF: name of structure is empty")
@@ -662,8 +655,8 @@ class InputGdsii(InputGdsiiTree):
         coords = []
         while 1:
             r = self.__parse_record__()
-            t = r.rtype  #type
-            l = r.length  #datalength
+            t = r.rtype  # type
+            l = r.length  # datalength
 
             if t == gds_records.Layer:
                 layer_number = self.__parse_int2__()
@@ -675,12 +668,10 @@ class InputGdsii(InputGdsiiTree):
             elif t == gds_records.EndEl:
                 break
             elif t == gds_records.ElFlags:
-                LOG.warning(
-                    "ELFLAGS in BOX is not supported. This will be ignored")
+                LOG.warning("ELFLAGS in BOX is not supported. This will be ignored")
                 self.__istream__.read(l)
             elif t == gds_records.Plex:
-                LOG.warning(
-                    "PLEX in BOX is not supported. This will be ignored")
+                LOG.warning("PLEX in BOX is not supported. This will be ignored")
                 self.__istream__.read(l)
             else:
                 LOG.error("Unsupported type in BOX: %s" % hex(t))
@@ -704,8 +695,11 @@ class InputGdsii(InputGdsiiTree):
             else:
                 return LOG.error(err_msg)
         else:
-            return Box(L, (0.5 * (xmin + xmax), 0.5 * (ymin + ymax)),
-                       (xmax - xmin, ymax - ymin))
+            return Box(
+                L,
+                (0.5 * (xmin + xmax), 0.5 * (ymin + ymax)),
+                (xmax - xmin, ymax - ymin),
+            )
 
     def __parse_label_element__(self):
         # read parameters
@@ -721,8 +715,8 @@ class InputGdsii(InputGdsiiTree):
         height = 1.0
         while 1:
             r = self.__parse_record__()
-            t = r.rtype  #type
-            l = r.length  #datatype
+            t = r.rtype  # type
+            l = r.length  # datatype
             if t == gds_records.Layer:
                 layer_number = self.__parse_int2__()
             elif t == gds_records.TextType:
@@ -733,15 +727,13 @@ class InputGdsii(InputGdsiiTree):
                 presentation = self.__parse_int2__()
                 hor_alignment = presentation % 4
                 ver_alignment = (presentation - hor_alignment) % 16 / 4
-                font = (
-                    presentation - hor_alignment - 4 * ver_alignment) % 64 / 16
+                font = (presentation - hor_alignment - 4 * ver_alignment) % 64 / 16
             elif t == gds_records.Width:
                 width = self.__parse_length__()
             elif t == gds_records.XY:
                 nxy = l / 8
                 if not nxy == 1:
-                    LOG.error(
-                        "TEXT (Label) only supports a single coordinate. ")
+                    LOG.error("TEXT (Label) only supports a single coordinate. ")
                     raise SystemExit
                 coord = self.__parse_coordinate__()
             elif t == gds_records.String:
@@ -771,15 +763,15 @@ class InputGdsii(InputGdsiiTree):
             layer = GdsiiLayer(number=layer_number, datatype=0)
             L = self.map_layer(layer)
             if L is None:
-                err_msg = "Could not map GDS layer %s in InputGdsii." % str(
-                    layer)
+                err_msg = "Could not map GDS layer %s in InputGdsii." % str(layer)
                 if self.__stop_on_unknown_gds_layer__:
                     raise IpkissException(err_msg)
                 else:
                     return LOG.error(err_msg)
             else:
-                return Label(L, text, coord, (hor_alignment, ver_alignment),
-                             font, 1.0, transform)
+                return Label(
+                    L, text, coord, (hor_alignment, ver_alignment), font, 1.0, transform
+                )
         else:
             return None
 
@@ -804,7 +796,8 @@ class GzipInputGdsii(InputGdsii):
 
     def read(self):
         from gzip import GzipFile
-        fStr = GzipFile(self.FileName, mode='rb')
+
+        fStr = GzipFile(self.FileName, mode="rb")
         super(GzipInputGdsii, self).__init__(__istream=fStr, **self.Kwargs)
         lib = super(GzipInputGdsii, self).read()
         fStr.close()

@@ -33,6 +33,7 @@ class ThinWgElDefinition(WgElDefinition):
           ___________________________________________________
         
     """
+
     thin_process = ProcessProperty(default=TECH.PROCESS.FC)
     thin_width = NonNegativeNumberProperty(default=1.0)
 
@@ -43,10 +44,10 @@ class ThinWgElDefinition(WgElDefinition):
             PathWindow(
                 layer=PPLayer(self.thin_process, TECH.PURPOSE.LF_AREA),
                 start_offset=-0.5 * self.thin_width,
-                end_offset=+0.5 * self.thin_width)
+                end_offset=+0.5 * self.thin_width,
+            )
         ]
         return windows
 
     def __repr__(self):
-        return "%s w=%f, t=%f" % ("THIN WIRE", self.wg_width,
-                                  self.trench_width)
+        return "%s w=%f, t=%f" % ("THIN WIRE", self.wg_width, self.trench_width)

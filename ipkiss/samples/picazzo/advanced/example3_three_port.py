@@ -48,35 +48,39 @@ class ThreePort(Structure):
 
     # method for determining the name (it is an autoname structure)
     def define_name(self):
-        return "%s_W%d_H%d_W%d_T%d" % (self.__name_prefix__, self.width * 1000,
-                                       self.height * 1000,
-                                       self.wg_width * 1000,
-                                       self.trench_width * 1000)
+        return "%s_W%d_H%d_W%d_T%d" % (
+            self.__name_prefix__,
+            self.width * 1000,
+            self.height * 1000,
+            self.wg_width * 1000,
+            self.trench_width * 1000,
+        )
 
     def define_elements(self, elems):
         # add shape elements and stuff that should only be on the waveguide layer
         elems += Rectangle(
-            PPLayer(self.process, TECH.PURPOSE.LF.LINE), (0.0, 0.0),
-            (self.width, self.height))
+            PPLayer(self.process, TECH.PURPOSE.LF.LINE),
+            (0.0, 0.0),
+            (self.width, self.height),
+        )
         elems += Rectangle(
-            PPLayer(self.process, TECH.PURPOSE.LF_AREA), (0.0, 0.0),
-            (self.width + 2 * self.trench_width,
-             self.height + 2 * self.trench_width))
+            PPLayer(self.process, TECH.PURPOSE.LF_AREA),
+            (0.0, 0.0),
+            (self.width + 2 * self.trench_width, self.height + 2 * self.trench_width),
+        )
         return elems
 
     def define_ports(self, ports):
-        wg_def = WgElDefinition(
-            wg_width=self.wg_width, trench_width=self.trench_width)
+        wg_def = WgElDefinition(wg_width=self.wg_width, trench_width=self.trench_width)
         ports += InOpticalPort(
-            position=(-0.5 * self.width, 0.0),
-            wg_definition=wg_def,
-            angle=180.0)
+            position=(-0.5 * self.width, 0.0), wg_definition=wg_def, angle=180.0
+        )
         ports += OutOpticalPort(
-            position=(0.0, 0.5 * self.height),
-            wg_definition=wg_def,
-            angle=90.0)
+            position=(0.0, 0.5 * self.height), wg_definition=wg_def, angle=90.0
+        )
         ports += OutOpticalPort(
-            position=(0.5 * self.width, 0.0), wg_definition=wg_def, angle=0.0)
+            position=(0.5 * self.width, 0.0), wg_definition=wg_def, angle=0.0
+        )
         return ports
 
 
@@ -99,7 +103,8 @@ class ThreePortToEast(ThreePort):
             width=self.width,
             height=self.height,
             wg_width=self.wg_width,
-            trench_width=self.trench_width)
+            trench_width=self.trench_width,
+        )
 
     def define_east_route(self):
         return RouteToEast(input_port=self.three_port.north_ports[0])

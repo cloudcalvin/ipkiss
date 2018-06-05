@@ -19,7 +19,12 @@
 #
 # Contact: ipkiss@intec.ugent.be
 
-from ipcore.all import StrongPropertyInitializer, RestrictedProperty, RestrictType, RestrictClass
+from ipcore.all import (
+    StrongPropertyInitializer,
+    RestrictedProperty,
+    RestrictType,
+    RestrictClass,
+)
 
 __all__ = ["DomainProperty"]
 
@@ -28,6 +33,7 @@ class __Domain__(StrongPropertyInitializer):
     """ Base class for a physical domain (like electrical, electromagnetic, thermal, optical, ...  
     The actual domains are defined when you load the specific package
     """
+
     __name__ = "Undefined"
 
     def __eq__(self, other):

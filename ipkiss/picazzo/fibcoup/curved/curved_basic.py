@@ -40,14 +40,16 @@ class CurveDimension(__CurveDimensionBase__):
     angle = AngleProperty(required=True)
     line_width = PositiveNumberProperty(required=True)
 
-    def __init__(self,
-                 center,
-                 ellipse_r_h,
-                 ellipse_r_v,
-                 angle,
-                 line_width,
-                 purpose=TECH.PURPOSE.DF.TRENCH,
-                 **kwargs):
+    def __init__(
+        self,
+        center,
+        ellipse_r_h,
+        ellipse_r_v,
+        angle,
+        line_width,
+        purpose=TECH.PURPOSE.DF.TRENCH,
+        **kwargs
+    ):
         super(CurveDimension, self).__init__(
             center=center,
             ellipse_r_h=ellipse_r_h,
@@ -55,36 +57,40 @@ class CurveDimension(__CurveDimensionBase__):
             angle=angle,
             line_width=line_width,
             purpose=purpose,
-            **kwargs)
+            **kwargs
+        )
 
     def define_elements(self, elems):
         S = ShapeEllipseArc(
             center=(self.center[0], self.center[1]),
             box_size=(2 * self.ellipse_r_h, 2 * self.ellipse_r_v),
             start_angle=180.0 - 0.5 * self.angle,
-            end_angle=180.0 + 0.5 * self.angle)
+            end_angle=180.0 + 0.5 * self.angle,
+        )
 
         elems += Boundary(
             PPLayer(self.process, self.purpose),
-            #ShapePath(original_shape = S, path_width = self.line_width))
+            # ShapePath(original_shape = S, path_width = self.line_width))
             ShapePathSpike(
-                original_shape=S,
-                path_width=self.line_width,
-                spike_angle=120.0))
+                original_shape=S, path_width=self.line_width, spike_angle=120.0
+            ),
+        )
         return elems
 
 
 class CurvedGrating(Structure):
     __name_prefix__ = "CG"
     curve_dimensions = RestrictedProperty(
-        restriction=RestrictTypeList(__CurveDimensionBase__), required=True)
+        restriction=RestrictTypeList(__CurveDimensionBase__), required=True
+    )
     process = ProcessProperty(default=TECH.PROCESS.FC)
 
     def __init__(
-            self, curve_dimensions=[], process=TECH.PROCESS.FC, **kwargs
-    ):  #FIXME - why can't we remove this? parameter curve_dimensions seems to give a problem
+        self, curve_dimensions=[], process=TECH.PROCESS.FC, **kwargs
+    ):  # FIXME - why can't we remove this? parameter curve_dimensions seems to give a problem
         super(CurvedGrating, self).__init__(
-            curve_dimensions=curve_dimensions, process=process, **kwargs)
+            curve_dimensions=curve_dimensions, process=process, **kwargs
+        )
 
     def define_elements(self, elems):
         for cd in self.curve_dimensions:

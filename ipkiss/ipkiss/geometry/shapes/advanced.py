@@ -44,8 +44,16 @@ class ShapeArcLineArc(Shape):
 
     angle_step = AngleProperty(default=TECH.METRICS.ANGLE_STEP)
 
-    def __init__(self, coord_start, angle_start, radius_start, coord_end,
-                 angle_end, radius_end, **kwargs):
+    def __init__(
+        self,
+        coord_start,
+        angle_start,
+        radius_start,
+        coord_end,
+        angle_end,
+        radius_end,
+        **kwargs
+    ):
         super(ShapeArcLineArc, self).__init__(
             coord_start=coord_start,
             coord_end=coord_end,
@@ -53,7 +61,8 @@ class ShapeArcLineArc(Shape):
             angle_end=angle_end,
             radius_start=radius_start,
             radius_end=radius_end,
-            **kwargs)
+            **kwargs
+        )
 
     def define_points(self, pts):
         sa = self.angle_start * DEG2RAD
@@ -64,13 +73,13 @@ class ShapeArcLineArc(Shape):
         sa = (sa) % (2 * pi)
         ea = (ea) % (2 * pi)
 
-        #angle bvetween two points
+        # angle bvetween two points
         connect_angle = angle_rad(self.coord_end, self.coord_start)
         ca_start = (connect_angle - sa) % (2 * pi)
         ca_end = (connect_angle - ea) % (2 * pi)
-        #LOG.debug("ca: %f %f %f" %(, connect_angle , ca_start, ca_end))
+        # LOG.debug("ca: %f %f %f" %(, connect_angle , ca_start, ca_end))
 
-        #check both positive and negative radii
+        # check both positive and negative radii
         valid = False
         signs = [(1, 1), (1, -1), (-1, 1), (-1, -1)]
         for s in signs:
@@ -78,12 +87,16 @@ class ShapeArcLineArc(Shape):
             radius_end = abs(self.radius_end) * s[1]
 
             # Centers of circles through the points.
-            c_start = (self.coord_start[0] + radius_start * sin(sa),
-                       self.coord_start[1] - radius_start * cos(sa))
-            c_end = (self.coord_end[0] + radius_end * sin(ea),
-                     self.coord_end[1] - radius_end * cos(ea))
+            c_start = (
+                self.coord_start[0] + radius_start * sin(sa),
+                self.coord_start[1] - radius_start * cos(sa),
+            )
+            c_end = (
+                self.coord_end[0] + radius_end * sin(ea),
+                self.coord_end[1] - radius_end * cos(ea),
+            )
 
-            #distance between centers
+            # distance between centers
             dm = distance(c_start, c_end)
             if abs(radius_start - radius_end) > dm:
                 # no valid solution possible
@@ -95,16 +108,17 @@ class ShapeArcLineArc(Shape):
             alpha = -acos((radius_start - radius_end) / dm)
 
             # unit vector from m to p.
-            mp = (mm[0] * cos(alpha) + mm[1] * sin(alpha),
-                  -mm[0] * sin(alpha) + mm[1] * cos(alpha))
+            mp = (
+                mm[0] * cos(alpha) + mm[1] * sin(alpha),
+                -mm[0] * sin(alpha) + mm[1] * cos(alpha),
+            )
 
             # Point at first circle.
-            p0 = (c_start[0] + radius_start * mp[0],
-                  c_start[1] + radius_start * mp[1])
+            p0 = (c_start[0] + radius_start * mp[0], c_start[1] + radius_start * mp[1])
             # Point at second circle.
             p1 = (c_end[0] + radius_end * mp[0], c_end[1] + radius_end * mp[1])
 
-            #LOG.debug("p0, p1:" %( p0, p1))
+            # LOG.debug("p0, p1:" %( p0, p1))
 
             forward_angle = angle_rad(p1, p0) % (2 * pi)
             backward_angle = angle_rad(p0, p1) % (2 * pi)
@@ -122,7 +136,7 @@ class ShapeArcLineArc(Shape):
             LOG.error("Can't connect two points with arc_line_arc")
             raise SystemExit
 
-        #LOG.debug("angles: %f %f %f %f" %( angle_start, straight_angle*180/pi, angle_end, backward_angle*180/pi))
+        # LOG.debug("angles: %f %f %f %f" %( angle_start, straight_angle*180/pi, angle_end, backward_angle*180/pi))
         if forward_turn == 0.0:
             pts += [self.coord_start]
         else:
@@ -131,7 +145,8 @@ class ShapeArcLineArc(Shape):
                 abs(radius_start),
                 sa * RAD2DEG,
                 forward_turn * RAD2DEG,
-                angle_step=self.angle_step)
+                angle_step=self.angle_step,
+            )
 
         if backward_turn == 0.0:
             pts += [self.coord_end]
@@ -141,15 +156,20 @@ class ShapeArcLineArc(Shape):
                 abs(radius_end),
                 bae * RAD2DEG,
                 backward_turn * RAD2DEG,
-                angle_step=self.angle_step)
+                angle_step=self.angle_step,
+            )
             bend2.reverse()
             pts += bend2
 
         return pts
 
     def move(self, position):
-        self.coord_start = (self.coord_start[0] + position[0],
-                            self.coord_start[1] + position[1])
-        self.coord_end = (self.coord_end[0] + position[0],
-                          self.coord_end[1] + position[1])
+        self.coord_start = (
+            self.coord_start[0] + position[0],
+            self.coord_start[1] + position[1],
+        )
+        self.coord_end = (
+            self.coord_end[0] + position[0],
+            self.coord_end[1] + position[1],
+        )
         return self

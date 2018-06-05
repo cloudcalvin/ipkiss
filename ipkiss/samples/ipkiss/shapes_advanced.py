@@ -35,27 +35,33 @@ import sys
 
 class AdvancedShapesExample(Structure):
     def define_elements(self, elems):
-        #empty list of elements
+        # empty list of elements
         ala = Structure("arc_line_arc")
         start_coord = (0.0, 0.0)
         end_coord = (40.0, 40.0)
         radius = 10.0
         for i in range(12):
-            start_angle = i * 10  #degrees
-            end_angle = -i * 10  #degrees
+            start_angle = i * 10  # degrees
+            end_angle = -i * 10  # degrees
             ala += Path(
                 Layer(0),
-                ShapeArcLineArc(start_coord, start_angle, radius, end_coord,
-                                end_angle, radius), 0.2)
+                ShapeArcLineArc(
+                    start_coord, start_angle, radius, end_coord, end_angle, radius
+                ),
+                0.2,
+            )
         for i in range(12):
             start_angle = 0.0
             end_angle = 0.0
             end_coord = (40.0, i * 5 - 20.0)
             ala += Path(
                 Layer(0),
-                ShapeArcLineArc(start_coord, start_angle, radius, end_coord,
-                                end_angle, radius), 0.2)
-        #define a shape: a list of coordinates
+                ShapeArcLineArc(
+                    start_coord, start_angle, radius, end_coord, end_angle, radius
+                ),
+                0.2,
+            )
+        # define a shape: a list of coordinates
         elems += [SRef(ala, (0.0, 0.0))]
         return elems
 
@@ -70,6 +76,6 @@ if __name__ == "__main__":
     # Write library
     OP.write(my_lib)
     print("Done : GDS2 file written to %s" % fileName)
-    #remark : instead of manually creating a Library and exporting it to GDS2, it is also possible to use
-    #the convenient shortcut function "write_gdsii" directly on the Structure, i.e.:
-    #layout.write_gdsii("example_advshapes.gds")
+    # remark : instead of manually creating a Library and exporting it to GDS2, it is also possible to use
+    # the convenient shortcut function "write_gdsii" directly on the Structure, i.e.:
+    # layout.write_gdsii("example_advshapes.gds")

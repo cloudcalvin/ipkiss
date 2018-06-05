@@ -24,11 +24,13 @@ from .elements.basic import ElementList
 from .structure import Structure
 from .. import constants
 
-#Multiple shapes to polygons
+# Multiple shapes to polygons
 
 __all__ = [
-    "str_shapes_boundaries", "str_shapes_paths", "el_shapes_boundaries",
-    "el_shapes_paths"
+    "str_shapes_boundaries",
+    "str_shapes_paths",
+    "el_shapes_boundaries",
+    "el_shapes_paths",
 ]
 
 
@@ -37,14 +39,13 @@ def str_shapes_boundaries(name, layer, shapes):
     return Structure(name, elements=el_shapes_boundaries(layer, shapes))
 
 
-def str_shapes_paths(name,
-                     layer,
-                     shapes,
-                     line_width=1.0,
-                     path_type=constants.PATH_TYPE_NORMAL):
+def str_shapes_paths(
+    name, layer, shapes, line_width=1.0, path_type=constants.PATH_TYPE_NORMAL
+):
     """Convert a list of shapes into a structure with Path elements on the specified layer"""
     return Structure(
-        name, elements=el_shapes_paths(layer, shapes, line_width, path_type))
+        name, elements=el_shapes_paths(layer, shapes, line_width, path_type)
+    )
 
 
 def el_shapes_boundaries(layer, shapes):
@@ -55,17 +56,13 @@ def el_shapes_boundaries(layer, shapes):
     return ret_el
 
 
-def el_shapes_paths(layer,
-                    shapes,
-                    line_width=0.0,
-                    path_type=constants.PATH_TYPE_NORMAL):
+def el_shapes_paths(
+    layer, shapes, line_width=0.0, path_type=constants.PATH_TYPE_NORMAL
+):
     """Converts a list of shapes into a list of Path elements on the specified layer"""
     ret_el = ElementList()
     for s in shapes:
         ret_el.append(
-            Path(
-                layer=layer,
-                shape=s,
-                line_width=line_width,
-                path_type=path_type))
+            Path(layer=layer, shape=s, line_width=line_width, path_type=path_type)
+        )
     return ret_el

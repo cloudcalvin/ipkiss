@@ -35,7 +35,8 @@ class __SpiralLoopElement__(Group):
     waveguides = DefinitionProperty(fdef_name="define_waveguides")
     reverse = BoolProperty(default=False)
     change_end_straight = Coord2Property(
-        default=(0.0, 0.0), doc="change the length of the end sections")
+        default=(0.0, 0.0), doc="change the length of the end sections"
+    )
 
     def define_elements(self, elems):
         for w in self.waveguides:
@@ -53,7 +54,8 @@ class __SpiralLoopElement__(Group):
 
 class WaveguideSpiralHeartElement(__SpiralLoopElement__):
     stub_direction = RestrictedProperty(
-        default="H", restriction=RestrictValueList(["H", "V"]))
+        default="H", restriction=RestrictValueList(["H", "V"])
+    )
 
     def define_waveguides(self):
         S = self.spacing
@@ -72,14 +74,33 @@ class WaveguideSpiralHeartElement(__SpiralLoopElement__):
         So = -Sy + bs2 - S + self.change_end_straight[1]
 
         if self.stub_direction == "H":
-            sh = Shape([(Sx, Si), (Sx, Sy), (-Sx, Sy), (-Sx, -Sy),
-                        (Sx - 2 * S, -Sy), (Sx - 2 * S, -0.5 * S), (-Sx + S,
-                                                                    -0.5 * S),
-                        (-Sx + S, Sy - S), (Sx - S, Sy - S), (Sx - S, So)])
+            sh = Shape(
+                [
+                    (Sx, Si),
+                    (Sx, Sy),
+                    (-Sx, Sy),
+                    (-Sx, -Sy),
+                    (Sx - 2 * S, -Sy),
+                    (Sx - 2 * S, -0.5 * S),
+                    (-Sx + S, -0.5 * S),
+                    (-Sx + S, Sy - S),
+                    (Sx - S, Sy - S),
+                    (Sx - S, So),
+                ]
+            )
         else:
-            sh = Shape([(Sx, Si), (Sx, Sy), (-Sx, Sy), (-Sx, -Sy), (-0.5 * S,
-                                                                    -Sy),
-                        (-0.5 * S, Sy - S), (Sx - S, Sy - S), (Sx - S, So)])
+            sh = Shape(
+                [
+                    (Sx, Si),
+                    (Sx, Sy),
+                    (-Sx, Sy),
+                    (-Sx, -Sy),
+                    (-0.5 * S, -Sy),
+                    (-0.5 * S, Sy - S),
+                    (Sx - S, Sy - S),
+                    (Sx - S, So),
+                ]
+            )
 
         if self.reverse:
             sh.reverse()
@@ -107,8 +128,9 @@ class WaveguideSpiralLoopElement(__SpiralLoopElement__):
 
         Si = -Sy + bs1 - S - self.change_end_straight[0]
         So = -Sy + bs2 + self.change_end_straight[1]
-        sh = Shape([(Sx, Si), (Sx, Sy), (-Sx, Sy), (-Sx, -Sy), (Sx - S, -Sy),
-                    (Sx - S, So)])
+        sh = Shape(
+            [(Sx, Si), (Sx, Sy), (-Sx, Sy), (-Sx, -Sy), (Sx - S, -Sy), (Sx - S, So)]
+        )
         if self.reverse:
             sh = sh.reverse()
         sh.move(self.center)
@@ -150,7 +172,8 @@ class WaveguideSingleSpiral(__WaveguideSpiral__):
                     wg_definition=self.wg_definition,
                     center=self.spiral_center,
                     loop_size=LS,
-                    spacing=self.spacing)
+                    spacing=self.spacing,
+                )
             ]
             LS = LS + (2 * self.spacing, 2 * self.spacing)
         return loops
@@ -164,10 +187,11 @@ class WaveguideDoubleSpiral(__WaveguideSpiral__):
     __name_prefix__ = "SPIRAL2"
     loops = DefinitionProperty(fdef_name="define_loops")
     stub_direction = RestrictedProperty(
-        default="H", restriction=RestrictValueList(["H", "V"]))
+        default="H", restriction=RestrictValueList(["H", "V"])
+    )
 
     def define_loops(self):
-        if (self.n_o_loops == 1):
+        if self.n_o_loops == 1:
             change_end_straight = (-self.spacing, 0.0)
         else:
             change_end_straight = (0.0, 0.0)
@@ -179,13 +203,13 @@ class WaveguideDoubleSpiral(__WaveguideSpiral__):
                 spacing=self.spacing,
                 stub_direction=self.stub_direction,
                 change_end_straight=change_end_straight,
-                reverse=True
-            )  #reverse : required for asymmetric waveguide definitions
+                reverse=True,
+            )  # reverse : required for asymmetric waveguide definitions
         ]
         LS = self.inner_size
         for i in range(self.n_o_loops - 1):
             LS = LS + (2 * self.spacing, 2 * self.spacing)
-            if (i == self.n_o_loops - 2):
+            if i == self.n_o_loops - 2:
                 change_end_straight = (-self.spacing, 0.0)
             else:
                 change_end_straight = (0.0, 0.0)
@@ -206,8 +230,8 @@ class WaveguideDoubleSpiral(__WaveguideSpiral__):
                     loop_size=LS,
                     spacing=2 * self.spacing,
                     change_end_straight=change_end_straight,
-                    reverse=True
-                )  #reverse : required for asymmetric waveguide definitions
+                    reverse=True,
+                )  # reverse : required for asymmetric waveguide definitions
             ]
         return loops
 
@@ -215,8 +239,7 @@ class WaveguideDoubleSpiral(__WaveguideSpiral__):
         if self.n_o_loops == 1:
             ports = self.loops[0].ports
         else:
-            ports = self.loops[-2].in_ports + self.loops[-1].in_ports.invert_copy(
-            )
+            ports = self.loops[-2].in_ports + self.loops[-1].in_ports.invert_copy()
         return ports
 
 
@@ -233,7 +256,8 @@ class WaveguideDoubleSpiralWithIncoupling(WaveguideDoubleSpiral):
 
         spiral_center = Coord2(
             self.inc_length + 0.5 * OS,
-            (2 * self.n_o_loops - 1) * S + 0.5 * self.inner_size.y)
+            (2 * self.n_o_loops - 1) * S + 0.5 * self.inner_size.y,
+        )
         return spiral_center
 
     def define_waveguides(self):
@@ -247,22 +271,35 @@ class WaveguideDoubleSpiralWithIncoupling(WaveguideDoubleSpiral):
 
         if self.stub_direction == "H":
             L_out = 0.5 * self.inner_size.y - self.spacing  # backward compatibility
-            #L_out = self.spacing + bs2
+            # L_out = self.spacing + bs2
         else:
             L_out = self.spacing + bs2
-        sh = Shape([(0.0, 0.0), (self.inc_length + OS - S, 0.0),
-                    (self.inc_length + OS - S,
-                     self.spiral_center.y - 0.5 * OLS[1] - S + bs1)])
+        sh = Shape(
+            [
+                (0.0, 0.0),
+                (self.inc_length + OS - S, 0.0),
+                (
+                    self.inc_length + OS - S,
+                    self.spiral_center.y - 0.5 * OLS[1] - S + bs1,
+                ),
+            ]
+        )
         waveguides += [self.wg_definition(shape=sh)]
 
-        sh = Shape([
-            (self.inc_length + OS + L_out + self.inc_length,
-             0.0), (self.inc_length + OS,
-                    0.0), (self.inc_length + OS,
-                           self.spiral_center.y - 0.5 * OLS[1] - S + bs2)
-        ]).reverse()  #reverse : required for asymmetric waveguide definitions
-        from ipkiss.plugins.photonics.port import InOpticalPort, OutOpticalPort, OpticalPortList
-        #because the second waveguide's shape was reversed, we also need to switch the ports
+        sh = Shape(
+            [
+                (self.inc_length + OS + L_out + self.inc_length, 0.0),
+                (self.inc_length + OS, 0.0),
+                (self.inc_length + OS, self.spiral_center.y - 0.5 * OLS[1] - S + bs2),
+            ]
+        ).reverse()  # reverse : required for asymmetric waveguide definitions
+        from ipkiss.plugins.photonics.port import (
+            InOpticalPort,
+            OutOpticalPort,
+            OpticalPortList,
+        )
+
+        # because the second waveguide's shape was reversed, we also need to switch the ports
         wg_el = self.wg_definition(shape=sh)
         waveguides += [wg_el]
         return waveguides
@@ -277,16 +314,16 @@ class WaveguideDoubleSpiralWithIncoupling(WaveguideDoubleSpiral):
         return elems
 
     def spiral_length(self):
-        return super(WaveguideDoubleSpiralWithIncoupling,
-                     self).spiral_length() + sum(
-                         [W.center_line().length() for W in self.waveguides])
+        return super(WaveguideDoubleSpiralWithIncoupling, self).spiral_length() + sum(
+            [W.center_line().length() for W in self.waveguides]
+        )
 
     def n_o_bends(self):
         return super(WaveguideDoubleSpiralWithIncoupling, self).n_o_bends() + 2
 
     def define_ports(self, prts):
         prts += self.waveguides[-2].in_ports
-        #prts += self.waveguides[-1].in_ports.invert_copy()
+        # prts += self.waveguides[-1].in_ports.invert_copy()
         prts += self.waveguides[-1].out_ports
         return prts
 
@@ -298,46 +335,51 @@ class __AutoSizeSpiral__(StrongPropertyInitializer):
     def define_inner_size(self):
         (bs1, bs2) = self.wg_definition.get_bend90_size()
         if self.stub_direction == "H":
-            return Coord2(self.stub_length + bs1 + bs2 + 3 * self.spacing,
-                          2 * bs1 + 2 * bs2 + self.spacing)
+            return Coord2(
+                self.stub_length + bs1 + bs2 + 3 * self.spacing,
+                2 * bs1 + 2 * bs2 + self.spacing,
+            )
         else:
-            return Coord2(2 * bs1 + 2 * bs2 + self.spacing,
-                          self.stub_length + bs1 + bs2 + self.spacing)
+            return Coord2(
+                2 * bs1 + 2 * bs2 + self.spacing,
+                self.stub_length + bs1 + bs2 + self.spacing,
+            )
 
 
 class WgSpiral(__AutoSizeSpiral__, WaveguideDoubleSpiralWithIncoupling):
     pass
 
 
-#def WgSpiralFixedLength(wg_definition,
-#total_length,
-#n_o_loops,
-#spacing = TECH.WG.SPACING,
-#stub_direction = "H",
-#**kwargs):
-#S = WgSpiral(wg_definition = wg_definition,
-#stub_length = 0,
-#n_o_loops = n_o_loops,
-#spacing = spacing,
-#stub_direction = stub_direction,
-#**kwargs)
-#l = S.spiral_length()
-#if total_length < l:
-#LOG.warning("Total length is too short for the given bend radius and n_o_loops")
-#else:
-#sis = S.inner_size
-#S.inner_size = Coord2(sis[0] + (total_length - l) / (4 * n_o_loops +1), sis[1])
-#l = S.spiral_length()
-#if abs(l-total_length) > 0.01:
-#LOG.info("Desired length: " + str(total_length)+  ", actual length: " + str(l))
+# def WgSpiralFixedLength(wg_definition,
+# total_length,
+# n_o_loops,
+# spacing = TECH.WG.SPACING,
+# stub_direction = "H",
+# **kwargs):
+# S = WgSpiral(wg_definition = wg_definition,
+# stub_length = 0,
+# n_o_loops = n_o_loops,
+# spacing = spacing,
+# stub_direction = stub_direction,
+# **kwargs)
+# l = S.spiral_length()
+# if total_length < l:
+# LOG.warning("Total length is too short for the given bend radius and n_o_loops")
+# else:
+# sis = S.inner_size
+# S.inner_size = Coord2(sis[0] + (total_length - l) / (4 * n_o_loops +1), sis[1])
+# l = S.spiral_length()
+# if abs(l-total_length) > 0.01:
+# LOG.info("Desired length: " + str(total_length)+  ", actual length: " + str(l))
 
-#return S
+# return S
 
 
 class __AutoSizeFixedLengthSpiral__(__AutoSizeSpiral__):
     total_length = NonNegativeNumberProperty(required=True)
     growth_direction = RestrictedProperty(
-        default="H", restriction=RestrictValueList(["H", "V"]))
+        default="H", restriction=RestrictValueList(["H", "V"])
+    )
     stub_length = LockedProperty()
 
     def define_inner_size(self):
@@ -362,18 +404,25 @@ class __AutoSizeFixedLengthSpiral__(__AutoSizeSpiral__):
             sis = S.inner_size
             if self.growth_direction == "H":
                 if self.stub_direction == "H":
-                    new_sis = Coord2(sis[0] + (self.total_length - l) /
-                                     (4 * self.n_o_loops + 1), sis[1])
+                    new_sis = Coord2(
+                        sis[0] + (self.total_length - l) / (4 * self.n_o_loops + 1),
+                        sis[1],
+                    )
                 else:
-                    new_sis = Coord2(sis[0] + (self.total_length - l) /
-                                     (4 * self.n_o_loops - 1), sis[1])
+                    new_sis = Coord2(
+                        sis[0] + (self.total_length - l) / (4 * self.n_o_loops - 1),
+                        sis[1],
+                    )
             else:
                 if self.stub_direction == "H":
-                    new_sis = Coord2(sis[0], sis[1] + (self.total_length - l) /
-                                     (4 * self.n_o_loops))
+                    new_sis = Coord2(
+                        sis[0], sis[1] + (self.total_length - l) / (4 * self.n_o_loops)
+                    )
                 else:
-                    new_sis = Coord2(sis[0], sis[1] + (self.total_length - l) /
-                                     (4 * self.n_o_loops + 2))
+                    new_sis = Coord2(
+                        sis[0],
+                        sis[1] + (self.total_length - l) / (4 * self.n_o_loops + 2),
+                    )
 
         # S.inner_size = new_sis
         # l = S.spiral_length()
@@ -385,11 +434,15 @@ class __AutoSizeFixedLengthSpiral__(__AutoSizeSpiral__):
 
     def define_stub_length(self):
         if self.stub_direction == "H":
-            return Coord2(self.stub_length + bs1 + bs2 + 3 * self.spacing,
-                          2 * bs1 + 2 * bs2 + self.spacing)
+            return Coord2(
+                self.stub_length + bs1 + bs2 + 3 * self.spacing,
+                2 * bs1 + 2 * bs2 + self.spacing,
+            )
         else:
-            return Coord2(2 * bs1 + 2 * bs2 + 3 * self.spacing,
-                          self.stub_length + bs1 + bs2 + 3 * self.spacing)
+            return Coord2(
+                2 * bs1 + 2 * bs2 + 3 * self.spacing,
+                self.stub_length + bs1 + bs2 + 3 * self.spacing,
+            )
 
         (bs1, bs2) = self.wg_definition.get_bend90_size()
         if self.stub_direction == "H":
@@ -398,6 +451,7 @@ class __AutoSizeFixedLengthSpiral__(__AutoSizeSpiral__):
             return self.inner_size[1] - bs1 - bs2 - 3 * spacing
 
 
-class WgSpiralFixedLength(__AutoSizeFixedLengthSpiral__,
-                          WaveguideDoubleSpiralWithIncoupling):
+class WgSpiralFixedLength(
+    __AutoSizeFixedLengthSpiral__, WaveguideDoubleSpiralWithIncoupling
+):
     pass

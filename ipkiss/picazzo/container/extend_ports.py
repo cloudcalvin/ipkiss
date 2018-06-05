@@ -23,9 +23,7 @@ from ipkiss.all import *
 from ipkiss.plugins.photonics.port.port_list import OpticalPortList
 from .container import __StructureContainerWithPortLabels__
 
-__all__ = [
-    "ExtendPorts",
-]
+__all__ = ["ExtendPorts"]
 
 
 class ExtendPorts(__StructureContainerWithPortLabels__):
@@ -41,10 +39,12 @@ class ExtendPorts(__StructureContainerWithPortLabels__):
         pl = self.__get_labeled_ports__()
 
         for p in pl:
-            s = Shape([
-                p.position,
-                p.position.move_polar_copy(self.extension_length, p.angle_deg)
-            ])
+            s = Shape(
+                [
+                    p.position,
+                    p.position.move_polar_copy(self.extension_length, p.angle_deg),
+                ]
+            )
             elems += p.wg_definition(shape=s)
         return elems
 

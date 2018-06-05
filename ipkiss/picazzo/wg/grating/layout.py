@@ -31,9 +31,14 @@ from ipkiss.plugins.photonics.wg.definition import WaveguideDefProperty
 from ipkiss.plugins.photonics.wg import WgElDefinition
 
 __all__ = [
-    "WgGrating", "WgGratingGeneric", "WgGratingRect", "WgGratingSideblock",
-    "WgGratingShallow", "WgGratingPeriodBlocks", "WgGratingPeriodShallow",
-    "WgGratingPeriodSideblock"
+    "WgGrating",
+    "WgGratingGeneric",
+    "WgGratingRect",
+    "WgGratingSideblock",
+    "WgGratingShallow",
+    "WgGratingPeriodBlocks",
+    "WgGratingPeriodShallow",
+    "WgGratingPeriodSideblock",
 ]
 
 ##############################################################################
@@ -43,6 +48,7 @@ __all__ = [
 
 class __WgGratingPeriod__(Structure):
     """ abstract class for waveguide grating period """
+
     __name_prefix__ = "WG_GP_"
     length = PositiveNumberProperty(required=True)
     wg_definition = WaveguideDefProperty(default=TECH.WGDEF.WIRE)
@@ -50,13 +56,11 @@ class __WgGratingPeriod__(Structure):
     def define_ports(self, prts):
         prts += [
             OpticalPort(
-                position=(0.0, 0.0),
-                angle=-180.0,
-                wg_definition=self.wg_definition),
+                position=(0.0, 0.0), angle=-180.0, wg_definition=self.wg_definition
+            ),
             OpticalPort(
-                position=(self.length, 0.0),
-                angle=0.0,
-                wg_definition=self.wg_definition)
+                position=(self.length, 0.0), angle=0.0, wg_definition=self.wg_definition
+            ),
         ]
         return prts
 
@@ -64,11 +68,13 @@ class __WgGratingPeriod__(Structure):
 class WgGratingPeriodBlocks(__WgGratingPeriod__):
     """ waveguide grating period consisting of rectangular blocks
         blocks is a list of (wg_definition, length) tuples """
+
     __name_prefix__ = "TECH_WG_GPB_"
 
     length = DefinitionProperty(fdef_name="define_length")
     blocks = RestrictedProperty(
-        restriction=RestrictList(RESTRICT_TUPLE2), required=True)
+        restriction=RestrictList(RESTRICT_TUPLE2), required=True
+    )
 
     def define_length(self):
         length = sum([d[1] for d in self.blocks])
@@ -84,57 +90,61 @@ class WgGratingPeriodBlocks(__WgGratingPeriod__):
     def define_ports(self, prts):
         prts += [
             OpticalPort(
-                position=(0.0, 0.0),
-                angle=-180.0,
-                wg_definition=self.wg_definition),
+                position=(0.0, 0.0), angle=-180.0, wg_definition=self.wg_definition
+            ),
             OpticalPort(
-                position=(self.length, 0.0),
-                angle=0.0,
-                wg_definition=self.wg_definition)
+                position=(self.length, 0.0), angle=0.0, wg_definition=self.wg_definition
+            ),
         ]
         return prts
 
 
-def wg_grating_period_rect(length,
-                           wg_width,
-                           wide_width,
-                           narrow_width,
-                           fill_factor=0.5,
-                           trench_width=2.0,
-                           process=TECH.PROCESS.WG):
+def wg_grating_period_rect(
+    length,
+    wg_width,
+    wide_width,
+    narrow_width,
+    fill_factor=0.5,
+    trench_width=2.0,
+    process=TECH.PROCESS.WG,
+):
     """ a waveguide grating period with a rectagular tooth """
-    return WgGratingPeriodBlocks(wg_width, [
-        Coord2(narrow_width, 0.5 * length * (1 - fill_factor)),
-        Coord2(wide_width, length * fill_factor),
-        Coord2(narrow_width, 0.5 * length * (1 - fill_factor))
-    ], trench_width, process, library)
+    return WgGratingPeriodBlocks(
+        wg_width,
+        [
+            Coord2(narrow_width, 0.5 * length * (1 - fill_factor)),
+            Coord2(wide_width, length * fill_factor),
+            Coord2(narrow_width, 0.5 * length * (1 - fill_factor)),
+        ],
+        trench_width,
+        process,
+        library,
+    )
 
 
 class WgGratingPeriodShallow(__WgGratingPeriod__):
     __name_prefix__ = "TECH_WG_GPS_"
-    fill_factor = RestrictedProperty(
-        restriction=RESTRICT_FRACTION, default=0.5)
+    fill_factor = RestrictedProperty(restriction=RESTRICT_FRACTION, default=0.5)
     deep_process = ProcessProperty(default=TECH.PROCESS.WG)
     shallow_process = ProcessProperty(default=TECH.PROCESS.FC)
 
     def define_elements(self, elems):
         elems += self.wg_definition(shape=[(0.0, 0.0), (self.length, 0.0)])
         elems += Rectangle(
-            PPLayer(self.shallow_process,
-                    TECH.PURPOSE.DF.TRENCH), (0.5 * self.length, 0.0),
-            (self.fill_factor * self.length, 2 * self.wg_definition.wg_width))
+            PPLayer(self.shallow_process, TECH.PURPOSE.DF.TRENCH),
+            (0.5 * self.length, 0.0),
+            (self.fill_factor * self.length, 2 * self.wg_definition.wg_width),
+        )
         return elems
 
     def define_ports(self, prts):
         prts += [
             OpticalPort(
-                position=(0.0, 0.0),
-                angle=-180.0,
-                wg_definition=self.wg_definition),
+                position=(0.0, 0.0), angle=-180.0, wg_definition=self.wg_definition
+            ),
             OpticalPort(
-                position=(self.length, 0.0),
-                angle=0.0,
-                wg_definition=self.wg_definition)
+                position=(self.length, 0.0), angle=0.0, wg_definition=self.wg_definition
+            ),
         ]
         return prts
 
@@ -149,41 +159,54 @@ class WgGratingPeriodSideblock(__WgGratingPeriod__):
         elems += self.wg_definition(shape=[(0.0, 0.0), (self.length, 0.0)])
         elems += Rectangle(
             PPLayer(self.process, TECH.PURPOSE.LF.LINE),
-            (0.5 * self.length, 0.5 * self.wg_definition.wg_width +
-             self.block_spacing + 0.5 * self.block_size[1]), self.block_size)
+            (
+                0.5 * self.length,
+                0.5 * self.wg_definition.wg_width
+                + self.block_spacing
+                + 0.5 * self.block_size[1],
+            ),
+            self.block_size,
+        )
         elems += Rectangle(
             PPLayer(self.process, TECH.PURPOSE.LF.LINE),
-            (0.5 * self.length, -0.5 * self.wg_definition.wg_width -
-             self.block_spacing - 0.5 * self.block_size[1]), self.block_size)
+            (
+                0.5 * self.length,
+                -0.5 * self.wg_definition.wg_width
+                - self.block_spacing
+                - 0.5 * self.block_size[1],
+            ),
+            self.block_size,
+        )
         return elems
 
     def define_ports(self, prts):
         prts += [
             OpticalPort(
-                position=(0.0, 0.0),
-                angle=-180.0,
-                wg_definition=self.wg_definition),
+                position=(0.0, 0.0), angle=-180.0, wg_definition=self.wg_definition
+            ),
             OpticalPort(
-                position=(self.length, 0.0),
-                angle=0.0,
-                wg_definition=self.wg_definition)
+                position=(self.length, 0.0), angle=0.0, wg_definition=self.wg_definition
+            ),
         ]
         return prts
 
 
 class WgGratingGeneric(Structure):
     """ waveguide with a grating """
+
     __name_prefix__ = "TECH_WG_GG_"
     periods = RestrictedProperty(
-        restriction=RestrictTypeList(__WgGratingPeriod__), required=True)
+        restriction=RestrictTypeList(__WgGratingPeriod__), required=True
+    )
     positions = DefinitionProperty(fdef_name="define_positions")
 
     def define_positions(self):
         p = [Coord2(0.0, 0.0)]
         for i in range(len(self.periods) - 1):
             p += [
-                p[-1] - self.periods[i + 1].west_ports[0].position +
-                self.periods[i].east_ports[0].position
+                p[-1]
+                - self.periods[i + 1].west_ports[0].position
+                + self.periods[i].east_ports[0].position
             ]
         return p
 
@@ -201,9 +224,11 @@ class WgGratingGeneric(Structure):
 
 class WgGrating(Structure):
     """ waveguide with a grating """
+
     __name_prefix__ = "TECH_WG_G_"
     period = RestrictedProperty(
-        restriction=RestrictType(__WgGratingPeriod__), required=True)
+        restriction=RestrictType(__WgGratingPeriod__), required=True
+    )
     n_o_periods = IntProperty(restriction=RESTRICT_POSITIVE, required=True)
     pitch = DefinitionProperty(fdef_name="define_pitch")
 
@@ -217,57 +242,63 @@ class WgGrating(Structure):
     def define_ports(self, prts):
         P = OpticalPortList()
         P += self.period.west_ports
-        P += self.period.east_ports.move_copy(
-            (self.pitch * (self.n_o_periods - 1), 0))
+        P += self.period.east_ports.move_copy((self.pitch * (self.n_o_periods - 1), 0))
         return P
 
 
-def wg_grating_period_rect(length,
-                           wg_definition,
-                           wide_wg_definition,
-                           narrow_wg_definition,
-                           fill_factor=0.5):
+def wg_grating_period_rect(
+    length, wg_definition, wide_wg_definition, narrow_wg_definition, fill_factor=0.5
+):
     """ a waveguide grating period with a rectagular tooth """
     return WgGratingPeriodBlocks(
         wg_definition=wg_definition,
-        blocks=[(narrow_wg_definition, 0.5 * length * (1 - fill_factor)),
-                (wide_wg_definition, length * fill_factor),
-                (narrow_wg_definition, 0.5 * length * (1 - fill_factor))])
+        blocks=[
+            (narrow_wg_definition, 0.5 * length * (1 - fill_factor)),
+            (wide_wg_definition, length * fill_factor),
+            (narrow_wg_definition, 0.5 * length * (1 - fill_factor)),
+        ],
+    )
 
 
-def WgGratingRect(pitch,
-                  n_o_periods,
-                  wg_definition,
-                  wide_wg_definition,
-                  narrow_wg_definition,
-                  fill_factor=0.5,
-                  trench_width=TECH.WG.TRENCH_WIDTH,
-                  process=TECH.PROCESS.WG):
-    period = wg_grating_period_rect(pitch, wg_definition, wide_wg_definition,
-                                    narrow_wg_definition, fill_factor)
+def WgGratingRect(
+    pitch,
+    n_o_periods,
+    wg_definition,
+    wide_wg_definition,
+    narrow_wg_definition,
+    fill_factor=0.5,
+    trench_width=TECH.WG.TRENCH_WIDTH,
+    process=TECH.PROCESS.WG,
+):
+    period = wg_grating_period_rect(
+        pitch, wg_definition, wide_wg_definition, narrow_wg_definition, fill_factor
+    )
     return WgGrating(period=period, n_o_periods=n_o_periods)
 
 
-def WgGratingShallow(pitch,
-                     n_o_periods,
-                     wg_definition=TECH.WGDEF.WIRE,
-                     fill_factor=0.5,
-                     deep_process=TECH.PROCESS.WG,
-                     shallow_process=TECH.PROCESS.FC):
+def WgGratingShallow(
+    pitch,
+    n_o_periods,
+    wg_definition=TECH.WGDEF.WIRE,
+    fill_factor=0.5,
+    deep_process=TECH.PROCESS.WG,
+    shallow_process=TECH.PROCESS.FC,
+):
     period = WgGratingPeriodShallow(
         length=pitch,
         wg_definition=wg_definition,
         fill_factor=fill_factor,
         deep_process=deep_process,
-        shallow_process=shallow_process)
+        shallow_process=shallow_process,
+    )
     return WgGrating(period=period, n_o_periods=n_o_periods)
 
 
-def WgGratingSideblock(pitch, n_o_periods, wg_definition, block_size,
-                       block_spacing):
+def WgGratingSideblock(pitch, n_o_periods, wg_definition, block_size, block_spacing):
     period = WgGratingPeriodSideblock(
         length=pitch,
         wg_definition=wg_definition,
         block_size=block_size,
-        block_spacing=block_spacing)
+        block_spacing=block_spacing,
+    )
     return WgGrating(period=period, n_o_periods=n_o_periods)

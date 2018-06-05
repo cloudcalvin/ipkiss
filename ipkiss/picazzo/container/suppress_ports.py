@@ -23,9 +23,7 @@ from ipkiss.all import *
 from ipkiss.plugins.photonics.port.port_list import OpticalPortList
 from .container import __StructureContainerWithPortLabels__
 
-__all__ = [
-    "SuppressPorts",
-]
+__all__ = ["SuppressPorts"]
 
 
 class SuppressPorts(__StructureContainerWithPortLabels__):
@@ -33,6 +31,7 @@ class SuppressPorts(__StructureContainerWithPortLabels__):
        If None is given, all ports will be suppressed. You can also provide a structure which
        will be attached to each suppressed port (a stub, to remove reflections)
        """
+
     __name_prefix__ = "SUPTRG"
 
     stub = StructureProperty(allow_none=True)
@@ -46,14 +45,13 @@ class SuppressPorts(__StructureContainerWithPortLabels__):
         if not (S is None):
             for p in pl:
                 elems += SRef(
-                    reference=S,
-                    transformation=vector_match_transform(S.ports[0], p))
+                    reference=S, transformation=vector_match_transform(S.ports[0], p)
+                )
         return elems
 
     def define_ports(self, ports):
         spl = self.__get_labeled_ports__()
-        for p in self.structure.ports.transform_copy(
-                self.structure_transformation):
+        for p in self.structure.ports.transform_copy(self.structure_transformation):
             if not (p in spl):
                 ports += p
 

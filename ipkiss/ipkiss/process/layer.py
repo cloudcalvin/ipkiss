@@ -22,14 +22,22 @@
 from ipcore.properties.descriptor import RestrictedProperty
 from ipcore.properties.predefined import StringProperty, IdStringProperty
 from ipcore.properties.restrictions import RestrictType
-from ipcore.properties.initializer import StrongPropertyInitializer, MetaPropertyInitializer
+from ipcore.properties.initializer import (
+    StrongPropertyInitializer,
+    MetaPropertyInitializer,
+)
 from ipcore.all import do_hash
 
 DEFINED_PROCESS_LAYERS = {}
 DEFINED_PATTERN_PURPOSES = {}
 __all__ = [
-    "ProcessLayer", "ProcessProperty", "ProcessLayerList", "PatternPurpose",
-    "PurposeProperty", "PPLayer", "ProcessPurposeLayer"
+    "ProcessLayer",
+    "ProcessProperty",
+    "ProcessLayerList",
+    "PatternPurpose",
+    "PurposeProperty",
+    "PPLayer",
+    "ProcessPurposeLayer",
 ]
 
 ###############################################################################################################
@@ -43,8 +51,8 @@ class MetaProcessLayerCreator(MetaPropertyInitializer):
     # Called when a new object is created
     def __call__(cls, *params, **keyword_params):
         # extract layer number
-        if 'extension' in keyword_params:
-            extension = keyword_params['extension']
+        if "extension" in keyword_params:
+            extension = keyword_params["extension"]
         elif len(params) >= 1:
             extension = params[1]
         else:
@@ -69,19 +77,20 @@ class ProcessLayer(StrongPropertyInitializer, metaclass=MetaProcessLayerCreator)
     """ Process layer represents a specific process step which requires a defined mask pattern. 
         Typically this is a lithography step in.
         """
+
     name = StringProperty(required=True)
     extension = IdStringProperty(required=True)
 
     def __init__(self, name, extension, **kwargs):
-        super(ProcessLayer, self).__init__(
-            name=name, extension=extension, **kwargs)
+        super(ProcessLayer, self).__init__(name=name, extension=extension, **kwargs)
 
     def __eq__(self, other):
-        if not isinstance(other, ProcessLayer): return False
+        if not isinstance(other, ProcessLayer):
+            return False
         return self.extension == other.extension
 
     def __ne__(self, other):
-        return (not self.__eq__(other))
+        return not self.__eq__(other)
 
     def __repr__(self):
         return "<Process %s>" % self.extension
@@ -103,8 +112,8 @@ class MetaPatternPurposeCreator(MetaPropertyInitializer):
     # Called when a new object is created
     def __call__(cls, *params, **keyword_params):
         # extract layer number
-        if 'extension' in keyword_params:
-            extension = keyword_params['extension']
+        if "extension" in keyword_params:
+            extension = keyword_params["extension"]
         elif len(params) >= 1:
             extension = params[1]
         else:
@@ -129,20 +138,21 @@ class PatternPurpose(StrongPropertyInitializer, metaclass=MetaPatternPurposeCrea
     """ Pattern Purpose represents what should be done with the geometric patterns which is defined.
         e.g. etch, inversion, comment, ...
         """
+
     name = StringProperty(required=True)
     extension = IdStringProperty(required=True)
     doc = StringProperty(default="")
 
     def __init__(self, name, extension, **kwargs):
-        super(PatternPurpose, self).__init__(
-            name=name, extension=extension, **kwargs)
+        super(PatternPurpose, self).__init__(name=name, extension=extension, **kwargs)
 
     def __eq__(self, other):
-        if not isinstance(other, PatternPurpose): return False
+        if not isinstance(other, PatternPurpose):
+            return False
         return self.extension == other.extension
 
     def __ne__(self, other):
-        return (not self.__eq__(other))
+        return not self.__eq__(other)
 
     def __repr__(self):
         return "<Purpose %s>" % self.extension
@@ -163,22 +173,22 @@ from ipkiss.primitives.layer import Layer
 class ProcessPurposeLayer(Layer):
     """ An Ipkiss layer which consists of a processlayer and a patternpurpose
     """
+
     process = ProcessProperty(required=True)
     purpose = PurposeProperty(required=True)
 
     def __init__(self, process, purpose, **kwargs):
         super(ProcessPurposeLayer, self).__init__(
-            process=process, purpose=purpose, **kwargs)
+            process=process, purpose=purpose, **kwargs
+        )
 
     # add visualisation information for later use in SVG output or display
 
     def __str__(self):
-        return "PPLAYER %s-%s" % (self.process.extension,
-                                  self.purpose.extension)
+        return "PPLAYER %s-%s" % (self.process.extension, self.purpose.extension)
 
     def __repr__(self):
-        return "<PPLayer %s-%s>" % (self.process.extension,
-                                    self.purpose.extension)
+        return "<PPLayer %s-%s>" % (self.process.extension, self.purpose.extension)
 
     def __eq__(self, other):
         if isinstance(other, ProcessPurposeLayer):
@@ -199,8 +209,7 @@ class ProcessPurposeLayer(Layer):
 
     def id(self):
         # can become more complex when datatype etc. is included
-        return do_hash("%s-%s" % (self.process.extension,
-                                  self.purpose.extension))
+        return do_hash("%s-%s" % (self.process.extension, self.purpose.extension))
 
 
 PPLayer = ProcessPurposeLayer
@@ -217,12 +226,15 @@ class ProcessLayerList(list):
         """ get ProcessLayerList item based on process layer extension """
         if isinstance(key, str):
             for i in self:
-                if i.extension == key: return i
-            raise IndexError("layer " + str(key) +
-                             " cannot be found in ProcessLayerList.")
+                if i.extension == key:
+                    return i
+            raise IndexError(
+                "layer " + str(key) + " cannot be found in ProcessLayerList."
+            )
         else:
-            raise TypeError("Index is wrong type " + str(type(key)) +
-                            " in ProcessLayerList")
+            raise TypeError(
+                "Index is wrong type " + str(type(key)) + " in ProcessLayerList"
+            )
 
     def __setitem__(self, key, value):
         """ set ProcessLayerList item based on process layer extension """
@@ -232,8 +244,9 @@ class ProcessLayerList(list):
                     return list.__setitem__(self, i, value)
             list.append(self, value)
         else:
-            raise TypeError("Index is wrong type " + str(type(key)) +
-                            " in ProcessLayerList")
+            raise TypeError(
+                "Index is wrong type " + str(type(key)) + " in ProcessLayerList"
+            )
 
     def __delitem__(self, key):
         if isinstance(key, str):
@@ -243,8 +256,9 @@ class ProcessLayerList(list):
                 return
             return list.__delitem__(self, key)
         else:
-            raise TypeError("Index is wrong type " + str(type(key)) +
-                            " in ProcessLayerList")
+            raise TypeError(
+                "Index is wrong type " + str(type(key)) + " in ProcessLayerList"
+            )
 
     def __contains__(self, item):
         if isinstance(item, ProcessLayer):
@@ -253,12 +267,14 @@ class ProcessLayerList(list):
             id = item
 
         for i in self:
-            if i.extension == id: return True
+            if i.extension == id:
+                return True
         return False
 
     def __fast_get_layer__(self, extension):
         for L in self:
-            if L.extension == extension: return L
+            if L.extension == extension:
+                return L
         return None
 
     def index(self, item):

@@ -36,7 +36,8 @@ class __ElementsForVFabricationAspect__(__Aspect__):
         Convert the structure's elements into a new set of elements for every active process, as defined by TECH.VFABRICATION.PROCESS_FLOW.
         """
         elems = self.__get_elements_per_process__(
-            processes=TECH.VFABRICATION.PROCESS_FLOW.active_processes)
+            processes=TECH.VFABRICATION.PROCESS_FLOW.active_processes
+        )
         return elems
 
     def __get_elements_per_process__(self, processes):
@@ -48,19 +49,19 @@ class __ElementsForVFabricationAspect__(__Aspect__):
         elems = ElementList()
         for process in processes:
             if hasattr(TECH.PPLAYER, process.extension) and hasattr(
-                    TECH.PPLAYER.__getattribute__(process.extension), "ALL"):
+                TECH.PPLAYER.__getattribute__(process.extension), "ALL"
+            ):
                 pplayer = TECH.PPLAYER.__getattribute__(
-                    process.extension).__getattribute__("TEXT")
-                mapping[TECH.PPLAYER.__getattribute__(
-                    process.extension).ALL] = pplayer
-        elems += get_elements_for_generated_layers(
-            self.elements, mapping=mapping)
+                    process.extension
+                ).__getattribute__("TEXT")
+                mapping[TECH.PPLAYER.__getattribute__(process.extension).ALL] = pplayer
+        elems += get_elements_for_generated_layers(self.elements, mapping=mapping)
         return elems
 
     def write_gdsii_vfabrication(self, filename_or_stream, **kwargs):
         struct_vfab = Structure(
-            name=self.name + "_VFAB",
-            elements=self.elements_per_active_process)
+            name=self.name + "_VFAB", elements=self.elements_per_active_process
+        )
         struct_vfab.write_gdsii(filename_or_stream, **kwargs)
 
 

@@ -19,11 +19,19 @@
 #
 # Contact: ipkiss@intec.ugent.be
 
-from ipcore.all import StrongPropertyInitializer, TypedList, TypedListProperty, RestrictedProperty, StringProperty, RestrictType
+from ipcore.all import (
+    StrongPropertyInitializer,
+    TypedList,
+    TypedListProperty,
+    RestrictedProperty,
+    StringProperty,
+    RestrictType,
+)
 
 
 class __Waveguide__(StrongPropertyInitializer):
     """ Abstract base class for waveguide """
+
     name = StringProperty()
 
 
@@ -34,6 +42,7 @@ def WaveguideProperty(internal_member_name=None, restriction=None, **kwargs):
 
 class __Mode__(StrongPropertyInitializer):
     """ Abstract base class for waveguide mode """
+
     waveguide = WaveguideProperty()
 
 
@@ -78,7 +87,8 @@ class ModeListProperty(TypedListProperty):
 
 class Waveguide(__Waveguide__):
     """ Abstract base class for waveguide keeping a list of modes """
-    modes = ModeListProperty(fdef_name='define_modes')
+
+    modes = ModeListProperty(fdef_name="define_modes")
 
     def define_modes(self, modes):
         return modes

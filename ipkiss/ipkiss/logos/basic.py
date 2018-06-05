@@ -38,5 +38,4 @@ class Logo(Structure):
     def define_name(self):
         logo_size = (1.0, 1.1)
         scale = min([self.size[0] / logo_size[0], self.size[1] / logo_size[1]])
-        return "%s_L%d_S%d" % (self.__name_prefix__, self.layer.id(),
-                               int(scale * 1000))
+        return "%s_L%d_S%d" % (self.__name_prefix__, self.layer.id(), int(scale * 1000))

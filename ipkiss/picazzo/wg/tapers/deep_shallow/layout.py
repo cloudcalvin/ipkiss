@@ -19,6 +19,12 @@
 #
 # Contact: ipkiss@intec.ugent.be
 
-from ...wgdefs.wg_fc.tapers import WgElPortTaperFromShallow, WgElPortTaperToShallow, WgElTaperDeepShallow, WgElTaperShallowDeep, WGFCWgElToWgElPortTaper
+from ...wgdefs.wg_fc.tapers import (
+    WgElPortTaperFromShallow,
+    WgElPortTaperToShallow,
+    WgElTaperDeepShallow,
+    WgElTaperShallowDeep,
+    WGFCWgElToWgElPortTaper,
+)
 
 # TODO. Eliminate this package. Move tests

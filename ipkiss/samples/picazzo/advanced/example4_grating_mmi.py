@@ -35,14 +35,17 @@ class GratingMmi(Structure):
 
     def define_name(self):
         return "%s_L%d_W%d_P%d_T%d_W%d_T%d" % (
-            self.__name_prefix__, self.mmi_length * 1000,
-            self.mmi_width * 1000, self.grating_pitch * 1000,
-            self.grating_trench_width * 1000, self.wg_width * 1000,
-            self.trench_width * 1000)
+            self.__name_prefix__,
+            self.mmi_length * 1000,
+            self.mmi_width * 1000,
+            self.grating_pitch * 1000,
+            self.grating_trench_width * 1000,
+            self.wg_width * 1000,
+            self.trench_width * 1000,
+        )
 
     def define_elements(self, elems):
-        wg_def = WgElDefinition(
-            wg_width=self.mmi_width, trench_width=self.trench_width)
+        wg_def = WgElDefinition(wg_width=self.mmi_width, trench_width=self.trench_width)
         elems += wg_def([(0.0, 0.0), (self.mmi_length, 0.0)])
         n_o_periods = int(self.mmi_length / self.grating_pitch)
         period1 = Structure(
@@ -51,19 +54,21 @@ class GratingMmi(Structure):
                 layer=PPLayer(TECH.PROCESS.FC, TECH.PURPOSE.DF.TRENCH),
                 begin_coord=(0.0, 0.0),
                 end_coord=(self.grating_trench_width, 0.0),
-                line_width=self.mmi_width))
+                line_width=self.mmi_width,
+            ),
+        )
         elems += ARef(
             reference=period1,
             origin=(0.0, 0.0),
             period=(self.grating_pitch, 1.0),
-            n_o_periods=(n_o_periods, 1))
+            n_o_periods=(n_o_periods, 1),
+        )
         return elems
 
     def define_ports(self, ports):
-        wg_def = WgElDefinition(
-            wg_width=self.wg_width, trench_width=self.trench_width)
+        wg_def = WgElDefinition(wg_width=self.wg_width, trench_width=self.trench_width)
+        ports += InOpticalPort(position=(0.0, 0.0), wg_definition=wg_def, angle=180.0)
         ports += InOpticalPort(
-            position=(0.0, 0.0), wg_definition=wg_def, angle=180.0)
-        ports += InOpticalPort(
-            position=(self.mmi_length, 0.0), wg_definition=wg_def, angle=0.0)
+            position=(self.mmi_length, 0.0), wg_definition=wg_def, angle=0.0
+        )
         return ports

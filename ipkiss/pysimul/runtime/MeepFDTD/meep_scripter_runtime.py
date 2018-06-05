@@ -42,7 +42,7 @@ class __MeepMaterialPolygonsFromFile__(object):
     def __init__(self):
         self.south_west_coord = 0.0
 
-    def __getstate__(self):  #for pickle : do not serialize
+    def __getstate__(self):  # for pickle : do not serialize
         return None
 
     def __transform_coords_to_numpy_array(self, coords):
@@ -56,69 +56,94 @@ class __MeepMaterialPolygonsFromFile__(object):
         return arr
 
     def __add_bitmap_polygon__(self, bitmap_polygon, value):
-        #value : will be an eps for 2D and a material stack ID for 3D...
+        # value : will be an eps for 2D and a material stack ID for 3D...
         if not (bitmap_polygon is None):
             georep = bitmap_polygon.georep_list
             for g in georep:
                 if not g.is_empty:
                     if g.is_ring:
                         coords = g.boundary.coords
-                        coords_array = self.__transform_coords_to_numpy_array(
-                            coords)
+                        coords_array = self.__transform_coords_to_numpy_array(coords)
                         self.add_polygon(coords_array, value)
                     else:
                         outer_polygon_coords_array = self.__transform_coords_to_numpy_array(
-                            g.exterior.coords)
+                            g.exterior.coords
+                        )
                         outer_polygon = self.add_polygon(
-                            outer_polygon_coords_array, value)
+                            outer_polygon_coords_array, value
+                        )
                         for ip in g.interiors:
-                            #inner polygons
+                            # inner polygons
                             inner_polygon_coords_array = self.__transform_coords_to_numpy_array(
-                                ip.coords)
-                            outer_polygon.add_inner_polygon(
-                                inner_polygon_coords_array)
+                                ip.coords
+                            )
+                            outer_polygon.add_inner_polygon(inner_polygon_coords_array)
 
 
-class MeepMaterial2DPolygonsFromFile(__MeepMaterialPolygonsFromFile__,
-                                     meep.PolygonCallback2D):
+class MeepMaterial2DPolygonsFromFile(
+    __MeepMaterialPolygonsFromFile__, meep.PolygonCallback2D
+):
     def __get_config_from_file__(self, file_name):
         file_handle = open(file_name, "r")
         from pickle import load
+
         (bitmap_polygons, eps_values, south_west) = load(file_handle)
         file_handle.close()
         return (bitmap_polygons, eps_values, south_west)
 
     def __init__(self, config_file, meep_volume):
         meep.PolygonCallback2D.__init__(self)
-        (bitmap_polygons, eps_values,
-         south_west) = self.__get_config_from_file__(config_file)
+        (bitmap_polygons, eps_values, south_west) = self.__get_config_from_file__(
+            config_file
+        )
         self.south_west_coord = south_west
-        for bitmap_polygon, eps in zip(bitmap_polygons,
-                                       eps_values)[1:]:  #ignore canvas polygon
+        for bitmap_polygon, eps in zip(bitmap_polygons, eps_values)[
+            1:
+        ]:  # ignore canvas polygon
             self.__add_bitmap_polygon__(bitmap_polygon, eps)
 
 
-class MeepMaterial3DPolygonsFromFile(__MeepMaterialPolygonsFromFile__,
-                                     meep.PolygonCallback3D):
+class MeepMaterial3DPolygonsFromFile(
+    __MeepMaterialPolygonsFromFile__, meep.PolygonCallback3D
+):
     def __get_config_from_file__(self, file_name):
         file_handle = open(file_name, "r")
         from pickle import load
-        (bitmap_polygons, material_stack_ids, south_west, material_stacks_npy,
-         n_o_material_stacks) = load(file_handle)
+
+        (
+            bitmap_polygons,
+            material_stack_ids,
+            south_west,
+            material_stacks_npy,
+            n_o_material_stacks,
+        ) = load(file_handle)
         file_handle.close()
-        return (bitmap_polygons, material_stack_ids, south_west,
-                material_stacks_npy, n_o_material_stacks)
+        return (
+            bitmap_polygons,
+            material_stack_ids,
+            south_west,
+            material_stacks_npy,
+            n_o_material_stacks,
+        )
 
     def __init__(self, config_file, meep_volume):
         meep.PolygonCallback3D.__init__(self)
-        (bitmap_polygons, material_stack_ids, south_west, material_stacks_npy,
-         n_o_material_stacks) = self.__get_config_from_file__(config_file)
+        (
+            bitmap_polygons,
+            material_stack_ids,
+            south_west,
+            material_stacks_npy,
+            n_o_material_stacks,
+        ) = self.__get_config_from_file__(config_file)
         self.south_west_coord = south_west
-        self.add_material_stacks_from_numpy_matrix(material_stacks_npy,
-                                                   n_o_material_stacks)
+        self.add_material_stacks_from_numpy_matrix(
+            material_stacks_npy, n_o_material_stacks
+        )
         for bitmap_polygon, material_stack_id in zip(
-                bitmap_polygons,
-                material_stack_ids)[1:]:  #ignore canvas polygon
+            bitmap_polygons, material_stack_ids
+        )[
+            1:
+        ]:  # ignore canvas polygon
             self.__add_bitmap_polygon__(bitmap_polygon, material_stack_id)
 
 
@@ -129,7 +154,8 @@ class AmplitudeFactorFromFile(meep.Callback):
 
     def __get_config_from_file__(self, file_name):
         from pickle import load
-        file_handle = open(file_name, 'r')
+
+        file_handle = open(file_name, "r")
         mode_profile = load(file_handle)
         return mode_profile
 
@@ -137,28 +163,28 @@ class AmplitudeFactorFromFile(meep.Callback):
         positions = self.mode_profile[0]
         fields = self.mode_profile[1]
         from scipy.interpolate import interp1d as interp
+
         i = interp(
             x=positions,
             y=fields,
-            kind='linear',
+            kind="linear",
             copy=True,
             bounds_error=False,
-            fill_value=0.0)
+            fill_value=0.0,
+        )
         f = float(i(coordinate_relative_to_port_position[1]))
         return f
 
     def complex_vec(self, vec):
-        #BEWARE, these are coordinates RELATIVE to the source center !!!!
+        # BEWARE, these are coordinates RELATIVE to the source center !!!!
         try:
             x = vec.x()
             y = vec.y()
             factor = self.__get_amplitude_factor__([x, y])
-            if (isinstance(factor, complex)):
+            if isinstance(factor, complex):
                 return factor
             else:
                 return complex(factor)
         except Exception as e:
-            print("Exception in AmplitudeFactor::complex_vec (%f,%f): %s" % (x,
-                                                                             y,
-                                                                             e))
+            print("Exception in AmplitudeFactor::complex_vec (%f,%f): %s" % (x, y, e))
             raise e

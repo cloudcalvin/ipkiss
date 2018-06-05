@@ -22,7 +22,7 @@
 from ipcore.all import *
 from ..basics.environment import __Environment__, Environment, DEFAULT_ENVIRONMENT
 
-__all__ = ['DEFAULT_ENVIRONMENT']
+__all__ = ["DEFAULT_ENVIRONMENT"]
 
 
 class __ThermalEnvironment__(__Environment__):

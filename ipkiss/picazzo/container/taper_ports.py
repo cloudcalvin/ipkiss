@@ -32,6 +32,7 @@ __all__ = ["TaperDeepPorts", "TaperShallowPorts", "ExtendedTaperPorts"]
 
 class __TaperPorts__(__StructureContainerWithPortLabels__):
     """ Base class for a structure containing an other structure with tapered ports """
+
     __name_prefix__ = "TP"
 
     tapers = DefinitionProperty(fdef_name="define_tapers")
@@ -53,31 +54,35 @@ class __TaperPorts__(__StructureContainerWithPortLabels__):
 
     def define_tapers(self):
         raise NotImplementedException(
-            "__TaperPorts__::define_tapers to be implemented by subclass!")
+            "__TaperPorts__::define_tapers to be implemented by subclass!"
+        )
 
 
 class TaperPorts(__TaperPorts__):
     """ Base class for tapered port structures"""
+
     __name_prefix__ = "TP"
     taper_length = PositiveNumberProperty(
-        default=TECH.WG.SHORT_TAPER_LENGTH, doc="length of the taper")
+        default=TECH.WG.SHORT_TAPER_LENGTH, doc="length of the taper"
+    )
     end_wg_def = WaveguideDefProperty(
-        default=TECH.WGDEF.WIRE, doc="waveguide definition of the outputs")
+        default=TECH.WGDEF.WIRE, doc="waveguide definition of the outputs"
+    )
     straight_extension = Size2Property(
-        default=(0.0, 0.0), doc="tuple: straight extensions of the tapers")
+        default=(0.0, 0.0), doc="tuple: straight extensions of the tapers"
+    )
 
 
 class TaperDeepPorts(TaperPorts):
     """ Structure containing another structure with its deep etched ports tapered """
+
     process = ProcessProperty(
         allow_none=True,
-        doc=
-        "To overrule the process, if the process of the start port should not be used"
+        doc="To overrule the process, if the process of the start port should not be used",
     )
     straight_extension = Size2Property(
         default=(0.15, 0.15),
-        doc=
-        "tuple: straight extensions of the tapers (0.15 as default to avoid DRC violations)"
+        doc="tuple: straight extensions of the tapers (0.15 as default to avoid DRC violations)",
     )
     __name_prefix__ = "TDP"
 
@@ -88,7 +93,8 @@ class TaperDeepPorts(TaperPorts):
                     start_port=P,
                     end_wg_def=self.end_wg_def,
                     length=self.taper_length,
-                    straight_extension=self.straight_extension)
+                    straight_extension=self.straight_extension,
+                )
                 for P in self.__get_labeled_ports__().optical_ports
             ]
         else:
@@ -98,7 +104,8 @@ class TaperDeepPorts(TaperPorts):
                     end_wg_def=self.end_wg_def,
                     length=self.taper_length,
                     straight_extension=self.straight_extension,
-                    start_process=self.process)
+                    start_process=self.process,
+                )
                 for P in self.__get_labeled_ports__().optical_ports
             ]
 
@@ -109,12 +116,11 @@ class TaperShallowPorts(TaperPorts):
     shallow_process = ProcessProperty(default=TECH.PROCESS.FC)
     deep_only_width = DefinitionProperty()
     straight_extension = Size2Property(
-        default=(0.15, 0.15), doc="tuple: straight extensions of the tapers")
+        default=(0.15, 0.15), doc="tuple: straight extensions of the tapers"
+    )
 
     def define_deep_only_width(self):
-        wg_widths = [
-            P.wg_definition.wg_width for P in self.__get_labeled_ports__()
-        ]
+        wg_widths = [P.wg_definition.wg_width for P in self.__get_labeled_ports__()]
 
         return max(TECH.WG.SPACING, self.end_wg_def.wg_width, max(wg_widths))
 
@@ -122,15 +128,16 @@ class TaperShallowPorts(TaperPorts):
         tapers = []
         for P in self.__get_labeled_ports__():
             if self.deep_only_width is None:
-                deep_only_width = max(TECH.WG.SPACING,
-                                      self.end_wg_def.wg_width,
-                                      P.wg_definition.wg_width)
+                deep_only_width = max(
+                    TECH.WG.SPACING, self.end_wg_def.wg_width, P.wg_definition.wg_width
+                )
             else:
                 deep_only_width = self.deep_only_width
             deep_only_wg = WgElDefinition(
                 wg_width=deep_only_width,
                 trench_width=P.wg_definition.trench_width,
-                process=self.deep_process)
+                process=self.deep_process,
+            )
             tapers.append(
                 WgElPortTaperFromShallow(
                     start_port=P,
@@ -139,7 +146,9 @@ class TaperShallowPorts(TaperPorts):
                     deep_process=self.deep_process,
                     shallow_process=self.shallow_process,
                     straight_extension=self.straight_extension,
-                    deep_only_wg_def=deep_only_wg))
+                    deep_only_wg_def=deep_only_wg,
+                )
+            )
         return tapers
 
 
@@ -150,11 +159,13 @@ class ExtendedTaperPorts(TaperPorts):
 
     def define_tapers(self):
         from picazzo.wg.taper_extended import WgElPortTaperExtended
+
         return [
             WgElPortTaperExtended(
                 start_port=P,
                 end_wg_def=self.end_wg_def,
                 length=self.taper_length,
-                straight_extension=self.straight_extension)
+                straight_extension=self.straight_extension,
+            )
             for P in self.__get_labeled_ports__()
         ]

@@ -39,20 +39,21 @@ my_combiner_transform = Translation((50, 0))
 my_arm1 = MziArmWithStructure(
     structure=my_ring1,
     splitter_port=my_splitter.ports["E1"],
-    combiner_port=my_combiner.ports.transform_copy(my_combiner_transform)[
-        "W1"])
+    combiner_port=my_combiner.ports.transform_copy(my_combiner_transform)["W1"],
+)
 my_arm2 = MziArmWaveguide(
     splitter_port=my_splitter.ports["E0"],
-    combiner_port=my_combiner.ports.transform_copy(my_combiner_transform)[
-        "W0"],
+    combiner_port=my_combiner.ports.transform_copy(my_combiner_transform)["W0"],
     route_south=True,
-    extra_length=40.0)
+    extra_length=40.0,
+)
 my_mzi = MZI(
     arm1=my_arm1,
     arm2=my_arm2,
     splitter=my_splitter,
     combiner=my_combiner,
-    combiner_transformation=my_combiner_transform)
+    combiner_transformation=my_combiner_transform,
+)
 
 my_mzi.write_gdsii("rlmzi1.gds")
 
@@ -61,10 +62,8 @@ my_mzi.write_gdsii("rlmzi1.gds")
 #
 
 my_mzi2 = MZIWithStructures(
-    structure2=my_ring2,
-    splitter=my_splitter,
-    combiner=my_combiner,
-    delay_length=-40.0)
+    structure2=my_ring2, splitter=my_splitter, combiner=my_combiner, delay_length=-40.0
+)
 
 my_mzi2.write_gdsii("rlmzi2.gds")
 
@@ -78,6 +77,7 @@ my_mzi3 = MZIWithStructures(
     structure2_transformation=VMirror(),
     splitter=my_splitter,
     combiner=my_combiner,
-    delay_length=20.0)
+    delay_length=20.0,
+)
 
 my_mzi3.write_gdsii("rlmzi3.gds")

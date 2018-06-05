@@ -50,11 +50,13 @@ class BasicOutput(StrongPropertyInitializer):
     filter = RestrictedProperty(
         default=Filter(),
         restriction=RestrictType(Filter),
-        doc="filter class which is applied to all output items")
+        doc="filter class which is applied to all output items",
+    )
     name_filter = RestrictedProperty(
         default=Filter(),
         restriction=RestrictType(Filter),
-        doc="filter class which is applied to all names")
+        doc="filter class which is applied to all names",
+    )
 
     def __init__(self, o_stream=sys.stdout, **kwargs):
         super(BasicOutput, self).__init__(o_stream=o_stream, **kwargs)
@@ -149,11 +151,11 @@ class OutputBasic(__OutputBasic__):
 
         if isinstance(item, Library):
             self.library = item
-            #for performance, to avoid repeated calls to DefinitionProperty in hot code
+            # for performance, to avoid repeated calls to DefinitionProperty in hot code
             self.grids_per_unit = self.library.grids_per_unit
             self.unit = self.library.unit
 
-        if (self.library == None):
+        if self.library == None:
             self.library = get_current_library()
 
         super(OutputBasic, self).do_collect(item, **kwargs)
@@ -167,8 +169,10 @@ class OutputBasic(__OutputBasic__):
 
     def collect_Structure(self, item, **kwargs):
         if self.echo:
-            LOG.info("Defining Structure %s with %d elements." %
-                     (item.name, len(item.elements)))
+            LOG.info(
+                "Defining Structure %s with %d elements."
+                % (item.name, len(item.elements))
+            )
         self.set_current_structure(item)
 
         self.__collect_structure_header__(item)
@@ -179,9 +183,9 @@ class OutputBasic(__OutputBasic__):
     def collect_Library(self, library, usecache=False, **kwargs):
         self.__collect_library_header__(library)
         unreferenced_structures = self.library.unreferenced_structures(
-            usecache=usecache)
-        referenced_structures = self.library.referenced_structures(
-            usecache=usecache)
+            usecache=usecache
+        )
+        referenced_structures = self.library.referenced_structures(usecache=usecache)
         self.collect(unreferenced_structures, **kwargs)
         self.collect(referenced_structures, **kwargs)
         self.__collect_library_footer__()
@@ -195,8 +199,7 @@ class OutputBasic(__OutputBasic__):
 
     def collect_ElementList(self, item, additional_transform=None, **kwargs):
         for s in item:
-            self.collect(
-                s, additional_transform=additional_transform, **kwargs)
+            self.collect(s, additional_transform=additional_transform, **kwargs)
         return
 
     def collect_StructureList(self, item, **kwargs):
@@ -208,12 +211,12 @@ class OutputBasic(__OutputBasic__):
         self.collect(
             item.elements,
             additional_transform=item.transformation + additional_transform,
-            **kwargs)
+            **kwargs
+        )
         return
 
     def collect_Boundary(self, item, additional_transform=None, **kwargs):
-        shape = item.shape.transform_copy(item.transformation +
-                                          additional_transform)
+        shape = item.shape.transform_copy(item.transformation + additional_transform)
         shape.snap_to_grid(self.grids_per_unit)
         shape.remove_identicals()
         coordinates = shape
@@ -221,23 +224,24 @@ class OutputBasic(__OutputBasic__):
         if len(shape) < 3:
             LOG.warning(
                 "BOUNDARY with fewer than 3 coordinates not allowed in structure %s"
-                % self.__current_structure__.name)
+                % self.__current_structure__.name
+            )
             return
         if len(shape) > TECH.GDSII.MAX_VERTEX_COUNT:
-            LOG.warning("BOUNDARY with more than " + str(
-                TECH.GDSII.MAX_VERTEX_COUNT) +
-                        " coordinates not supported in structure " +
-                        self.__current_structure__.name)
+            LOG.warning(
+                "BOUNDARY with more than "
+                + str(TECH.GDSII.MAX_VERTEX_COUNT)
+                + " coordinates not supported in structure "
+                + self.__current_structure__.name
+            )
         # shape must be closed!
         if not (coordinates[0] == coordinates[-1]):
             coordinates.append(coordinates[0])
-        self.collect_boundary_element(
-            layer=item.layer, coordinates=coordinates)
+        self.collect_boundary_element(layer=item.layer, coordinates=coordinates)
         return
 
     def collect_Path(self, item, additional_transform=None, **kwargs):
-        shape = item.shape.transform_copy(item.transformation +
-                                          additional_transform)
+        shape = item.shape.transform_copy(item.transformation + additional_transform)
         shape.snap_to_grid(self.grids_per_unit)
         shape.remove_identicals()
         coordinates = Shape(shape)
@@ -248,13 +252,15 @@ class OutputBasic(__OutputBasic__):
             return
 
         if shape.closed:
-            if not (shape[-1] == shape[0]): coordinates.append(shape[0])
+            if not (shape[-1] == shape[0]):
+                coordinates.append(shape[0])
 
         self.collect_path_element(
             layer=item.layer,
             coordinates=coordinates,
             line_width=item.line_width,
-            path_type=item.path_type)
+            path_type=item.path_type,
+        )
         return
 
     def __scale_value__(self, value):

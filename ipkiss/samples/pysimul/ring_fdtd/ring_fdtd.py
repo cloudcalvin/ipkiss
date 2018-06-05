@@ -30,12 +30,14 @@ from pysimul.runtime.processor import *
 from ipkiss.all import LOG
 
 ring = RingRect180DropFilter(
-    bend_radius=5.00, straights=(0.0, 0.0), coupler_spacings=[0.67, 0.67])
+    bend_radius=5.00, straights=(0.0, 0.0), coupler_spacings=[0.67, 0.67]
+)
 
 from ipkiss.plugins.vfabrication import *
+
 ring.write_gdsii_vfabrication("ring_vfab.gds")
 
-#export to GDS
+# export to GDS
 my_lib = Library("RING")
 my_lib += ring
 fileName = "ring.gds"
@@ -55,7 +57,8 @@ params["structure"] = ring
 
 params["resolution"] = 20  # low resolution, just for the example...
 params["engine"] = MeepSimulationEngine(
-    resolution=params["resolution"], use_averaging=False)
+    resolution=params["resolution"], use_averaging=False
+)
 params["pml_thickness"] = 1.0
 params["include_growth"] = 0.0
 
@@ -65,7 +68,9 @@ params["sources"] = [
         center_wavelength=wavelength,
         pulse_width=pulse_width,
         port=ring.west_ports[0].transform_copy(
-            transformation=Translation(translation=(2.0, 0.0))))
+            transformation=Translation(translation=(2.0, 0.0))
+        ),
+    )
 ]
 
 params["datacollectors"] = [
@@ -74,23 +79,32 @@ params["datacollectors"] = [
         pulse_width=pulse_width,
         number_of_sampling_freq=2000,
         port=ring.east_ports[0].transform_copy(
-            transformation=Translation(translation=(-2.0, 0.0))),
-        overlap_trench=False)
+            transformation=Translation(translation=(-2.0, 0.0))
+        ),
+        overlap_trench=False,
+    )
 ]
 
 params["step_processor"] = SaveFieldsHDF5Processor(
-    fileName="RING_Hz.h5", H5OutputIntervalSteps=1000, field_component=compHz)
+    fileName="RING_Hz.h5", H5OutputIntervalSteps=1000, field_component=compHz
+)
 print()
 print()
-print("*************************************** WARNING **********************************************************************")
-print("***** WARNING : INCREASE THE maximum_steps PARAMETER TO 750000 IN ORDER TO SEE RESONANCE PEAK !!!!!!!! ***************")
-print("*************************************** WARNING **********************************************************************")
+print(
+    "*************************************** WARNING **********************************************************************"
+)
+print(
+    "***** WARNING : INCREASE THE maximum_steps PARAMETER TO 750000 IN ORDER TO SEE RESONANCE PEAK !!!!!!!! ***************"
+)
+print(
+    "*************************************** WARNING **********************************************************************"
+)
 print()
 print()
 print()
 params["stopcriterium"] = StopAfterSteps(
     maximum_steps=10000
-)  #INCREASE TO 750000 IN ORDER TO SEE RESONANCE PEAK !!!!!!!!
+)  # INCREASE TO 750000 IN ORDER TO SEE RESONANCE PEAK !!!!!!!!
 
 params["post_processor"] = PersistFluxplanes()
 
@@ -101,7 +115,8 @@ print("Done with the simulation. Now plotting the flux...")
 
 import pickle
 from dependencies.matplotlib_wrapper import *
-file_flux_output = open("fluxplane_datacollector", 'r')
+
+file_flux_output = open("fluxplane_datacollector", "r")
 
 flux_output = pickle.load(file_flux_output)
 file_flux_output.close()
@@ -110,7 +125,7 @@ frequencies = 1000.0 / flux_output.flux_per_freq[0]
 F = flux_output.flux_per_freq[1]
 
 pyplot.clf()
-p1, = pyplot.plot(frequencies, F, 'yo')
+p1, = pyplot.plot(frequencies, F, "yo")
 
 pyplot.savefig("ring_output_flux.png")
 

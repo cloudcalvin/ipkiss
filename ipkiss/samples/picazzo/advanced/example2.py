@@ -41,8 +41,7 @@ class PicazzoExample2(Structure):
         # alignment waveguide
         wg_def = WgElDefinition()
         align_wg = wg_def(shape=[(0.0, 0.0), (50.0, 0.0)])
-        align = Structure(
-            name="align", elements=[align_wg], ports=align_wg.ports)
+        align = Structure(name="align", elements=[align_wg], ports=align_wg.ports)
         layout += align
 
         # photonic crystal waveguides
@@ -55,7 +54,8 @@ class PicazzoExample2(Structure):
                 pitch=pitch,
                 diameter=diameter,
                 n_o_cladding_layers=cladding_layers,
-                n_o_periods=n_o_periods)
+                n_o_periods=n_o_periods,
+            )
 
         # ring resonators
         radii = [3, 4, 5]

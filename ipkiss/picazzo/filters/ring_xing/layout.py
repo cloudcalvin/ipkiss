@@ -24,9 +24,7 @@ from picazzo.filters.ring import RingRect
 
 from ipkiss.all import *
 
-__all__ = [
-    "RingCrossingGeneric", "RingCrossingMiniGeneric", "RingCrossingBendGeneric"
-]
+__all__ = ["RingCrossingGeneric", "RingCrossingMiniGeneric", "RingCrossingBendGeneric"]
 
 #################################################################
 ### crossing classes
@@ -35,10 +33,10 @@ __all__ = [
 
 class RingCrossingGeneric(Structure):
     """crossing with a ring resonator"""
+
     __name_prefix__ = "ringX_"
     process = ProcessProperty(default=TECH.PROCESS.WG)
-    ring = RestrictedProperty(
-        restriction=RestrictType(RingRect), required=True)
+    ring = RestrictedProperty(restriction=RestrictType(RingRect), required=True)
     wg_definition = WaveguideDefProperty(default=TECH.WGDEF.WIRE)
     spacing = PositiveNumberProperty(default=TECH.WG.DC_SPACING)
 
@@ -73,6 +71,7 @@ class RingCrossingGeneric(Structure):
 
 class RingCrossingMiniGeneric(RingCrossingGeneric):
     """crossing with a ring resonator"""
+
     __name_prefix__ = "mringX_"
 
     def get_wg_length(self):
@@ -80,21 +79,20 @@ class RingCrossingMiniGeneric(RingCrossingGeneric):
 
     def define_wg_h(self):
         wg_def = WgElDefinition(
-            wg_width=self.wg_width,
-            trench_width=self.trench_width,
-            process=self.process)
+            wg_width=self.wg_width, trench_width=self.trench_width, process=self.process
+        )
         return wg_def([(-wg_length, 0.0), (wg_length, 0.0)])
 
     def define_wg_v(self):
         wg_def = WgElDefinition(
-            wg_width=self.wg_width,
-            trench_width=self.trench_width,
-            process=self.process)
+            wg_width=self.wg_width, trench_width=self.trench_width, process=self.process
+        )
         return wg_def([(0.0, wg_length), (0.0, -wg_length)])
 
 
 class RingCrossingBendGeneric(RingCrossingGeneric):
     """crossing with a ring resonator with bent coupling sections"""
+
     __name_prefix__ = "ringX_B"
 
     couple_angle = AngleProperty(required=True)
@@ -105,8 +103,12 @@ class RingCrossingBendGeneric(RingCrossingGeneric):
         # override waveguides
         R = mesn(self.ring.get_bend90_size()) + self.spacing
         s = ShapeBendRelative((R, 0.0), R, 0.0, self.couple_angle)
-        s += ShapeBendRelative(s[-1].move_polar_copy(R, self.couple_angle), R,
-                               self.couple_angle, -self.couple_angle)
+        s += ShapeBendRelative(
+            s[-1].move_polar_copy(R, self.couple_angle),
+            R,
+            self.couple_angle,
+            -self.couple_angle,
+        )
         s += s[-1].move_polar_copy(R, 0)
         s2 = s.c_mirror_copy()
         s2.reverse()
@@ -115,8 +117,10 @@ class RingCrossingBendGeneric(RingCrossingGeneric):
         wg_h = Wg2El(s2, s3, self.wg_width, self.trench_width)
         wg_v = Wg2El(
             s2.rotate_copy((0.0, 0.0), 90).v_mirror(),
-            s3.rotate_copy((0.0, 0.0), 90).v_mirror(), self.wg_width,
-            self.trench_width)
+            s3.rotate_copy((0.0, 0.0), 90).v_mirror(),
+            self.wg_width,
+            self.trench_width,
+        )
         return (wg_h, wg_v)
 
     def define_wg_h(self):
@@ -126,12 +130,13 @@ class RingCrossingBendGeneric(RingCrossingGeneric):
         return self.get_wg_h_wg_v()[1]
 
     def define_elements(self, elems):
-        elems = super(RingCrossingBendGeneric, self).define_elements(
-            self, elems)
+        elems = super(RingCrossingBendGeneric, self).define_elements(self, elems)
         elems += Boundary(
             PPLayer(self.process, TECH.PURPOSE.LF_AREA),
-            self.wg_h.size_info().bounding_box)
+            self.wg_h.size_info().bounding_box,
+        )
         elems += Boundary(
             PPLayer(self.process, TECH.PURPOSE.LF_AREA),
-            self.wg_v.size_info().bounding_box)
+            self.wg_v.size_info().bounding_box,
+        )
         return elems

@@ -28,28 +28,26 @@ class SimpleExample(Structure):
     def define_elements(self, elems):
         boundaries = Structure(name="boundaries")
         boundaries += Rectangle(
-            layer=Layer(0), center=(0, 150), box_size=(200, 200.0))  #rectangle
+            layer=Layer(0), center=(0, 150), box_size=(200, 200.0)
+        )  # rectangle
 
-        boundaries += Circle(
-            layer=Layer(1), center=(0, -150), radius=100)  #circle
+        boundaries += Circle(layer=Layer(1), center=(0, -150), radius=100)  # circle
 
         paths = Structure(name="paths")
         paths += RectanglePath(
-            layer=Layer(2),
-            center=(0, 150),
-            box_size=(200, 200),
-            line_width=4.0)  #rectangle
+            layer=Layer(2), center=(0, 150), box_size=(200, 200), line_width=4.0
+        )  # rectangle
         paths += CirclePath(
-            layer=Layer(3), center=(0, -150), radius=100,
-            line_width=4.0)  #circle
+            layer=Layer(3), center=(0, -150), radius=100, line_width=4.0
+        )  # circle
 
         elems += SRef(boundaries, (0, 0))
-        elems += SRef(paths, (300, 0))  #simple references
+        elems += SRef(paths, (300, 0))  # simple references
 
         return elems
 
 
-if (__name__ == "__main__"):
+if __name__ == "__main__":
     layout = SimpleExample(name="layout")
     my_lib = Library(name="ELEMENTS", unit=1E-6, grid=5E-9)
     # Add main layout to library
@@ -59,6 +57,6 @@ if (__name__ == "__main__"):
     # Write library
     OP.write(my_lib)
     print("Done : GDS2 file written to %s" % fileName)
-    #remark : instead of manually creating a Library and exporting it to GDS2, it is also possible to use
-    #the convenient shortcut function "write_gdsii" directly on the Structure, i.e.:
-    #layout.write_gdsii("example_simple.gds")
+    # remark : instead of manually creating a Library and exporting it to GDS2, it is also possible to use
+    # the convenient shortcut function "write_gdsii" directly on the Structure, i.e.:
+    # layout.write_gdsii("example_simple.gds")

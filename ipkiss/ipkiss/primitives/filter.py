@@ -27,6 +27,7 @@ from ipkiss.log import IPKISS_LOG as LOG
 class Filter(StrongPropertyInitializer):
     """ base class that processes any IPKISS primitive (does type checking where needed).
         The call should ALWAYS return a list object with IPKISS primitives """
+
     name = StringProperty(allow_none=True)
 
     def __call__(self, item):
@@ -40,13 +41,13 @@ class Filter(StrongPropertyInitializer):
 
     def filter(self, item):
         import inspect
+
         T = type(item)
         if inspect.isclass(T):
             for M in inspect.getmro(T):
                 N = "__filter_%s__" % M.__name__
                 if hasattr(self, N):
-                    LOG.debug("Applying method %s of %s to %s" % (N, self,
-                                                                  item))
+                    LOG.debug("Applying method %s of %s to %s" % (N, self, item))
                     return getattr(self, N)(item)
             return self.__filter_default__(item)
         else:
@@ -88,11 +89,12 @@ class __CompoundFilter__(Filter):
     def __add__(self, other):
         if isinstance(other, __CompoundFilter__):
             return __CompoundFilter__(
-                name=self.name,
-                filters=self._sub_filters + other.__sub_filters)
+                name=self.name, filters=self._sub_filters + other.__sub_filters
+            )
         elif isinstance(other, Filter):
             return __CompoundFilter__(
-                name=self.name, filters=self._sub_filters + [other])
+                name=self.name, filters=self._sub_filters + [other]
+            )
         else:
             raise TypeError("Cannot add %s to Filter" % type(other))
 
@@ -142,18 +144,21 @@ class ToggledCompoundFilter(__CompoundFilter__):
         if not isinstance(key, str):
             raise KeyError(
                 "__ToggledCompoundFilter__: key must be of type str, is type %s"
-                % (type(key)))
+                % (type(key))
+            )
         if not isinstance(item, bool):
             raise KeyError(
                 "__ToggledCompoundFilter__: item must be of type bool, is type %s"
-                % (type(item)))
+                % (type(item))
+            )
         self.__filter_status[key] = item
 
     def __getitem__(self, key):
         if not isinstance(key, str):
             raise KeyError(
                 "__ToggledCompoundFilter__: key must be of type str, is type %s"
-                % (type(key)))
+                % (type(key))
+            )
         if not key in list(self.__filter_status.keys()):
             return True
         return self.__filter_status[key]
@@ -175,8 +180,10 @@ class ToggledCompoundFilter(__CompoundFilter__):
         S = "< Toggled Compound Filter:"
         for i in self._sub_filters:
             S += "   %s" % i.__repr__()
-            if i.name not in list(self.__filter_status.keys(
-            )) or self.__filter_status[i.name]:
+            if (
+                i.name not in list(self.__filter_status.keys())
+                or self.__filter_status[i.name]
+            ):
                 S += "(enabled)"
             else:
                 S += "(disabled)"

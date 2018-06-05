@@ -44,16 +44,21 @@ class __Field__(Transformable, StrongPropertyInitializer):
 
 class __ScalarField__(__Field__):
     """ a scalar value field """
+
     value = NumberProperty(required=True)
 
     def overlap(self, other):
         # FIXME: Check this computation
         if hasattr(self.value, "conj"):
-            return self.value.conj() * other.value / sqrt(
-                abs(self.value) * abs(other.value))
+            return (
+                self.value.conj()
+                * other.value
+                / sqrt(abs(self.value) * abs(other.value))
+            )
         else:
-            return self.value * other.value / math.sqrt(
-                abs(self.value) * abs(other.value))
+            return (
+                self.value * other.value / math.sqrt(abs(self.value) * abs(other.value))
+            )
 
     def __abs__(self):
         return abs(self.value)
@@ -83,7 +88,8 @@ class __Vectorial3Field__(__Field__):
 
 class __CompoundField__(__Field__):
     value = RestrictedProperty(
-        required=True, restriction=RestrictList(RestrictType(__Field__)))
+        required=True, restriction=RestrictList(RestrictType(__Field__))
+    )
 
     def transform(self, transformation):
         """ transforms a field in a coordinate system: this basically just reverses the rotation """
@@ -95,14 +101,14 @@ class __CompoundField__(__Field__):
 RESTRICT_FIELD = RestrictType(__Field__)
 
 
-def FieldProperty(internal_member_name=None,
-                  restriction=None,
-                  preprocess=None,
-                  **kwargs):
+def FieldProperty(
+    internal_member_name=None, restriction=None, preprocess=None, **kwargs
+):
     """ Geometry property descriptor for a class """
     R = RESTRICT_FIELD & restriction
     return RestrictedProperty(
         internal_member_name=internal_member_name,
         restriction=R,
         preprocess=preprocess,
-        **kwargs)
+        **kwargs
+    )

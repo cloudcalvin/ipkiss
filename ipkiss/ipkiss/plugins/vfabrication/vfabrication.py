@@ -35,7 +35,14 @@ from ipkiss.exceptions.exc import IpkissException
 from ipkiss.primitives.filters.path_to_boundary_filter import PathToBoundaryFilter
 from ipkiss.primitives.filters.path_cut_filter import PathCutFilter
 from ipkiss.primitives.structure import StructureProperty
-from ipkiss.primitives.layer import __GeneratedLayerAnd__, __GeneratedLayerNot__, __GeneratedLayerOr__, __GeneratedLayerXor__, __GeneratedLayer_2Layer__, __GeneratedLayer__
+from ipkiss.primitives.layer import (
+    __GeneratedLayerAnd__,
+    __GeneratedLayerNot__,
+    __GeneratedLayerOr__,
+    __GeneratedLayerXor__,
+    __GeneratedLayer_2Layer__,
+    __GeneratedLayer__,
+)
 from ipkiss import constants
 import logging
 import copy
@@ -59,44 +66,51 @@ class VirtualFabrication(__VirtualFabrication__):
     grid = FloatProperty(default=0.05)
 
     def __collect_metrics__(self):
-        #component_size_info = the size of the original component, without the growth
+        # component_size_info = the size of the original component, without the growth
         component_size_info = self.structure.size_info()
-        #size_info = the size of the total canvas, including growth
+        # size_info = the size of the total canvas, including growth
         size_info = copy.deepcopy(component_size_info)
         size_info.grow_absolute(self.include_growth)
-        #canvas_size = the number of points in the complete grid (=the grid of the bounding box, including the growth)
-        canvas_size = (int(numpy.ceil(size_info.width / self.grid)), int(
-            numpy.ceil(size_info.height / self.grid)))
-        #component_canvas_size = the number of points in the grid covering the component (without the growth)
-        component_canvas_size = (int(
-            numpy.ceil(component_size_info.width / self.grid)), int(
-                numpy.ceil(component_size_info.height / self.grid)))
-        LOG.debug("Component width: %s and height: %s" %
-                  (str(component_size_info.width),
-                   str(component_size_info.height)))
+        # canvas_size = the number of points in the complete grid (=the grid of the bounding box, including the growth)
+        canvas_size = (
+            int(numpy.ceil(size_info.width / self.grid)),
+            int(numpy.ceil(size_info.height / self.grid)),
+        )
+        # component_canvas_size = the number of points in the grid covering the component (without the growth)
+        component_canvas_size = (
+            int(numpy.ceil(component_size_info.width / self.grid)),
+            int(numpy.ceil(component_size_info.height / self.grid)),
+        )
+        LOG.debug(
+            "Component width: %s and height: %s"
+            % (str(component_size_info.width), str(component_size_info.height))
+        )
         LOG.debug("Total canvas size : %s" % str(canvas_size))
         LOG.debug("Total canvas size info : %s" % str(size_info))
         LOG.debug("Component canvas size : %s" % str(component_canvas_size))
         LOG.debug("Component size info: %s" % str(component_size_info))
-        return (canvas_size, size_info, component_canvas_size,
-                component_size_info)
+        return (canvas_size, size_info, component_canvas_size, component_size_info)
 
     def extend_component_at_ports(self):
-        if (self.include_growth > 0.0):
+        if self.include_growth > 0.0:
             component_size_info = self.structure.size_info()
-            l = component_size_info.width + component_size_info.height + 2 * self.include_growth
+            l = (
+                component_size_info.width
+                + component_size_info.height
+                + 2 * self.include_growth
+            )
             new_elements = ElementList(self.structure.elements)
             for p in self.structure.ports:
-                wg_shape = Shape(points=[
-                    p.position,
-                    p.position.move_polar_copy(l, p.angle_deg)
-                ])
+                wg_shape = Shape(
+                    points=[p.position, p.position.move_polar_copy(l, p.angle_deg)]
+                )
                 wg_elem = p.wg_definition(shape=wg_shape)
                 new_elements.append(wg_elem)
             self.structure = Structure(
                 name=self.structure.name + "_EXT" + str(self.include_growth),
                 elements=new_elements,
-                ports=self.structure.ports)
+                ports=self.structure.ports,
+            )
 
     def define_geometry(self):
         raise NotImplementedException(
@@ -108,7 +122,8 @@ class VirtualFabrication(__VirtualFabrication__):
 
 
 def __common_function_apply_polygon_to_array_memory_sparing__(
-        array, polygon_points, do_bitwise_or=True, value=None):
+    array, polygon_points, do_bitwise_or=True, value=None
+):
     if (do_bitwise_or) and (value is not None):
         raise Exception(
             "Invalid parameters : if do_bitwise_or==True, then value should be None"
@@ -117,17 +132,17 @@ def __common_function_apply_polygon_to_array_memory_sparing__(
         raise Exception(
             "Invalid parameters : if do_bitwise_or==False, then value should not be None"
         )
-    #calculate for which range in the array we have to calculate the overlap with this polygon
+    # calculate for which range in the array we have to calculate the overlap with this polygon
     min_x = max(0, numpy.min([p[0] for p in polygon_points]) - 1)
     max_x = min(array.shape[0], numpy.max([p[0] for p in polygon_points]) + 1)
     min_y = max(0, numpy.min([p[1] for p in polygon_points]) - 1)
     max_y = min(array.shape[1], numpy.max([p[1] for p in polygon_points]) + 1)
-    #the range that requires overlap will be plit up in slices (so as to limit memory consumption) - only needed for large polygons spanning over huge canvas
+    # the range that requires overlap will be plit up in slices (so as to limit memory consumption) - only needed for large polygons spanning over huge canvas
     SLICE_X_SIZE = 10000.0
     SLICE_Y_SIZE = 10000.0
     slices_x = numpy.arange(0, numpy.ceil((max_x - min_x) / SLICE_X_SIZE))
     slices_y = numpy.arange(0, numpy.ceil((max_y - min_y) / SLICE_Y_SIZE))
-    #now iterate over all the slices
+    # now iterate over all the slices
     for slice_x in slices_x:
         for slice_y in slices_y:
             from_x = numpy.floor(slice_x * SLICE_X_SIZE + min_x)
@@ -136,30 +151,37 @@ def __common_function_apply_polygon_to_array_memory_sparing__(
             to_y = numpy.ceil(min((slice_y + 1) * SLICE_Y_SIZE + min_y, max_y))
             x_range = numpy.arange(from_x, to_x, dtype=numpy.int16)
             y_range = numpy.arange(from_y, to_y, dtype=numpy.int16)
-            #calculate which canvas points correspond to this slice
+            # calculate which canvas points correspond to this slice
             x_range_corrected = x_range + 0.5
             y_range_corrected = y_range + 0.5
-            canvas_points = __common_function_cartesian__((x_range_corrected,
-                                                           y_range_corrected))
-            #calculate the overlap between canvas points and polygon : which canvas point are inside the polygon?
+            canvas_points = __common_function_cartesian__(
+                (x_range_corrected, y_range_corrected)
+            )
+            # calculate the overlap between canvas points and polygon : which canvas point are inside the polygon?
             points_inside_polygon_flag = nxutils.points_inside_poly(
-                canvas_points, polygon_points)
-            #reshape the array with the flags
+                canvas_points, polygon_points
+            )
+            # reshape the array with the flags
             target_shape = (to_x - from_x, to_y - from_y)
             points_inside_polygon_flag = points_inside_polygon_flag.reshape(
-                target_shape)
-            if (do_bitwise_or):
-                #apply the true/false flag to the array
+                target_shape
+            )
+            if do_bitwise_or:
+                # apply the true/false flag to the array
                 array[from_x:to_x, from_y:to_y] = numpy.bitwise_or(
-                    array[from_x:to_x, from_y:to_y],
-                    points_inside_polygon_flag)
+                    array[from_x:to_x, from_y:to_y], points_inside_polygon_flag
+                )
             else:
                 array[from_x:to_x, from_y:to_y] = numpy.where(
-                    points_inside_polygon_flag == True, value,
-                    array[from_x:to_x, from_y:to_y])
+                    points_inside_polygon_flag == True,
+                    value,
+                    array[from_x:to_x, from_y:to_y],
+                )
             percent_done = int(
-                float(slice_x * len(slices_y) + slice_y) * 100.0 /
-                (len(slices_x) * len(slices_y)))
+                float(slice_x * len(slices_y) + slice_y)
+                * 100.0
+                / (len(slices_x) * len(slices_y))
+            )
             if percent_done < 100:
                 LOG.debug("%i percent done..." % percent_done)
 
@@ -175,7 +197,7 @@ def __common_function_cartesian__(arrays, out=None):
     if arrays[1:]:
         __common_function_cartesian__(arrays[1:], out=out[0:m, 1:])
         for j in range(1, arrays[0].size):
-            out[j * m:(j + 1) * m, 1:] = out[0:m, 1:]
+            out[j * m : (j + 1) * m, 1:] = out[0:m, 1:]
     return out
 
 
@@ -185,10 +207,11 @@ from dependencies.shapely_wrapper import Polygon as ShapelyPolygon
 
 class LayerShapelyPolygons(ShapelyPolygonCollection):
     """Associate a collection of shapely polygons with a layer"""
+
     layer = LayerProperty(
-        required=True, doc="The layer associated with these Shapely polygons")
-    size_info = SizeInfoProperty(
-        required=True, doc="The sizeinfo including the growth")
+        required=True, doc="The layer associated with these Shapely polygons"
+    )
+    size_info = SizeInfoProperty(required=True, doc="The sizeinfo including the growth")
     shape = FunctionNameProperty(fget_name="get_shape")
     canvas_polygon = DefinitionProperty(fdef_name="define_canvas_polygon")
 
@@ -198,13 +221,15 @@ class LayerShapelyPolygons(ShapelyPolygonCollection):
     def add_element(self, e):
         if not isinstance(e, __ShapeElement__):
             raise IpkissException(
-                "Wrong parameter. Expected object of type __ShapeElement__")
-        if (isinstance(e, Path)):
+                "Wrong parameter. Expected object of type __ShapeElement__"
+            )
+        if isinstance(e, Path):
             grid = TECH.METRICS.GRID
             filter = PathCutFilter(
                 max_path_length=int(constants.GDSII_MAX_COORDINATES / 2),
                 grids_per_unit=int(1.0 / grid),
-                overlap=1)
+                overlap=1,
+            )
             filter += PathToBoundaryFilter()
             elems = list(filter(e))
             for e2 in elems:
@@ -217,7 +242,8 @@ class LayerShapelyPolygons(ShapelyPolygonCollection):
 
     def fabricate_offspring(self, georep):
         return LayerShapelyPolygons(
-            layer=self.layer, size_info=self.size_info, georep=georep)
+            layer=self.layer, size_info=self.size_info, georep=georep
+        )
 
     def add_shape(self, shape):
         pts = [(p[0], p[1]) for p in shape.points]
@@ -237,14 +263,15 @@ class LayerShapelyPolygons(ShapelyPolygonCollection):
     def to_numpy_array(self, grid=TECH.METRICS.GRID):
         resolution = int(1.0 / TECH.METRICS.GRID)
         bitmap = numpy.zeros(
-            [self.shape[0] * resolution, self.shape[1] * resolution],
-            dtype=bool)
-        if (not self.is_empty()):
+            [self.shape[0] * resolution, self.shape[1] * resolution], dtype=bool
+        )
+        if not self.is_empty():
             mp = self.georep
             for g in mp.geoms:
                 polygon_points = list(g.boundary.coords)
                 self.__common_function_apply_polygon_to_array_memory_sparing__(
-                    bitmap, polygon_points)
+                    bitmap, polygon_points
+                )
         return bitmap
 
     def __cartesian__(self, arrays, out=None):
@@ -258,29 +285,34 @@ from pysics.basics.material.material_stack import MaterialStackFactory
 
 
 class VirtualFabricationProcessSuperposition2DMaterialStackPolygonsOnly(
-        VirtualFabrication):
+    VirtualFabrication
+):
     save_debug_images = BoolProperty(default=False)
     process_flow = VFabricationProcessFlowProperty(
-        required=True,
-        doc="Process flow to use during the virtual fabrication.")
+        required=True, doc="Process flow to use during the virtual fabrication."
+    )
     material_stack_factory = RestrictedProperty(
-        required=True, restriction=RestrictType(MaterialStackFactory))
+        required=True, restriction=RestrictType(MaterialStackFactory)
+    )
 
     def __collect_metrics__(self):
-        #component_size_info = the size of the original component, without the growth
+        # component_size_info = the size of the original component, without the growth
         component_size_info = self.structure.size_info()
-        #size_info = the size of the total canvas, including growth
+        # size_info = the size of the total canvas, including growth
         size_info = copy.deepcopy(component_size_info)
         size_info.grow_absolute(self.include_growth)
-        LOG.debug("Component width: %s and height: %s" %
-                  (str(component_size_info.width),
-                   str(component_size_info.height)))
+        LOG.debug(
+            "Component width: %s and height: %s"
+            % (str(component_size_info.width), str(component_size_info.height))
+        )
         LOG.debug("Total canvas size info : %s" % str(size_info))
         LOG.debug("Component size info: %s" % str(component_size_info))
         return (size_info, component_size_info)
 
     def __make_process_polygons__(self):
-        from ipkiss.boolean_ops.boolean_ops_elements import __get_composite_shapely_polygon_for_elements_on_generated_layer__
+        from ipkiss.boolean_ops.boolean_ops_elements import (
+            __get_composite_shapely_polygon_for_elements_on_generated_layer__
+        )
 
         process_polygons = dict()
         (size_info, component_size_info) = self.__collect_metrics__()
@@ -288,50 +320,57 @@ class VirtualFabricationProcessSuperposition2DMaterialStackPolygonsOnly(
 
         for process in self.process_flow.active_processes:
             if hasattr(TECH.PPLAYER, process.extension) and hasattr(
-                    TECH.PPLAYER.__getattribute__(process.extension), "ALL"):
+                TECH.PPLAYER.__getattribute__(process.extension), "ALL"
+            ):
                 shapely_geom = __get_composite_shapely_polygon_for_elements_on_generated_layer__(
                     elements=self.structure.elements,
                     generated_layer=TECH.PPLAYER.__getattribute__(
-                        process.extension).ALL)
+                        process.extension
+                    ).ALL,
+                )
                 bm = LayerShapelyPolygons(
-                    layer=Layer(
-                        number=0, name="VFABRICATION_%s" % process.extension),
-                    size_info=size_info)
+                    layer=Layer(number=0, name="VFABRICATION_%s" % process.extension),
+                    size_info=size_info,
+                )
                 bm.georep = shapely_geom
                 process_polygons[process] = bm
 
         for process in self.process_flow.active_processes:
             if process not in process_polygons:
                 process_polygons[process] = LayerShapelyPolygons(
-                    layer=Layer(
-                        number=0, name="VFABRICATION_%s" % process.extension),
-                    size_info=size_info)
+                    layer=Layer(number=0, name="VFABRICATION_%s" % process.extension),
+                    size_info=size_info,
+                )
 
-        for process, is_lf_fabrication in list(self.process_flow.is_lf_fabrication.items(
-        )):
+        for process, is_lf_fabrication in list(
+            self.process_flow.is_lf_fabrication.items()
+        ):
             bm = process_polygons[process]
             if is_lf_fabrication:
                 process_polygons[process] = bm.bitwise_not()
 
         if self.save_debug_images:
             for process, bm in list(process_polygons.items()):
-                bm.save_to_image("vfabrication_%s_process_polygon_%s.png" %
-                                 (self.structure.name, process.extension))
+                bm.save_to_image(
+                    "vfabrication_%s_process_polygon_%s.png"
+                    % (self.structure.name, process.extension)
+                )
 
         return (process_polygons, size_info)
 
     def validate_properties(self):
         if set(self.process_flow.is_lf_fabrication.keys()) != set(
-                self.process_flow.active_processes):
+            self.process_flow.active_processes
+        ):
             raise Exception(
                 "Invalid value for property is_lf_fabrication : every process in property 'all_processes' should have a corresponding entry in property 'is_lf_fabrication' and vice versa."
             )
         return True
 
     def define_geometry(self):
-        #STEP 1 : per process in 'self.process_flow.active_processes', generate a Shapely polygon indicating the area where this process will be physically applied
+        # STEP 1 : per process in 'self.process_flow.active_processes', generate a Shapely polygon indicating the area where this process will be physically applied
         (process_polygons, size_info) = self.__make_process_polygons__()
-        #STEP 2 : resolve the superposition of processes and generate a geometrical description based on material stacks
+        # STEP 2 : resolve the superposition of processes and generate a geometrical description based on material stacks
         g = ProcessSuperpositionVirtualFabrication2DGeometryPolygons(
             material_stack_factory=self.material_stack_factory,
             processes=self.process_flow.active_processes,
@@ -339,17 +378,19 @@ class VirtualFabricationProcessSuperposition2DMaterialStackPolygonsOnly(
             process_polygons=process_polygons,
             size_info=size_info,
             grid=self.grid,
-            save_debug_images=self.save_debug_images)
+            save_debug_images=self.save_debug_images,
+        )
         LOG.debug("Virtualfabrication: done...")
         return g
 
 
 class VirtualFabricationProcessSuperposition3DMaterialStackPolygonsOnly(
-        VirtualFabricationProcessSuperposition2DMaterialStackPolygonsOnly):
+    VirtualFabricationProcessSuperposition2DMaterialStackPolygonsOnly
+):
     def define_geometry(self):
-        #STEP 1 : per process in 'self.process_flow.active_processes', generate a Shapely polygon indicating the area where this process will be physically applied
+        # STEP 1 : per process in 'self.process_flow.active_processes', generate a Shapely polygon indicating the area where this process will be physically applied
         (process_polygons, size_info) = self.__make_process_polygons__()
-        #STEP 2 : resolve the superposition of processes and generate a geometrical description based on material stacks
+        # STEP 2 : resolve the superposition of processes and generate a geometrical description based on material stacks
         g = ProcessSuperpositionVirtualFabrication3DGeometryPolygons(
             material_stack_factory=self.material_stack_factory,
             processes=self.process_flow.active_processes,
@@ -357,18 +398,21 @@ class VirtualFabricationProcessSuperposition3DMaterialStackPolygonsOnly(
             process_polygons=process_polygons,
             size_info=size_info,
             grid=self.grid,
-            save_debug_images=self.save_debug_images)
+            save_debug_images=self.save_debug_images,
+        )
         LOG.debug("Virtualfabrication: done...")
         return g
 
 
-#shortcut function
-def virtual_fabrication_2d(structure,
-                           process_flow,
-                           material_stack_factory,
-                           include_growth=0.0,
-                           environment=DEFAULT_ENVIRONMENT,
-                           grid=0.05):
+# shortcut function
+def virtual_fabrication_2d(
+    structure,
+    process_flow,
+    material_stack_factory,
+    include_growth=0.0,
+    environment=DEFAULT_ENVIRONMENT,
+    grid=0.05,
+):
     return VirtualFabricationProcessSuperposition2DMaterialStackPolygonsOnly(
         structure=structure,
         include_growth=include_growth,
@@ -376,16 +420,19 @@ def virtual_fabrication_2d(structure,
         grid=grid,
         process_flow=process_flow,
         material_stack_factory=material_stack_factory,
-        save_debug_images=False)
+        save_debug_images=False,
+    )
 
 
-#shortcut function
-def virtual_fabrication_3d(structure,
-                           process_flow,
-                           material_stack_factory,
-                           include_growth=0.0,
-                           environment=DEFAULT_ENVIRONMENT,
-                           grid=0.05):
+# shortcut function
+def virtual_fabrication_3d(
+    structure,
+    process_flow,
+    material_stack_factory,
+    include_growth=0.0,
+    environment=DEFAULT_ENVIRONMENT,
+    grid=0.05,
+):
     return VirtualFabricationProcessSuperposition3DMaterialStackPolygonsOnly(
         structure=structure,
         include_growth=include_growth,
@@ -393,4 +440,5 @@ def virtual_fabrication_3d(structure,
         grid=grid,
         process_flow=process_flow,
         material_stack_factory=material_stack_factory,
-        save_debug_images=False)
+        save_debug_images=False,
+    )

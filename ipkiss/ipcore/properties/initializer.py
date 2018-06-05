@@ -28,7 +28,7 @@ from ipcore.helperfunc import *
 from ipcore.exceptions.exc import IpcoreAttributeException
 import inspect
 
-SUPPRESSED = (None, )
+SUPPRESSED = (None,)
 
 _REGISTERED_CLASSES = set()
 
@@ -86,10 +86,10 @@ class MetaPropertyInitializer(MetaMixinBowl):
                 C.bind_properties()
 
     def compile_doc(cls, ignore_properties=[]):
-        ''' create a string in the RestructedText format with documentation about the class and it's properties '''
+        """ create a string in the RestructedText format with documentation about the class and it's properties """
         cdescr = "- Class description : "
         if (cls.__doc__) and (cls.__doc__.find(cdescr) < 0):
-            #first time __doc__ is generated
+            # first time __doc__ is generated
             cls.__doc_source_code__ = cls.__doc__.strip()
             doc = cdescr + "*" + cls.__doc_source_code__ + "*\n"
         else:
@@ -111,8 +111,11 @@ class MetaPropertyInitializer(MetaMixinBowl):
                     if hasattr(prop_attr, "__doc__"):
                         doc += " : " + prop_attr.__doc__
                     if hasattr(prop_attr, "restriction"):
-                        doc += "\n\t\t - restriction = *" + str(
-                            prop_attr.restriction) + "*\n"
+                        doc += (
+                            "\n\t\t - restriction = *"
+                            + str(prop_attr.restriction)
+                            + "*\n"
+                        )
 
         if len(op) > 0:
             doc += "\n- Optional parameters :\n"
@@ -123,13 +126,14 @@ class MetaPropertyInitializer(MetaMixinBowl):
                     if hasattr(prop_attr, "__doc__"):
                         doc += " : " + prop_attr.__doc__
                     if hasattr(prop_attr, "restriction"):
-                        doc += "\n\t\t - restriction = *" + str(
-                            prop_attr.restriction) + "*"
+                        doc += (
+                            "\n\t\t - restriction = *"
+                            + str(prop_attr.restriction)
+                            + "*"
+                        )
                     if hasattr(prop_attr, "default"):
-                        doc += "\n\t\t - default = *" + str(
-                            prop_attr.default) + "*"
-                    if hasattr(prop_attr,
-                               "allow_none") and (prop_attr.allow_none):
+                        doc += "\n\t\t - default = *" + str(prop_attr.default) + "*"
+                    if hasattr(prop_attr, "allow_none") and (prop_attr.allow_none):
                         doc += "\n\t\t - *None* allowed"
                     doc += "\n"
 
@@ -139,16 +143,14 @@ class MetaPropertyInitializer(MetaMixinBowl):
             if a in cls_dir:
                 cls_dir.remove(a)
         for attr_name in cls_dir:
-            if (attr_name.find("__") < 0):
+            if attr_name.find("__") < 0:
                 attr = getattr(cls, attr_name)
                 if inspect.ismethod(attr):
                     (args, varargs, varkw, defaults) = inspect.getargspec(attr)
                     len_args = len(args) if args is not None else 0
                     len_defaults = len(defaults) if defaults is not None else 0
-                    default_completed = list(
-                        (None, ) * (len_args - len_defaults))
-                    default_completed.extend(defaults
-                                             if defaults is not None else [])
+                    default_completed = list((None,) * (len_args - len_defaults))
+                    default_completed.extend(defaults if defaults is not None else [])
                     if len_args > 0:
                         param_doc = "("
                         for arg, default in zip(args, default_completed):
@@ -232,7 +234,7 @@ class PropertyInitializer(MixinBowl, metaclass=MetaPropertyInitializer):
         return not getattr(cls, item).locked
 
     def __clear_cached_values_in_store__(self):  # FIXME: improve performance?
-        if (not self.flag_busy_initializing):
+        if not self.flag_busy_initializing:
             store_content_flattened = list(self.__store__.items())
             for (key, item) in store_content_flattened:
                 origin = item[1]
@@ -247,8 +249,8 @@ class PropertyInitializer(MixinBowl, metaclass=MetaPropertyInitializer):
             prop = getattr(self.__class__, p)
             if isinstance(prop, DefinitionProperty):
                 if (prop.__value_was_stored__(self)) and (
-                        prop.__get_property_value_origin__(
-                            self) == SET_EXTERNALLY):
+                    prop.__get_property_value_origin__(self) == SET_EXTERNALLY
+                ):
                     es_props.append(p)
             else:
                 es_props.append(p)
@@ -256,7 +258,7 @@ class PropertyInitializer(MixinBowl, metaclass=MetaPropertyInitializer):
 
     def __init_property_default__(self, item):
         P = getattr(type(self), item)
-        if hasattr(P, 'default'):
+        if hasattr(P, "default"):
             setattr(self, item, P.__get_default__())
 
     def __copy__(self):
@@ -268,6 +270,7 @@ class PropertyInitializer(MixinBowl, metaclass=MetaPropertyInitializer):
 
     def __deepcopy__(self, memo):
         from copy import deepcopy
+
         req_props = self.__externally_set_properties__()
         kwargs = {}
         for p in req_props:
@@ -292,19 +295,20 @@ class PropertyInitializer(MixinBowl, metaclass=MetaPropertyInitializer):
             return False
         myprops = self.__get_properties__()
         otherprops = other.__get_properties__()
-        if (len(myprops) != len(otherprops)):
+        if len(myprops) != len(otherprops):
             return False
         for myp, otherp in zip(myprops, otherprops):
             name = myp[0]
-            if (name != otherp[0]):
+            if name != otherp[0]:
                 return False
             myVal = getattr(self, name)
             otherVal = getattr(other, name)
             try:
-                if (myVal != otherVal):
+                if myVal != otherVal:
                     return False
             except ValueError as e:
                 import numpy
+
                 if isinstance(myVal, numpy.ndarray):
                     if (myVal != otherVal).any():
                         return False
@@ -331,7 +335,8 @@ class StrongPropertyInitializer(PropertyInitializer):
             if not p in kwargs:
                 raise IpcoreAttributeException(
                     "Required property '%s' is not found in keyword arguments of '%s' initialization."
-                    % (p, str(type(self))))
+                    % (p, str(type(self)))
+                )
 
         self.flag_busy_initializing = False
 
@@ -366,17 +371,20 @@ class StrongPropertyInitializer(PropertyInitializer):
         for (key, value) in list(kwargs.items()):
             if (not key in props) and (not allow_unmatched_kwargs):
                 raise IpcoreAttributeException(
-                    "Keyword argument '%s' does not match a property of %s." %
-                    (key, str(type(self))))
+                    "Keyword argument '%s' does not match a property of %s."
+                    % (key, str(type(self)))
+                )
             if not is_suppressed(value):
                 setattr(self, key, value)
 
     def __do_validation__(self):
         if not self.validate_properties():
             from ipcore.exceptions.exc import IpcorePropertyDescriptorException
+
             raise IpcorePropertyDescriptorException(
-                "Validation failed for object %s of type %s." %
-                (str(self), str(self.__class__)))
+                "Validation failed for object %s of type %s."
+                % (str(self), str(self.__class__))
+            )
 
     def __make_static__(self):
         """Disables the automatic clearing of cached values when a property is externally set.
@@ -389,9 +397,8 @@ class StrongPropertyInitializer(PropertyInitializer):
         self.__clear_cached_values_in_store__()
 
     def __clear_cached_values_in_store__(self):
-        if (not self.is_static):
-            super(StrongPropertyInitializer,
-                  self).__clear_cached_values_in_store__()
+        if not self.is_static:
+            super(StrongPropertyInitializer, self).__clear_cached_values_in_store__()
 
     def validate_properties(self):
         """Check whether a combination of properties is valid.
@@ -410,4 +417,5 @@ class StrongPropertyInitializer(PropertyInitializer):
     def __property_was_externally_set__(self, property_name):
         property_name = "__prop_%s__" % property_name
         return (property_name in self.__store__) and (
-            self.__store__[property_name][1] == 0)  # 0=SET_EXTERNALLY
+            self.__store__[property_name][1] == 0
+        )  # 0=SET_EXTERNALLY

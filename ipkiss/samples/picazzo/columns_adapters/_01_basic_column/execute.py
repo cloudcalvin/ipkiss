@@ -28,12 +28,14 @@ class ExampleColumn(Structure):
     def define_elements(self, elems):
         # define a column
         from picazzo.io.column import IoColumnGroup
+
         my_column = IoColumnGroup(
-            south_east=(2000.0, 0.0),  # column width = 2000um
-            y_spacing=25.0)  # vertical spacing between waveguides
+            south_east=(2000.0, 0.0), y_spacing=25.0  # column width = 2000um
+        )  # vertical spacing between waveguides
 
         # define a component
         from picazzo.filters.ring import RingRect180DropFilter
+
         my_ring = RingRect180DropFilter(name="My_Ring")
 
         # add the component to the column

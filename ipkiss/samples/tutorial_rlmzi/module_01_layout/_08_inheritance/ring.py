@@ -39,12 +39,14 @@ class RingResonator(Structure):
     bus_wg_def = WaveguideDefProperty(default=TECH.WGDEF.WIRE)
     coupler_spacing = PositiveNumberProperty(
         default=TECH.WG.DC_SPACING,
-        doc="spacing between centerline of bus waveguide and ring waveguide")
+        doc="spacing between centerline of bus waveguide and ring waveguide",
+    )
 
     def validate_properties(self):
         """ check whether the combination of properties is valid """
         if self.coupler_spacing <= 0.5 * (
-                self.ring_wg_def.wg_width + self.bus_wg_def.wg_width):
+            self.ring_wg_def.wg_width + self.bus_wg_def.wg_width
+        ):
             return False  # waveguides would touch: Not OK
         if self.ring_radius < self.ring_wg_def.wg_width:
             return False  # ring would become a disc
@@ -52,10 +54,10 @@ class RingResonator(Structure):
 
     def define_elements(self, elems):
         shape_ring = ShapeCircle(center=(0, 0), radius=self.ring_radius)
-        shape_bus = [(-self.ring_radius,
-                      -self.ring_radius - self.coupler_spacing),
-                     (self.ring_radius,
-                      -self.ring_radius - self.coupler_spacing)]
+        shape_bus = [
+            (-self.ring_radius, -self.ring_radius - self.coupler_spacing),
+            (self.ring_radius, -self.ring_radius - self.coupler_spacing),
+        ]
 
         elems += self.ring_wg_def(shape=shape_ring)
         elems += self.bus_wg_def(shape=shape_bus)
@@ -64,21 +66,22 @@ class RingResonator(Structure):
     def define_ports(self, prts):
         prts += [
             OpticalPort(
-                position=(-self.ring_radius,
-                          -self.ring_radius - self.coupler_spacing),
+                position=(-self.ring_radius, -self.ring_radius - self.coupler_spacing),
                 angle=180.0,
-                wg_definition=self.bus_wg_def),
+                wg_definition=self.bus_wg_def,
+            ),
             OpticalPort(
-                position=(self.ring_radius,
-                          -self.ring_radius - self.coupler_spacing),
+                position=(self.ring_radius, -self.ring_radius - self.coupler_spacing),
                 angle=0.0,
-                wg_definition=self.bus_wg_def)
+                wg_definition=self.bus_wg_def,
+            ),
         ]
         return prts
 
 
-class RingResonatorWithDisc(RingResonator):  #inheritance
+class RingResonatorWithDisc(RingResonator):  # inheritance
     """ ring resonator with a disc in the center """
+
     disc_radius = PositiveNumberProperty(default=0.5 * TECH.WG.BEND_RADIUS)
 
     def define_elements(self, elems):

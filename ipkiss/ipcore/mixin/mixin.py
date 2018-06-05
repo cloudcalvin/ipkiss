@@ -29,17 +29,17 @@ class MixinIngredient(object):
 class MetaMixinBowl(type):
     def mixin_first(cls, mixin_class):
         if not mixin_class in cls.__bases__:
-            if cls.__bases__ == (object, ):
-                cls.__bases__ = (mixin_class, )
+            if cls.__bases__ == (object,):
+                cls.__bases__ = (mixin_class,)
             else:
-                cls.__bases__ = (mixin_class, ) + cls.__bases__
+                cls.__bases__ = (mixin_class,) + cls.__bases__
 
     def mixin_last(cls, mixin_class):
         if not mixin_class in cls.__bases__:
-            if cls.__bases__ == (object, ):
-                cls.__bases__ = (mixin_class, )
+            if cls.__bases__ == (object,):
+                cls.__bases__ = (mixin_class,)
             else:
-                cls.__bases__ = cls.__bases__ + (mixin_class, )
+                cls.__bases__ = cls.__bases__ + (mixin_class,)
 
     def mixin(cls, mixin_class, first=True):
         if first:

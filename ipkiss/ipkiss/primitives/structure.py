@@ -22,10 +22,17 @@
 from .. import settings
 from ..geometry import transformable
 
-from ipcore.properties.descriptor import RestrictedProperty, FunctionNameProperty, DefinitionProperty
+from ipcore.properties.descriptor import (
+    RestrictedProperty,
+    FunctionNameProperty,
+    DefinitionProperty,
+)
 from ipcore.properties.predefined import StringProperty, TimeProperty, IdStringProperty
 from ipcore.properties.restrictions import RestrictType
-from ipcore.properties.initializer import StrongPropertyInitializer, MetaPropertyInitializer
+from ipcore.properties.initializer import (
+    StrongPropertyInitializer,
+    MetaPropertyInitializer,
+)
 from ..technology.settings import TECH
 from .unit_grid import UnitGridContainer
 from .elements.basic import ElementList
@@ -36,9 +43,7 @@ import copy
 from ipcore.mixin.mixin import MixinBowl
 from ipcore.types_list import TypedList
 
-__all__ = [
-    "Structure", "StructureList", "StructureProperty", "StructureListProperty"
-]
+__all__ = ["Structure", "StructureList", "StructureProperty", "StructureListProperty"]
 
 
 class MetaStructureCreator(MetaPropertyInitializer):
@@ -48,14 +53,15 @@ class MetaStructureCreator(MetaPropertyInitializer):
 
         # construct a dictionary of only keyword arguments (removes all non-keyword arguments)
         import inspect
+
         p, a, k, d = inspect.getargspec(cls.__init__)
         if d is None:
             d = []
         kwargs = {}
-        for k, v in zip(p[-len(d):], d):
+        for k, v in zip(p[-len(d) :], d):
             kwargs[k] = v
         kwargs.update(keyword_params)
-        for k, v in zip(p[1:len(params) + 1], params):
+        for k, v in zip(p[1 : len(params) + 1], params):
             kwargs[k] = v
 
         # optional here: perform check if there are no missing arguments
@@ -63,10 +69,11 @@ class MetaStructureCreator(MetaPropertyInitializer):
         # extract library for the structure
         from . import library
         from .. import settings
+
         lib = None
-        if 'library' in kwargs:
-            lib = kwargs['library']
-            del (kwargs['library'])
+        if "library" in kwargs:
+            lib = kwargs["library"]
+            del (kwargs["library"])
         if lib is None:
             lib = settings.get_current_library()
 
@@ -80,7 +87,7 @@ class MetaStructureCreator(MetaPropertyInitializer):
             lib.__fast_add__(S)
             return S
         else:
-            #libstr.set_bulk(**kwargs) # TODO: enable set_bulk in (Strong)PropertyInitializer
+            # libstr.set_bulk(**kwargs) # TODO: enable set_bulk in (Strong)PropertyInitializer
             del S
             return libstr
             # return the existing object
@@ -90,7 +97,8 @@ class ChildStructuresProperty(DefinitionProperty):
     def __init__(self, internal_member_name=None, **kwargs):
         kwargs["restriction"] = RestrictType(allowed_types=[list])
         super(ChildStructuresProperty, self).__init__(
-            internal_member_name=internal_member_name, **kwargs)
+            internal_member_name=internal_member_name, **kwargs
+        )
 
     def __check_restriction__(self, obj, value):
         super(ChildStructuresProperty, self).__check_restriction__(obj, value)
@@ -98,12 +106,13 @@ class ChildStructuresProperty(DefinitionProperty):
             if not isinstance(v, Structure):
                 raise AttributeError(
                     "The list of child structures should contain items of type 'Structure' only.... found an item of type : %s"
-                    % type(v))
+                    % type(v)
+                )
 
     def __call_getter_function__(self, obj):
         f = self.__get_getter_function__(obj)
         value = f(StructureList())
-        if (value is None):
+        if value is None:
             value = {}
         self.__cache_property_value_on_object__(obj, value)
         value = self.__get_property_value_of_object__(obj)
@@ -112,8 +121,7 @@ class ChildStructuresProperty(DefinitionProperty):
 
 class __StructureHierarchy__(StrongPropertyInitializer):
     child_structures = ChildStructuresProperty(
-        doc=
-        "The hierarchical child structures of this structure as a dictionary with key = name, value = structure"
+        doc="The hierarchical child structures of this structure as a dictionary with key = name, value = structure"
     )
 
     def define_child_structures(self, children):
@@ -127,7 +135,7 @@ class __StructureHierarchy__(StrongPropertyInitializer):
             return False
         myChStrLen = len(self.child_structures)
         otherChStrLen = len(other.child_structures)
-        if (myChStrLen != otherChStrLen):
+        if myChStrLen != otherChStrLen:
             return False
         else:
             return True
@@ -136,16 +144,17 @@ class __StructureHierarchy__(StrongPropertyInitializer):
         return not self.__eq__(other)
 
 
-class Structure(UnitGridContainer, __StructureHierarchy__, MixinBowl, metaclass=MetaStructureCreator):
+class Structure(
+    UnitGridContainer, __StructureHierarchy__, MixinBowl, metaclass=MetaStructureCreator
+):
     """Base class for a parametric cell"""
+
     __name_generator__ = TECH.ADMIN.NAME_GENERATOR
     created = TimeProperty(
-        doc=
-        "Timestamp when the structure was created (a floating point number expressed in seconds since the epoch, in UTC)."
+        doc="Timestamp when the structure was created (a floating point number expressed in seconds since the epoch, in UTC)."
     )
     modified = TimeProperty(
-        doc=
-        "Timestamp when the structure was modified (a floating point number expressed in seconds since the epoch, in UTC)."
+        doc="Timestamp when the structure was modified (a floating point number expressed in seconds since the epoch, in UTC)."
     )
     comment = StringProperty(doc="User comment string.", default="")
 
@@ -153,28 +162,28 @@ class Structure(UnitGridContainer, __StructureHierarchy__, MixinBowl, metaclass=
 
     def __init__(self, name=None, elements=None, library=None, **kwargs):
         super(Structure, self).__init__(**kwargs)
-        if (library is None):
+        if library is None:
             library = settings.get_current_library()
-        if (not (name is None)):
+        if not (name is None):
             self.__dict__["__name__"] = name
             Structure.name.__set__(self, name)
-        kwargs['unit'] = library.unit
-        kwargs['grid'] = library.grid
-        if (not (elements is None)):
+        kwargs["unit"] = library.unit
+        kwargs["grid"] = library.grid
+        if not (elements is None):
             self.elements = ElementList(elements)
         super(Structure, self).__init__(**kwargs)
 
     def define_name(self):
-        if (not hasattr(self, '__name__')) or (self.__name__ is None):
+        if (not hasattr(self, "__name__")) or (self.__name__ is None):
             self.__name__ = self.__name_generator__(self)
         return self.__name__
 
     def __cmp__(self, other):
         myname = self.name
         othername = other.name
-        if (myname < othername):
+        if myname < othername:
             return -1
-        elif (myname > othername):
+        elif myname > othername:
             return 1
         else:
             return 0
@@ -203,25 +212,28 @@ class StructureList(TypedList):
     __item_type__ = Structure
 
     def is_empty(self):
-        if (len(self) == 0): return True
+        if len(self) == 0:
+            return True
         for e in self:
-            if not e.is_empty(): return False
+            if not e.is_empty():
+                return False
         return True
 
     # overload acces routines to get dictionary behaviour but without using the name as primary key
     def __getitem__(self, key):
         if isinstance(key, str):
             for i in self:
-                if i.name == key: return i
-            raise IndexError("Structure " + key +
-                             " cannot be found in StructureList.")
+                if i.name == key:
+                    return i
+            raise IndexError("Structure " + key + " cannot be found in StructureList.")
         else:
             return list.__getitem__(self, key)
 
     def __setitem__(self, key, value):
         if isinstance(key, str):
             for i in range(0, len(self)):
-                if self[i].name == key: return list.__setitem__(self, i, value)
+                if self[i].name == key:
+                    return list.__setitem__(self, i, value)
             list.append(self, value)
         else:
             return list.__setitem__(self, key, value)
@@ -229,7 +241,8 @@ class StructureList(TypedList):
     def __delitem__(self, key):
         if isinstance(key, str):
             for i in range(0, len(self)):
-                if self[i].name == key: return list.__delitem__(self, i)
+                if self[i].name == key:
+                    return list.__delitem__(self, i)
                 return
             return list.__delitem__(self, key)
         else:
@@ -242,14 +255,16 @@ class StructureList(TypedList):
             name = item
         if isinstance(name, str):
             for i in self:
-                if i.name == name: return True
+                if i.name == name:
+                    return True
             return False
         else:
             return list.__contains__(self, item)
 
     def __fast_contains__(self, name):
         for i in self:
-            if i.name == name: return True
+            if i.name == name:
+                return True
         return False
 
     def index(self, item):
@@ -274,8 +289,11 @@ class StructureList(TypedList):
                 return
             elif not self.__fast_contains__(item.name):
                 list.append(self, item)
-        elif isinstance(item, StructureList) or isinstance(
-                item, list) or isinstance(item, set):
+        elif (
+            isinstance(item, StructureList)
+            or isinstance(item, list)
+            or isinstance(item, set)
+        ):
             for s in item:
                 self.add(s, overwrite)
         else:
@@ -288,9 +306,7 @@ class StructureList(TypedList):
         return self.add(other, overwrite)
 
 
-def StructureListProperty(internal_member_name=None,
-                          restriction=None,
-                          **kwargs):
+def StructureListProperty(internal_member_name=None, restriction=None, **kwargs):
     """Property for assigning a StructureList"""
     R = RestrictType(StructureList) & restriction
     return RestrictedProperty(internal_member_name, restriction=R, **kwargs)

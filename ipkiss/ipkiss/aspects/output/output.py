@@ -28,22 +28,27 @@ TECH = get_technology()
 
 class StructureOutputAspect(object):
 
-    #mixin for convenient export of a Structure to GDS2
-    def write_gdsii(self,
-                    filename_or_stream,
-                    unit=TECH.METRICS.UNIT,
-                    grid=TECH.METRICS.GRID,
-                    layer_map=None):
+    # mixin for convenient export of a Structure to GDS2
+    def write_gdsii(
+        self,
+        filename_or_stream,
+        unit=TECH.METRICS.UNIT,
+        grid=TECH.METRICS.GRID,
+        layer_map=None,
+    ):
         from ipkiss.primitives import Library
         from ipkiss.io.output_gdsii import FileOutputGdsii, OutputGdsii
         from ipkiss.log import IPKISS_LOG as LOG
+
         my_lib = Library(name=self.name, unit=unit, grid=grid)
         my_lib += self
         if layer_map is None:
-            layer_map = TECH.GDSII.EXPORT_LAYER_MAP  #bind only at this moment, because TECH.GDSII.EXPORT_LAYER_MAP could have been assigned a different value since original loading of this module
+            layer_map = (
+                TECH.GDSII.EXPORT_LAYER_MAP
+            )  # bind only at this moment, because TECH.GDSII.EXPORT_LAYER_MAP could have been assigned a different value since original loading of this module
         if isinstance(filename_or_stream, str):
             OP = FileOutputGdsii(filename_or_stream, layer_map=layer_map)
-        elif (filename_or_stream == sys.stdout):
+        elif filename_or_stream == sys.stdout:
             OP = OutputGdsii(sys.stdout, layer_map=layer_map)
         OP.write(my_lib)
         LOG.debug("Finished writing structure to GDS2.")

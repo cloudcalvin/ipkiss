@@ -30,8 +30,11 @@ from ipkiss.all import *
 from math import atan2
 
 __all__ = [
-    "WgApertureWrapper", "DeepWgAperture", "OpenAperture", "ApertureProperty",
-    "ShallowWgAperture"
+    "WgApertureWrapper",
+    "DeepWgAperture",
+    "OpenAperture",
+    "ApertureProperty",
+    "ShallowWgAperture",
 ]
 
 
@@ -55,6 +58,7 @@ def ApertureProperty(internal_member_name=None, restriction=None, **kwargs):
 
 class _WgApertureSingleProcess(__WgAperture__):
     """ abstract aperture base class on a single_process layer"""
+
     process = ProcessProperty(default=TECH.PROCESS.WG)
 
 
@@ -63,8 +67,11 @@ class WgApertureWrapper(__WgAperture__):
     center = Coord2Property(default=(0.0, 0.0))
 
     def define_name(self):
-        return "AP_%s_C%d_%d" % (self.structure.name, self.center.x * 1000,
-                                 self.center.y * 1000)
+        return "AP_%s_C%d_%d" % (
+            self.structure.name,
+            self.center.x * 1000,
+            self.center.y * 1000,
+        )
 
     def define_elements(self, elems):
         elems += SRef(self.structure)
@@ -82,15 +89,19 @@ class WgApertureWrapper(__WgAperture__):
 
 class OpenAperture(__WgAperture__):
     """ Aperture into a slab area """
+
     __name_prefix__ = "APO"
     aperture_wg_definition = WaveguideDefProperty(
-        required=True, doc="definition of the aperture cross-section")
+        required=True, doc="definition of the aperture cross-section"
+    )
     wg_definition = WaveguideDefProperty(
-        default=TECH.WGDEF.WIRE, doc="definition of the start waveguide")
+        default=TECH.WGDEF.WIRE, doc="definition of the start waveguide"
+    )
     center = Coord2Property(default=(0.0, 0.0), doc="center coordinate")
     taper_length = PositiveNumberProperty(default=30.0, doc="taper length")
     aperture_angle = AngleProperty(
-        default=10.0, doc="diffraction angle of the aperture")
+        default=10.0, doc="diffraction angle of the aperture"
+    )
 
     def angle_deg(self):
         return self.aperture_angle
@@ -100,23 +111,29 @@ class OpenAperture(__WgAperture__):
 
     def aperture_shape(self, process):
         ap_def = self.aperture_wg_definition
-        return Shape([(0, -ap_def.trench_width - 0.5 * ap_def.wg_width),
-                      (0, -0.5 * ap_def.wg_width), (0, 0.5 * ap_def.wg_width),
-                      (0, 0.5 * ap_def.wg_width + ap_def.trench_width)]).move(
-                          self.center)
+        return Shape(
+            [
+                (0, -ap_def.trench_width - 0.5 * ap_def.wg_width),
+                (0, -0.5 * ap_def.wg_width),
+                (0, 0.5 * ap_def.wg_width),
+                (0, 0.5 * ap_def.wg_width + ap_def.trench_width),
+            ]
+        ).move(self.center)
 
     def define_ports(self, ports):
         ports += [
             OpticalPort(
                 position=(self.center[0] + self.taper_length, self.center[1]),
                 wg_definition=self.wg_definition,
-                angle=0.0)
+                angle=0.0,
+            )
         ]
         return ports
 
 
 class DeepWgAperture(OpenAperture):
     """Deep waveguide aperture into a slab area"""
+
     __name_prefix__ = "APD"
 
     def define_elements(self, elems):
@@ -125,22 +142,31 @@ class DeepWgAperture(OpenAperture):
         ww = self.wg_definition.wg_width
         wt = self.wg_definition.trench_width
         elems += Wedge(
-            PPLayer(TECH.PROCESS.WG,
-                    TECH.PURPOSE.LF.LINE), (self.center[0], self.center[1]),
-            (self.center[0] + self.taper_length, self.center[1]), apw, ww)
+            PPLayer(TECH.PROCESS.WG, TECH.PURPOSE.LF.LINE),
+            (self.center[0], self.center[1]),
+            (self.center[0] + self.taper_length, self.center[1]),
+            apw,
+            ww,
+        )
         S = Shape(
-            [(0.0, +0.5 * apw), (-0.1, +0.5 * apw + 0.5 * apt),
-             (0.0, +0.5 * apw + apt), (0.5 * self.taper_length, 0.25 *
-                                       (ww + apw) + max(wt, apt)),
-             (self.taper_length, +0.5 * ww + wt),
-             (self.taper_length + 0.1, +0.5 * ww + 0.5 * wt),
-             (self.taper_length, +0.5 * ww), (self.taper_length, -0.5 * ww),
-             (self.taper_length + 0.1, -0.5 * ww - 0.5 * wt),
-             (self.taper_length, -0.5 * ww - wt),
-             (0.5 * self.taper_length, -0.25 *
-              (ww + apw) - max(wt, apt)), (0.0, -0.5 * apw - apt),
-             (-0.1, -0.5 * apw - 0.5 * apt), (0.0, -0.5 * apw)],
-            closed=True)
+            [
+                (0.0, +0.5 * apw),
+                (-0.1, +0.5 * apw + 0.5 * apt),
+                (0.0, +0.5 * apw + apt),
+                (0.5 * self.taper_length, 0.25 * (ww + apw) + max(wt, apt)),
+                (self.taper_length, +0.5 * ww + wt),
+                (self.taper_length + 0.1, +0.5 * ww + 0.5 * wt),
+                (self.taper_length, +0.5 * ww),
+                (self.taper_length, -0.5 * ww),
+                (self.taper_length + 0.1, -0.5 * ww - 0.5 * wt),
+                (self.taper_length, -0.5 * ww - wt),
+                (0.5 * self.taper_length, -0.25 * (ww + apw) - max(wt, apt)),
+                (0.0, -0.5 * apw - apt),
+                (-0.1, -0.5 * apw - 0.5 * apt),
+                (0.0, -0.5 * apw),
+            ],
+            closed=True,
+        )
         S.translate(self.center)
         elems += Boundary(PPLayer(TECH.PROCESS.WG, TECH.PURPOSE.LF_AREA), S)
         return elems
@@ -154,13 +180,15 @@ class DeepWgAperture(OpenAperture):
             OpticalPort(
                 position=(self.center[0] + self.taper_length, self.center[1]),
                 wg_definition=self.wg_definition,
-                angle=0.0)
+                angle=0.0,
+            )
         ]
         return ports
 
 
 class ShallowWgAperture(OpenAperture):
     """Shallow waveguide aperture into a slab area, starting from a deep etched waveguide"""
+
     __name_prefix__ = "APS"
     deep_taper_length = PositiveNumberProperty(default=15.0)
     deep_taper_width = PositiveNumberProperty(default=3.0)
@@ -176,64 +204,96 @@ class ShallowWgAperture(OpenAperture):
 
         # shallow part
         W = Wedge(
-            PPLayer(self.shallow_process,
-                    TECH.PURPOSE.LF.LINE), (self.center[0], self.center[1]),
-            (self.center[0] + self.taper_length, self.center[1]), apw,
-            self.shallow_wg_width)
+            PPLayer(self.shallow_process, TECH.PURPOSE.LF.LINE),
+            (self.center[0], self.center[1]),
+            (self.center[0] + self.taper_length, self.center[1]),
+            apw,
+            self.shallow_wg_width,
+        )
         elems += W
         S = Shape(
-            [(0.0, +0.5 * apw), (-0.1, 0.5 * apw + 0.5 * apt),
-             (0.0, +0.5 * apw + apt),
-             (0.5 * self.taper_length, 0.25 *
-              (self.shallow_wg_width + apw) + max(wt, apt)),
-             (self.taper_length, +0.5 * self.shallow_wg_width + wt),
-             (self.taper_length + 0.1,
-              +0.5 * self.shallow_wg_width + 0.5 * wt),
-             (self.taper_length, +0.5 * self.shallow_wg_width),
-             (self.taper_length, -0.5 * self.shallow_wg_width),
-             (self.taper_length + 0.1,
-              -0.5 * self.shallow_wg_width - 0.5 * wt),
-             (self.taper_length, -0.5 * self.shallow_wg_width - wt),
-             (0.5 * self.taper_length, -0.25 *
-              (self.shallow_wg_width + apw) - max(wt, apt)),
-             (0.0, -0.5 * apw - apt), (-0.1, -0.5 * apw - 0.5 * apt),
-             (0.0, -0.5 * apw)],
-            closed=True)
+            [
+                (0.0, +0.5 * apw),
+                (-0.1, 0.5 * apw + 0.5 * apt),
+                (0.0, +0.5 * apw + apt),
+                (
+                    0.5 * self.taper_length,
+                    0.25 * (self.shallow_wg_width + apw) + max(wt, apt),
+                ),
+                (self.taper_length, +0.5 * self.shallow_wg_width + wt),
+                (self.taper_length + 0.1, +0.5 * self.shallow_wg_width + 0.5 * wt),
+                (self.taper_length, +0.5 * self.shallow_wg_width),
+                (self.taper_length, -0.5 * self.shallow_wg_width),
+                (self.taper_length + 0.1, -0.5 * self.shallow_wg_width - 0.5 * wt),
+                (self.taper_length, -0.5 * self.shallow_wg_width - wt),
+                (
+                    0.5 * self.taper_length,
+                    -0.25 * (self.shallow_wg_width + apw) - max(wt, apt),
+                ),
+                (0.0, -0.5 * apw - apt),
+                (-0.1, -0.5 * apw - 0.5 * apt),
+                (0.0, -0.5 * apw),
+            ],
+            closed=True,
+        )
         S.translate(self.center)
-        elems += Boundary(
-            PPLayer(self.shallow_process, TECH.PURPOSE.LF_AREA), S)
+        elems += Boundary(PPLayer(self.shallow_process, TECH.PURPOSE.LF_AREA), S)
 
         # deep part
         W = Wedge(
             PPLayer(self.deep_process, TECH.PURPOSE.LF.LINE),
-            (self.center[0] +
-             (self.taper_length - self.deep_taper_length), self.center[1]),
+            (
+                self.center[0] + (self.taper_length - self.deep_taper_length),
+                self.center[1],
+            ),
             (self.center[0] + self.taper_length, self.center[1]),
-            self.deep_taper_width, ww)
+            self.deep_taper_width,
+            ww,
+        )
         elems += W
         S = Shape(
-            [(self.taper_length - self.deep_taper_length,
-              +0.5 * self.deep_taper_width),
-             (self.taper_length - self.deep_taper_length - 0.1,
-              +0.5 * self.deep_taper_width + 0.5 * apt),
-             (self.taper_length - self.deep_taper_length,
-              +0.5 * self.deep_taper_width + apt),
-             (self.taper_length - 0.5 * self.deep_taper_length, 0.25 *
-              (ww + self.deep_taper_width) + wt),
-             (self.taper_length, +0.5 * ww + wt),
-             (self.taper_length + 0.1, +0.5 * ww + 0.5 * wt),
-             (self.taper_length, +0.5 * ww), (self.taper_length, -0.5 * ww),
-             (self.taper_length + 0.1, -0.5 * ww - 0.5 * wt),
-             (self.taper_length, -0.5 * ww - wt),
-             (self.taper_length - 0.5 * self.deep_taper_length, -0.25 *
-              (ww + self.deep_taper_width) - wt),
-             (self.taper_length - self.deep_taper_length,
-              -0.5 * self.deep_taper_width - apt),
-             (self.taper_length - self.deep_taper_length - 0.1,
-              -0.5 * self.deep_taper_width - 0.5 * apt),
-             (self.taper_length - self.deep_taper_length,
-              -0.5 * self.deep_taper_width)],
-            closed=True)
+            [
+                (
+                    self.taper_length - self.deep_taper_length,
+                    +0.5 * self.deep_taper_width,
+                ),
+                (
+                    self.taper_length - self.deep_taper_length - 0.1,
+                    +0.5 * self.deep_taper_width + 0.5 * apt,
+                ),
+                (
+                    self.taper_length - self.deep_taper_length,
+                    +0.5 * self.deep_taper_width + apt,
+                ),
+                (
+                    self.taper_length - 0.5 * self.deep_taper_length,
+                    0.25 * (ww + self.deep_taper_width) + wt,
+                ),
+                (self.taper_length, +0.5 * ww + wt),
+                (self.taper_length + 0.1, +0.5 * ww + 0.5 * wt),
+                (self.taper_length, +0.5 * ww),
+                (self.taper_length, -0.5 * ww),
+                (self.taper_length + 0.1, -0.5 * ww - 0.5 * wt),
+                (self.taper_length, -0.5 * ww - wt),
+                (
+                    self.taper_length - 0.5 * self.deep_taper_length,
+                    -0.25 * (ww + self.deep_taper_width) - wt,
+                ),
+                (
+                    self.taper_length - self.deep_taper_length,
+                    -0.5 * self.deep_taper_width - apt,
+                ),
+                (
+                    self.taper_length - self.deep_taper_length - 0.1,
+                    -0.5 * self.deep_taper_width - 0.5 * apt,
+                ),
+                (
+                    self.taper_length - self.deep_taper_length,
+                    -0.5 * self.deep_taper_width,
+                ),
+            ],
+            closed=True,
+        )
         S.translate(self.center)
         elems += Boundary(PPLayer(self.deep_process, TECH.PURPOSE.LF_AREA), S)
         return elems
@@ -243,19 +303,25 @@ class ShallowWgAperture(OpenAperture):
             return OpenAperture.aperture_shape(self, process)
         else:
             ap_def = self.aperture_wg_definition
-            return Shape([
-                (0, -self.apdef.trench_width - 0.5 * self.deep_taper_width),
-                (0,
-                 -0.5 * self.deep_taper_width), (0,
-                                                 0.5 * self.deep_taper_width),
-                (0, 0.5 * self.deep_taper_width + self.ap_def.trench_width)
-            ]).rotate((0.0, 0.0), self.aperture_angle).move(self.center)
+            return (
+                Shape(
+                    [
+                        (0, -self.apdef.trench_width - 0.5 * self.deep_taper_width),
+                        (0, -0.5 * self.deep_taper_width),
+                        (0, 0.5 * self.deep_taper_width),
+                        (0, 0.5 * self.deep_taper_width + self.ap_def.trench_width),
+                    ]
+                )
+                .rotate((0.0, 0.0), self.aperture_angle)
+                .move(self.center)
+            )
 
     def define_ports(self, ports):
         ports += [
             OpticalPort(
                 position=(self.center[0] + self.taper_length, self.center[1]),
                 wg_definition=self.wg_definition,
-                angle=0.0)
+                angle=0.0,
+            )
         ]
         return ports

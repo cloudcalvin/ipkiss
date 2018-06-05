@@ -23,8 +23,10 @@ from ipkiss.all import Vector, RAD2DEG, DEG2RAD
 from math import atan2, cos, sin
 
 __all__ = [
-    "aperture_mounting_circular", "aperture_mounting_circular_spacing",
-    "aperture_mounting_rowland", "aperture_angles"
+    "aperture_mounting_circular",
+    "aperture_mounting_circular_spacing",
+    "aperture_mounting_rowland",
+    "aperture_angles",
 ]
 
 
@@ -33,9 +35,13 @@ def aperture_mounting_circular(center, radius, angles):
     apertures on a same circle, pointing to the center of the circle, with given angles from the center"""
     vectors = [
         Vector(
-            position=(center[0] + radius * cos(DEG2RAD * a),
-                      center[1] + radius * sin(DEG2RAD * a)),
-            angle=a) for a in angles
+            position=(
+                center[0] + radius * cos(DEG2RAD * a),
+                center[1] + radius * sin(DEG2RAD * a),
+            ),
+            angle=a,
+        )
+        for a in angles
     ]
     return vectors
 
@@ -49,8 +55,9 @@ def aperture_angles(radius, center_angle, pitch, n_o_apertures):
     return angles
 
 
-def aperture_mounting_circular_spacing(center, radius, center_angle, pitch,
-                                       n_o_apertures):
+def aperture_mounting_circular_spacing(
+    center, radius, center_angle, pitch, n_o_apertures
+):
     """ Generates a tuple of (positions, angles), with positions and angles lists, for 
     apertures on a circle, pointing to the center of the circle, with a given spacing """
     angles = aperture_angles(radius, center_angle, pitch, n_o_apertures)
@@ -63,11 +70,20 @@ def aperture_mounting_rowland(pole_vector, radius, angles):
     and the apertures pointing to the pole and for given angles with respect to the pole """
     vectors = [
         Vector(
-            position=(pole_vector[0] + 2 * radius * cos(
-                DEG2RAD * (a - pole_vector.angle_deg)) * cos(DEG2RAD * a),
-                      pole_vector[1] + 2 * radius * cos(
-                          DEG2RAD *
-                          (a - pole_vector.angle_deg)) * sin(DEG2RAD * a)),
-            angle=a) for a in angles
+            position=(
+                pole_vector[0]
+                + 2
+                * radius
+                * cos(DEG2RAD * (a - pole_vector.angle_deg))
+                * cos(DEG2RAD * a),
+                pole_vector[1]
+                + 2
+                * radius
+                * cos(DEG2RAD * (a - pole_vector.angle_deg))
+                * sin(DEG2RAD * a),
+            ),
+            angle=a,
+        )
+        for a in angles
     ]
     return vectors

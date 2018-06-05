@@ -61,7 +61,7 @@ class PovrayFile:
                 item.write(self)
 
     def writeln(self, s=""):
-        #print "  "*self.__indent+s
+        # print "  "*self.__indent+s
         self.file.write("  " * self.__indent + s + os.linesep)
 
 
@@ -181,7 +181,7 @@ class Camera(Item):
 
 class LightSource(Item):
     def __init__(self, v, *opts, **kwargs):
-        Item.__init__(self, "light_source", (Vector(v), ), opts, **kwargs)
+        Item.__init__(self, "light_source", (Vector(v),), opts, **kwargs)
 
 
 class Background(Item):
@@ -191,8 +191,8 @@ class Background(Item):
 
 class Box(Item):
     def __init__(self, v1, v2, *opts, **kwargs):
-        #self.v1 = Vector(v1)
-        #self.v2 = Vector(v2)
+        # self.v1 = Vector(v1)
+        # self.v2 = Vector(v2)
         Item.__init__(self, "box", (v1, v2), opts, **kwargs)
 
 
@@ -224,16 +224,14 @@ class Sphere(Item):
 
 
 class Prism(Item):
-    def __init__(self,
-                 point_list,
-                 heights=(0, 1),
-                 prism_item="linear_spline linear_sweep",
-                 opts=[],
-                 **kwargs):
-        options = [
-            heights[0], heights[1],
-            len(point_list),
-            Vector_List(point_list)
-        ]
+    def __init__(
+        self,
+        point_list,
+        heights=(0, 1),
+        prism_item="linear_spline linear_sweep",
+        opts=[],
+        **kwargs
+    ):
+        options = [heights[0], heights[1], len(point_list), Vector_List(point_list)]
         options.extend(opts)
         Item.__init__(self, "prism", [prism_item], options, **kwargs)

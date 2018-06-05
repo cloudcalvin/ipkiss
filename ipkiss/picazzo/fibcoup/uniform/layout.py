@@ -36,15 +36,18 @@ class FiberCouplerGratingUniform(__UnitCell__, FiberCouplerGratingAuto):
     n_o_periods = IntProperty(restriction=RESTRICT_POSITIVE, required=True)
 
     def __get_grating__(self):
-        return (GratingUniform(self.unit_cell, self.origin, (self.period, 1.0),
-                               (self.n_o_periods, 1)), None)
+        return (
+            GratingUniform(
+                self.unit_cell, self.origin, (self.period, 1.0), (self.n_o_periods, 1)
+            ),
+            None,
+        )
 
 
 ###############################################################################
 ## uniform grating
 ###############################################################################
-class UniformLineGrating(__AutoUnitCell__, __AutoSocket__,
-                         FiberCouplerGratingUniform):
+class UniformLineGrating(__AutoUnitCell__, __AutoSocket__, FiberCouplerGratingUniform):
 
     line_width = PositiveNumberProperty(required=True)
     wg_definition = WaveguideDefProperty(required=True)
@@ -52,14 +55,21 @@ class UniformLineGrating(__AutoUnitCell__, __AutoSocket__,
     process = ProcessProperty(default=TECH.PROCESS.FC)
 
     def __get_grating__(self):
-        return (GratingUniformLine(
-            self.line_width,
-            self.wg_definition.wg_width + self.wg_definition.trench_width,
-            self.period, self.n_o_periods, TECH.PURPOSE.DF.TRENCH,
-            self.process), None)
+        return (
+            GratingUniformLine(
+                self.line_width,
+                self.wg_definition.wg_width + self.wg_definition.trench_width,
+                self.period,
+                self.n_o_periods,
+                TECH.PURPOSE.DF.TRENCH,
+                self.process,
+            ),
+            None,
+        )
 
     def __get_socket_and_pos__(self):
         socket = BroadWgSocket(
-            wg_definition=self.wg_definition, wg_length=self.wg_length)
+            wg_definition=self.wg_definition, wg_length=self.wg_length
+        )
         socket_position = Coord2(-self.wg_length * 0.5, 0.0)
         return (socket, socket_position)

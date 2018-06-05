@@ -20,6 +20,7 @@
 # Contact: ipkiss@intec.ugent.be
 
 from sys import stderr
+
 try:
     from shapely.geometry import Polygon
     from shapely.geometry import LineString
@@ -33,49 +34,99 @@ try:
     from shapely.geos import TopologicalError
 
 except ImportError as e:
-    print("*************************** DEPENDENCY NOT FOUND **************************************************************************************** ", file=stderr)
-    print("**** MODULE SHAPELY COULD NOT BE FOUND, PLEASE INSTALL IT                                                                             *** ", file=stderr)
-    print("**** On Windows, download from :                                                                                                      *** ", file=stderr)
-    print("****         http://gispython.org/dist/Shapely-1.2.1.win32.exe                                                                        *** ", file=stderr)
-    print("**** On Linux :                                                                                                                       *** ", file=stderr)
-    print("****         install from source (version 1.2.1 needed) :                                                                             *** ", file=stderr)
-    print("****         http://pypi.python.org/packages/source/S/Shapely/Shapely-1.2.1.tar.gz#md5=da54c772443bd0398aa588e0f3e9c190               *** ", file=stderr)
-    print("***************************************************************************************************************************************** ", file=stderr)
+    print(
+        "*************************** DEPENDENCY NOT FOUND **************************************************************************************** ",
+        file=stderr,
+    )
+    print(
+        "**** MODULE SHAPELY COULD NOT BE FOUND, PLEASE INSTALL IT                                                                             *** ",
+        file=stderr,
+    )
+    print(
+        "**** On Windows, download from :                                                                                                      *** ",
+        file=stderr,
+    )
+    print(
+        "****         http://gispython.org/dist/Shapely-1.2.1.win32.exe                                                                        *** ",
+        file=stderr,
+    )
+    print(
+        "**** On Linux :                                                                                                                       *** ",
+        file=stderr,
+    )
+    print(
+        "****         install from source (version 1.2.1 needed) :                                                                             *** ",
+        file=stderr,
+    )
+    print(
+        "****         http://pypi.python.org/packages/source/S/Shapely/Shapely-1.2.1.tar.gz#md5=da54c772443bd0398aa588e0f3e9c190               *** ",
+        file=stderr,
+    )
+    print(
+        "***************************************************************************************************************************************** ",
+        file=stderr,
+    )
 
 try:
     from descartes import PolygonPatch
 
 except ImportError as e:
-    print("*************************** DEPENDENCY NOT FOUND **************************************************************************************** ", file=stderr)
-    print("**** MODULE DESCARTES COULD NOT BE FOUND, PLEASE INSTALL IT                                                                           *** ", file=stderr)
-    print("**** On both Windows and Linux, install from source as follows:                                                                       *** ", file=stderr)
-    print("****         * download from : http://pypi.python.org/packages/source/d/descartes/descartes-1.0.tar.gz                                *** ", file=stderr)
-    print("****         * extract it. On Windows, you can use 7-zip (available at www.7-zip.org)                                                 *** ", file=stderr)
-    print("****         * run the following command in the directory where you extracted the file :                                              *** ", file=stderr)
-    print("****                    python setup.py install                                                                                       *** ", file=stderr)
-    print("***************************************************************************************************************************************** ", file=stderr)
+    print(
+        "*************************** DEPENDENCY NOT FOUND **************************************************************************************** ",
+        file=stderr,
+    )
+    print(
+        "**** MODULE DESCARTES COULD NOT BE FOUND, PLEASE INSTALL IT                                                                           *** ",
+        file=stderr,
+    )
+    print(
+        "**** On both Windows and Linux, install from source as follows:                                                                       *** ",
+        file=stderr,
+    )
+    print(
+        "****         * download from : http://pypi.python.org/packages/source/d/descartes/descartes-1.0.tar.gz                                *** ",
+        file=stderr,
+    )
+    print(
+        "****         * extract it. On Windows, you can use 7-zip (available at www.7-zip.org)                                                 *** ",
+        file=stderr,
+    )
+    print(
+        "****         * run the following command in the directory where you extracted the file :                                              *** ",
+        file=stderr,
+    )
+    print(
+        "****                    python setup.py install                                                                                       *** ",
+        file=stderr,
+    )
+    print(
+        "***************************************************************************************************************************************** ",
+        file=stderr,
+    )
 
 
 def shapely_polygon_to_image(polygon, filename, show=False):
     from dependencies.matplotlib_wrapper import pyplot
+
     fig = pyplot.gcf()
     fig.clear()
     ax = fig.add_subplot(1, 1, 1)
-    if (not polygon.is_empty):
+    if not polygon.is_empty:
         if isinstance(polygon, Polygon):
-            patch = PolygonPatch(polygon, fc='b')
+            patch = PolygonPatch(polygon, fc="b")
             ax.add_patch(patch)
         else:
             for p in polygon.geoms:
                 try:
-                    patch = PolygonPatch(p, fc='b')
+                    patch = PolygonPatch(p, fc="b")
                     ax.add_patch(patch)
                 except AssertionError:
                     LOG.error(
                         "An element of type %s will not be plotted on the image."
-                        % type(polygon))
+                        % type(polygon)
+                    )
     ax.autoscale_view()
-    pyplot.axis('equal')
+    pyplot.axis("equal")
     if show:
         pyplot.show()
     pyplot.savefig(filename, dpi=500)
@@ -85,6 +136,7 @@ def shapely_geom_to_shape(g):
     """Convert a Shapely geometry to an IPKISS shape"""
     from ipkiss.all import Shape, Coord2
     import sys
+
     if g.is_empty:
         return Shape()
     elif g.is_ring:
@@ -114,16 +166,20 @@ def shapely_geom_to_shape(g):
                     for exterior_point in g_exterior_coords_list:
                         exterior_point_index = exterior_point_index + 1
                         curr_dist = interior_start_point_coord2.distance(
-                            Coord2(exterior_point))
+                            Coord2(exterior_point)
+                        )
                         if curr_dist < dist:
                             closest_exterior_point_index = exterior_point_index
                             dist = curr_dist
                     result_points.extend(
-                        g_exterior_coords_list[closest_exterior_point_index:])
+                        g_exterior_coords_list[closest_exterior_point_index:]
+                    )
                     result_points.extend(
-                        g_exterior_coords_list[0:closest_exterior_point_index])
+                        g_exterior_coords_list[0:closest_exterior_point_index]
+                    )
                     result_points.append(
-                        g_exterior_coords_list[closest_exterior_point_index])
+                        g_exterior_coords_list[closest_exterior_point_index]
+                    )
                     result_points.append(interior_start_point)
                     result_points.extend(interior.coords)
                 else:
@@ -137,8 +193,9 @@ def shapely_geom_to_shape(g):
 
 def flatten_shapely_geom(g):
     result_list = []
-    if (isinstance(g, MultiPolygon)
-            or isinstance(g, GeometryCollection)) and (not g.is_empty):
+    if (isinstance(g, MultiPolygon) or isinstance(g, GeometryCollection)) and (
+        not g.is_empty
+    ):
         for g2 in g.geoms:
             result_list.extend(flatten_shapely_geom(g2))
     else:
@@ -156,7 +213,8 @@ class ShapelyPolygonCollection(StrongPropertyInitializer):
     canvas_polygon = DefinitionProperty(fdef_name="define_canvas_polygon")
     georep_list = FunctionNameProperty(fget_name="get_georep_list")
     georep = FunctionNameProperty(
-        fget_name="__get_georep__", fset_name="__set_georep__")
+        fget_name="__get_georep__", fset_name="__set_georep__"
+    )
 
     def __get_georep__(self):
         if not hasattr(self, "__georep__"):
@@ -176,13 +234,15 @@ class ShapelyPolygonCollection(StrongPropertyInitializer):
             if not polygon.is_valid:
                 LOG.warning(
                     "Tried to add an invalid polygon to the PolygonCollection: %s\nThe polygon is ignored."
-                    % str(pts))
+                    % str(pts)
+                )
             else:
                 self.georep = self.georep.union(polygon)
         else:
             LOG.warning(
                 "Tried to add a polygon with %i points to the PolygonCollection: %s\nThe polygon is ignored."
-                % (len(pts), str(pts)))
+                % (len(pts), str(pts))
+            )
 
     def get_georep_list(self):
         """Return a list with all elements in the geometrical representation """
@@ -222,9 +282,9 @@ class ShapelyPolygonCollection(StrongPropertyInitializer):
         return up
 
     def bitwise_or(self, other_polygon_collection):
-        if (other_polygon_collection.is_empty()):
+        if other_polygon_collection.is_empty():
             return self
-        elif (self.is_empty()):
+        elif self.is_empty():
             return other_polygon_collection
         else:
             other_georep = other_polygon_collection.georep
@@ -236,9 +296,9 @@ class ShapelyPolygonCollection(StrongPropertyInitializer):
             return pc
 
     def bitwise_and(self, other_polygon_collection):
-        if (other_polygon_collection.is_empty()):
+        if other_polygon_collection.is_empty():
             return self.fabricate_offspring(MultiPolygon())
-        elif (self.is_empty()):
+        elif self.is_empty():
             return self.fabricate_offspring(MultiPolygon())
         else:
             other_georep = other_polygon_collection.georep
@@ -250,9 +310,9 @@ class ShapelyPolygonCollection(StrongPropertyInitializer):
             return pc
 
     def bitwise_xor(self, other_polygon_collection):
-        if (other_polygon_collection.is_empty()):
+        if other_polygon_collection.is_empty():
             return self
-        elif (self.is_empty()):
+        elif self.is_empty():
             return other_polygon_collection
         else:
             other_georep = other_polygon_collection.georep
@@ -264,7 +324,7 @@ class ShapelyPolygonCollection(StrongPropertyInitializer):
             return pc
 
     def bitwise_not(self):
-        if (not self.is_empty()):
+        if not self.is_empty():
             my_georep = self.georep
             my_p = self.__do_cascaded_union__(my_georep)
         else:
@@ -274,10 +334,9 @@ class ShapelyPolygonCollection(StrongPropertyInitializer):
         return pc
 
     def difference(self, other_polygon_collection):
-        if (other_polygon_collection is None
-                or other_polygon_collection.is_empty()):
+        if other_polygon_collection is None or other_polygon_collection.is_empty():
             return self
-        elif (self.is_empty()):
+        elif self.is_empty():
             return self
         else:
             other_georep = other_polygon_collection.georep
@@ -307,7 +366,7 @@ class ShapelyPolygonCollection(StrongPropertyInitializer):
             return pc
 
     def unionize(self):
-        if (self.is_empty()):
+        if self.is_empty():
             return self.georep
         else:
             my_georep = self.georep
@@ -319,4 +378,5 @@ class ShapelyPolygonCollection(StrongPropertyInitializer):
 
     def save_to_image(self, filename, show=False):
         from dependencies.shapely_wrapper import shapely_polygon_to_image
+
         shapely_polygon_to_image(self.georep, filename, show)

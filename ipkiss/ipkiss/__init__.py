@@ -25,6 +25,7 @@ import sys
 def initialize():
     from ipkiss.log import IPKISS_LOG as LOG
     from . import settings
+
     print(settings.START_MESSAGE, file=sys.stderr)
 
 

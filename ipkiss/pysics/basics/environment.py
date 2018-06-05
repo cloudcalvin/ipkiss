@@ -21,7 +21,7 @@
 
 from ipcore.all import *
 
-__all__ = ['Environment', 'EnvironmentProperty', 'DEFAULT_ENVIRONMENT']
+__all__ = ["Environment", "EnvironmentProperty", "DEFAULT_ENVIRONMENT"]
 
 
 class __Environment__(StrongPropertyInitializer):
@@ -35,6 +35,7 @@ class Environment(__Environment__):
         New physical quantities are mixed in when loading the library for some (multi)physics.
         Default values should ben those of vacuum at room temperature. 
     """
+
     pass
 
 
@@ -43,14 +44,14 @@ DEFAULT_ENVIRONMENT = Environment()
 RESTRICT_ENVIRONMENT = RestrictType(Environment)
 
 
-def EnvironmentProperty(internal_member_name=None,
-                        restriction=None,
-                        preprocess=None,
-                        **kwargs):
+def EnvironmentProperty(
+    internal_member_name=None, restriction=None, preprocess=None, **kwargs
+):
     """ Environment property descriptor for a class """
     R = RESTRICT_ENVIRONMENT & restriction
     return RestrictedProperty(
         internal_member_name=internal_member_name,
         restriction=R,
         preprocess=preprocess,
-        **kwargs)
+        **kwargs
+    )

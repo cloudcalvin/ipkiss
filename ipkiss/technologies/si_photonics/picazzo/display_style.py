@@ -41,11 +41,9 @@ class PurposeDisplayStyleSet(__AutoDisplayStyleSet__):
 
 
 class ProcessPurposeDisplayStyleSet(__AutoDisplayStyleSet__):
-    def __init__(self,
-                 process_map,
-                 purpose_map,
-                 process_kw=["color"],
-                 purpose_kw=["edge_color"]):
+    def __init__(
+        self, process_map, purpose_map, process_kw=["color"], purpose_kw=["edge_color"]
+    ):
         self.process_map = process_map
         self.purpose_map = purpose_map
         self.process_kw = process_kw

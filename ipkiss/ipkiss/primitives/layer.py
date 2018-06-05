@@ -23,7 +23,10 @@ from ipcore.properties.descriptor import RestrictedProperty
 from ipcore.properties.restrictions import RestrictType
 from ipcore.properties.processors import ProcessorTypeCast
 from ipcore.properties.predefined import NumberProperty, IntProperty, StringProperty
-from ipcore.properties.initializer import StrongPropertyInitializer, MetaPropertyInitializer
+from ipcore.properties.initializer import (
+    StrongPropertyInitializer,
+    MetaPropertyInitializer,
+)
 from ipcore.helperfunc import do_hash
 from ipcore.types_list import TypedList
 
@@ -39,19 +42,20 @@ class MetaLayerCreator(MetaPropertyInitializer):
 
         import inspect
         from .. import settings
+
         p, a, k, d = inspect.getargspec(cls.__init__)
         if d is None:
             d = []
         kwargs = {}
-        for k, v in zip(p[-len(d):], d):
+        for k, v in zip(p[-len(d) :], d):
             kwargs[k] = v
         kwargs.update(keyword_params)
-        for k, v in zip(p[1:len(params) + 1], params):
+        for k, v in zip(p[1 : len(params) + 1], params):
             kwargs[k] = v
 
-        if 'layerlist' in kwargs:
-            layerlist = kwargs['layerlist']
-            del (kwargs['layerlist'])
+        if "layerlist" in kwargs:
+            layerlist = kwargs["layerlist"]
+            del (kwargs["layerlist"])
         else:
             layerlist = None
 
@@ -75,8 +79,7 @@ class __Layer__(StrongPropertyInitializer, metaclass=MetaLayerCreator):
         elif other is None:
             return self
         else:
-            raise TypeError("Cannot AND %s with %s" % (type(self),
-                                                       type(other)))
+            raise TypeError("Cannot AND %s with %s" % (type(self), type(other)))
 
     def __iand__(self, other):
         C = self.__and__(other)
@@ -102,8 +105,7 @@ class __Layer__(StrongPropertyInitializer, metaclass=MetaLayerCreator):
         elif other is None:
             return self
         else:
-            raise TypeError("Cannot XOR %s with %s" % (type(self),
-                                                       type(other)))
+            raise TypeError("Cannot XOR %s with %s" % (type(self), type(other)))
 
     def __ixor__(self, other):
         C = self.__xor__(other)
@@ -234,30 +236,30 @@ class LayerList(TypedList):
     def __getitem__(self, key):
         if isinstance(key, int):
             for i in self:
-                if i.id() == key: return i
-            raise IndexError("layer " + str(key) +
-                             " cannot be found in LayerList.")
+                if i.id() == key:
+                    return i
+            raise IndexError("layer " + str(key) + " cannot be found in LayerList.")
         elif isinstance(key, str):
             for i in self:
-                if i.name == key: return i
-            raise IndexError("layer " + str(key) +
-                             " cannot be found in LayerList.")
+                if i.name == key:
+                    return i
+            raise IndexError("layer " + str(key) + " cannot be found in LayerList.")
         else:
-            raise TypeError("Index is wrong type " + str(type(key)) +
-                            " in LayerList")
+            raise TypeError("Index is wrong type " + str(type(key)) + " in LayerList")
 
     def __setitem__(self, key, value):
         if isinstance(key, int):
             for i in range(0, len(self)):
-                if self[i].id() == key: return list.__setitem__(self, i, value)
+                if self[i].id() == key:
+                    return list.__setitem__(self, i, value)
             list.append(self, value)
         elif isinstance(key, str):
             for i in range(0, len(self)):
-                if self[i].name == key: return list.__setitem__(self, i, value)
+                if self[i].name == key:
+                    return list.__setitem__(self, i, value)
             list.append(self, value)
         else:
-            raise TypeError("Index is wrong type " + str(type(key)) +
-                            " in LayerList")
+            raise TypeError("Index is wrong type " + str(type(key)) + " in LayerList")
 
     def __delitem__(self, key):
         if isinstance(key, int):
@@ -273,8 +275,7 @@ class LayerList(TypedList):
                 return
             return list.__delitem__(self, key)
         else:
-            raise TypeError("Index is wrong type " + str(type(key)) +
-                            " in LayerList")
+            raise TypeError("Index is wrong type " + str(type(key)) + " in LayerList")
 
     def __contains__(self, item):
         if isinstance(item, Layer):
@@ -283,17 +284,20 @@ class LayerList(TypedList):
             id = item
         elif isinstance(item, str):
             for i in self:
-                if i.name == name: return True
+                if i.name == name:
+                    return True
             return False
 
         if isinstance(id, int):
             for i in self:
-                if i.id() == id: return True
+                if i.id() == id:
+                    return True
             return False
 
     def __fast_get_layer__(self, id):
         for L in self:
-            if L.id() == id: return L
+            if L.id() == id:
+                return L
         return None
 
     def index(self, item):

@@ -22,7 +22,12 @@
 import string
 
 from ipcore.properties.restrictions import __PropertyRestriction__
-from ipcore.properties.predefined import StringProperty, PositiveNumberProperty, IntProperty, RESTRICT_NONNEGATIVE
+from ipcore.properties.predefined import (
+    StringProperty,
+    PositiveNumberProperty,
+    IntProperty,
+    RESTRICT_NONNEGATIVE,
+)
 from ipcore.properties.descriptor import RestrictedProperty
 
 from .basic import __LayerElement__
@@ -45,8 +50,10 @@ class RestrictAlignment(__PropertyRestriction__):
 
     def validate(self, value, obj=None):
         if len(value) == 2:
-            if not value[0] in constants.TEXT_ALIGNS_HORIZONTAL: return False
-            if not value[1] in constants.TEXT_ALIGNS_VERTICAL: return False
+            if not value[0] in constants.TEXT_ALIGNS_HORIZONTAL:
+                return False
+            if not value[1] in constants.TEXT_ALIGNS_VERTICAL:
+                return False
             return True
         return False
 
@@ -62,27 +69,29 @@ def AlignmentProperty(internal_member_name=None, restriction=None, **kwargs):
     return RestrictedProperty(internal_member_name, restriction=R, **kwargs)
 
 
-#----------------------------------------------------------------------------
+# ----------------------------------------------------------------------------
 # Text
-#----------------------------------------------------------------------------
+# ----------------------------------------------------------------------------
 class __TextElement__(__LayerElement__):
     text = StringProperty(required=True)
     coordinate = Coord2Property(default=(0.0, 0.0))
     alignment = AlignmentProperty(
-        default=(constants.TEXT_ALIGN_CENTER, constants.TEXT_ALIGN_TOP))
+        default=(constants.TEXT_ALIGN_CENTER, constants.TEXT_ALIGN_TOP)
+    )
     height = PositiveNumberProperty(default=20.0)
     font = FontProperty(default=TEXT_FONT_DEFAULT)
 
-    def __init__(self,
-                 layer,
-                 text,
-                 coordinate=(0.0, 0.0),
-                 alignment=(constants.TEXT_ALIGN_CENTER,
-                            constants.TEXT_ALIGN_TOP),
-                 font=TEXT_FONT_DEFAULT,
-                 height=20.0,
-                 transformation=None,
-                 **kwargs):
+    def __init__(
+        self,
+        layer,
+        text,
+        coordinate=(0.0, 0.0),
+        alignment=(constants.TEXT_ALIGN_CENTER, constants.TEXT_ALIGN_TOP),
+        font=TEXT_FONT_DEFAULT,
+        height=20.0,
+        transformation=None,
+        **kwargs
+    ):
         super(__TextElement__, self).__init__(
             layer=layer,
             text=text,
@@ -91,7 +100,8 @@ class __TextElement__(__LayerElement__):
             font=font,
             height=height,
             transformation=transformation,
-            **kwargs)
+            **kwargs
+        )
 
     def get_h_alignment(self):
         return self.alignment[0]
@@ -107,22 +117,23 @@ class __TextElement__(__LayerElement__):
         return (len(string.strip(self.text)) == 0) or (self.height == 0)
 
 
-#----------------------------------------------------------------------------
+# ----------------------------------------------------------------------------
 # Polygon Text
-#----------------------------------------------------------------------------
+# ----------------------------------------------------------------------------
 
 
 class PolygonText(Group, __TextElement__):
-    def __init__(self,
-                 layer,
-                 text,
-                 coordinate=(0.0, 0.0),
-                 alignment=(constants.TEXT_ALIGN_CENTER,
-                            constants.TEXT_ALIGN_TOP),
-                 font=TEXT_FONT_DEFAULT,
-                 height=20.0,
-                 transformation=None,
-                 **kwargs):
+    def __init__(
+        self,
+        layer,
+        text,
+        coordinate=(0.0, 0.0),
+        alignment=(constants.TEXT_ALIGN_CENTER, constants.TEXT_ALIGN_TOP),
+        font=TEXT_FONT_DEFAULT,
+        height=20.0,
+        transformation=None,
+        **kwargs
+    ):
         super(PolygonText, self).__init__(
             layer=layer,
             text=text,
@@ -131,13 +142,14 @@ class PolygonText(Group, __TextElement__):
             font=font,
             height=height,
             transformation=transformation,
-            **kwargs)
+            **kwargs
+        )
 
     def define_elements(self, elems):
         F = self.font
         text = self.text.upper()
 
-        #determine start position
+        # determine start position
         letter_height = self.height
         letter_spacing = letter_height * F.spacing
         line_width = letter_height * F.line_width
@@ -165,28 +177,30 @@ class PolygonText(Group, __TextElement__):
         ypos += self.coordinate[1]
         for c in text:
             elems += F.elements_character(
-                self.layer, c, letter_height, (xpos, ypos), angle=0.0)
-            xpos += letter_width  #* ca
+                self.layer, c, letter_height, (xpos, ypos), angle=0.0
+            )
+            xpos += letter_width  # * ca
 
         return elems
 
 
-#----------------------------------------------------------------------------
+# ----------------------------------------------------------------------------
 # Label text
-#----------------------------------------------------------------------------
+# ----------------------------------------------------------------------------
 class Label(__TextElement__):
     font = IntProperty(restriction=RESTRICT_NONNEGATIVE, required=True)
 
-    def __init__(self,
-                 layer,
-                 text,
-                 coordinate=(0.0, 0.0),
-                 alignment=(constants.TEXT_ALIGN_CENTER,
-                            constants.TEXT_ALIGN_TOP),
-                 font=TEXT_FONT_DEFAULT,
-                 height=20.0,
-                 transformation=None,
-                 **kwargs):
+    def __init__(
+        self,
+        layer,
+        text,
+        coordinate=(0.0, 0.0),
+        alignment=(constants.TEXT_ALIGN_CENTER, constants.TEXT_ALIGN_TOP),
+        font=TEXT_FONT_DEFAULT,
+        height=20.0,
+        transformation=None,
+        **kwargs
+    ):
         super(Label, self).__init__(
             layer=layer,
             text=text,
@@ -195,7 +209,8 @@ class Label(__TextElement__):
             font=font,
             height=height,
             transformation=transformation,
-            **kwargs)
+            **kwargs
+        )
 
     def size_info(self):
         text_width = len(self.text) * self.height
@@ -215,8 +230,12 @@ class Label(__TextElement__):
             B = self.coordinate[1] - self.height
         T = B + self.height
         return size_info.size_info_from_numpyarray(
-            (Shape([(L, B), (L, T), (R, B), (R, T)], True).transform(
-                self.transformation)).points)
+            (
+                Shape([(L, B), (L, T), (R, B), (R, T)], True).transform(
+                    self.transformation
+                )
+            ).points
+        )
 
     def flat_copy(self, level=-1):
         return self.__copy__()

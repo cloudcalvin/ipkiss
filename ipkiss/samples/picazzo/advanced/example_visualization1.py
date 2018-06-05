@@ -23,18 +23,18 @@ from technologies.si_photonics.picazzo.default import *
 from .example3_three_port import *  # our structure
 from ipkiss.plugins.vfabrication import *
 
-#Illustrates how to create a 2D- and 3D-visualization of a certain component.
-#Only use for specific components, not for complete masks (requires quite a lot of RAM)
+# Illustrates how to create a 2D- and 3D-visualization of a certain component.
+# Only use for specific components, not for complete masks (requires quite a lot of RAM)
 
 my_component = ThreePortToEast(width=5.0, height=2.0)
 
-#make a 2d-visualisation (requires Matplotlib)
+# make a 2d-visualisation (requires Matplotlib)
 my_component.visualize_2d()
 
-#render a 3d-visualisation with POVRAY : create a POVRAY-file
+# render a 3d-visualisation with POVRAY : create a POVRAY-file
 my_component.visualize_3d_povray(camera_pos=(10, 0, 10))
 # This generates a file '3PORT_R_W5000_H2000_W450_T2000_2D_R10_GR0.000000.pov' which should then be rendered
 # with the software Povray : http://www.povray.org/download/
 
-#render a 3d-visualisation as a VTK-file (requires Meep)
-#my_component.visualize_3d_vtk(resolution = 40)
+# render a 3d-visualisation as a VTK-file (requires Meep)
+# my_component.visualize_3d_vtk(resolution = 40)

@@ -20,7 +20,11 @@
 # Contact: ipkiss@intec.ugent.be
 
 from ..ipkiss.common import *
-from ipkiss.technology.technology import ProcessTechnologyTree, TechnologyTree, DelayedInitTechnologyTree
+from ipkiss.technology.technology import (
+    ProcessTechnologyTree,
+    TechnologyTree,
+    DelayedInitTechnologyTree,
+)
 from ipkiss.technology import get_technology
 from ipkiss.geometry.coord import Coord2
 from ipkiss.process.layer import ProcessLayer, PatternPurpose
@@ -74,10 +78,10 @@ TECH.PROCESS.GER = ProcessLayer("Local germanidation", "GER")
 
 # TSV
 TECH.PROCESS.TSV = ProcessLayer("Through Silicon Via", "TSV")
-TECH.PROCESS.UBUMP = ProcessLayer("Microbumps on Top Wafer for 3D integration",
-                                  "UBUMP")
+TECH.PROCESS.UBUMP = ProcessLayer("Microbumps on Top Wafer for 3D integration", "UBUMP")
 TECH.PROCESS.BBUMP = ProcessLayer(
-    "Microbumps on Bottom Wafer for 3D integration", "BBUMP")
+    "Microbumps on Bottom Wafer for 3D integration", "BBUMP"
+)
 TECH.PROCESS.M2B = ProcessLayer("Metallization 2 Bottom wafer", "M2B")
 
 # Clearout
@@ -99,8 +103,7 @@ TECH.PROCESS.VO1 = ProcessLayer("Optical via 1", "VO1")
 TECH.PROCESS.GW1 = ProcessLayer("Generic Windows 1", "GW1")
 TECH.PROCESS.GW2 = ProcessLayer("Generic Windows 2", "GW2")
 TECH.PROCESS.GW3 = ProcessLayer("Generic Windows 3", "GW3")
-TECH.PROCESS.XW = ProcessLayer(
-    "Various windows, grouping of GW1, FCW, HFW,...", "XW")
+TECH.PROCESS.XW = ProcessLayer("Various windows, grouping of GW1, FCW, HFW,...", "XW")
 
 # contact masks
 TECH.PROCESS.CONT1 = ProcessLayer("Contact mask 1", "CONT1")
@@ -143,31 +146,50 @@ class TechDisplayTree(DelayedInitTechnologyTree):
         DISPLAY_BLACK = DisplayStyle(color=color.COLOR_BLACK, edgewidth=0.0)
         DISPLAY_WHITE = DisplayStyle(color=color.COLOR_WHITE, edgewidth=0.0)
         DISPLAY_INVERSION = DisplayStyle(
-            color=color.COLOR_BLUE, alpha=0.5, edgewidth=1.0)
-        DISPLAY_DF = DisplayStyle(
-            color=color.COLOR_GREEN, alpha=0.5, edgewidth=1.0)
-        DISPLAY_LF = DisplayStyle(
-            color=color.COLOR_YELLOW, alpha=0.5, edgewidth=1.0)
-        DISPLAY_TEXT = DisplayStyle(
-            color=color.COLOR_MAGENTA, alpha=0.5, edgewidth=1.0)
-        DISPLAY_HOLE = DisplayStyle(
-            color=color.COLOR_RED, alpha=0.5, edgewidth=1.0)
+            color=color.COLOR_BLUE, alpha=0.5, edgewidth=1.0
+        )
+        DISPLAY_DF = DisplayStyle(color=color.COLOR_GREEN, alpha=0.5, edgewidth=1.0)
+        DISPLAY_LF = DisplayStyle(color=color.COLOR_YELLOW, alpha=0.5, edgewidth=1.0)
+        DISPLAY_TEXT = DisplayStyle(color=color.COLOR_MAGENTA, alpha=0.5, edgewidth=1.0)
+        DISPLAY_HOLE = DisplayStyle(color=color.COLOR_RED, alpha=0.5, edgewidth=1.0)
         DISPLAY_ALIGNMENT = DisplayStyle(
-            color=color.COLOR_CYAN, alpha=0.5, edgewidth=1.0)
+            color=color.COLOR_CYAN, alpha=0.5, edgewidth=1.0
+        )
         style_set = DisplayStyleSet()
         style_set.background = DISPLAY_WHITE
         process_display_order = [
-            TECH.PROCESS.RFC, TECH.PROCESS.FCW, TECH.PROCESS.FC,
-            TECH.PROCESS.WG, TECH.PROCESS.NT, TECH.PROCESS.EBW,
-            TECH.PROCESS.HFW, TECH.PROCESS.VGW, TECH.PROCESS.CO,
-            TECH.PROCESS.NBODY, TECH.PROCESS.PBODY, TECH.PROCESS.P1,
-            TECH.PROCESS.PPLUS, TECH.PROCESS.N1, TECH.PROCESS.NPLUS,
-            TECH.PROCESS.PP1, TECH.PROCESS.PP2, TECH.PROCESS.SAL,
-            TECH.PROCESS.MC1, TECH.PROCESS.MC2, TECH.PROCESS.MH,
-            TECH.PROCESS.M1, TECH.PROCESS.V12, TECH.PROCESS.M2,
-            TECH.PROCESS.MP1, TECH.PROCESS.MP2, TECH.PROCESS.FC2,
-            TECH.PROCESS.WG2, TECH.PROCESS.VO1, TECH.PROCESS.GW1,
-            TECH.PROCESS.GW2, TECH.PROCESS.GW3
+            TECH.PROCESS.RFC,
+            TECH.PROCESS.FCW,
+            TECH.PROCESS.FC,
+            TECH.PROCESS.WG,
+            TECH.PROCESS.NT,
+            TECH.PROCESS.EBW,
+            TECH.PROCESS.HFW,
+            TECH.PROCESS.VGW,
+            TECH.PROCESS.CO,
+            TECH.PROCESS.NBODY,
+            TECH.PROCESS.PBODY,
+            TECH.PROCESS.P1,
+            TECH.PROCESS.PPLUS,
+            TECH.PROCESS.N1,
+            TECH.PROCESS.NPLUS,
+            TECH.PROCESS.PP1,
+            TECH.PROCESS.PP2,
+            TECH.PROCESS.SAL,
+            TECH.PROCESS.MC1,
+            TECH.PROCESS.MC2,
+            TECH.PROCESS.MH,
+            TECH.PROCESS.M1,
+            TECH.PROCESS.V12,
+            TECH.PROCESS.M2,
+            TECH.PROCESS.MP1,
+            TECH.PROCESS.MP2,
+            TECH.PROCESS.FC2,
+            TECH.PROCESS.WG2,
+            TECH.PROCESS.VO1,
+            TECH.PROCESS.GW1,
+            TECH.PROCESS.GW2,
+            TECH.PROCESS.GW3,
         ]
 
         for process in process_display_order:

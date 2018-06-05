@@ -42,30 +42,23 @@ class PicazzoExample5(Structure):
         # alignment waveguide
         wg_def = WgElDefinition()
         align_wg = wg_def(shape=[(0.0, 0.0), (50.0, 0.0)])
-        align = Structure(
-            name="align", elements=[align_wg], ports=align_wg.ports)
+        align = Structure(name="align", elements=[align_wg], ports=align_wg.ports)
         layout += align  # adds default fiber couplers
         layout.add(
-            align, west_fibcoups=[
-                STANDARD_GRATING_1550_TM()
-            ])  # with 1550-TM fiber couplers on the left side
+            align, west_fibcoups=[STANDARD_GRATING_1550_TM()]
+        )  # with 1550-TM fiber couplers on the left side
 
         # 2x2 mmi
-        MMI = ShallowMmi1x2Tapered(
-            width=3, length=5, wg_offset=0.5, taper_width=1.0)
+        MMI = ShallowMmi1x2Tapered(width=3, length=5, wg_offset=0.5, taper_width=1.0)
         layout += MMI  # standard fibcoups
         layout.add(
             MMI,
             west_fibcoups=[STANDARD_GRATING_1300_TE()],
-            east_fibcoups=[STANDARD_GRATING_1550_TM()]
+            east_fibcoups=[STANDARD_GRATING_1550_TM()],
         )  # with 1300 fiber couplers on the left side, and TM on the right side
 
         layout.add(
-            MMI,
-            west_fibcoups=[
-                STANDARD_GRATING_1550_TE(),
-                STANDARD_GRATING_1300_TE()
-            ]
+            MMI, west_fibcoups=[STANDARD_GRATING_1550_TE(), STANDARD_GRATING_1300_TE()]
         )  # on the left side, the bottom fiber coupler is 1550, the second one 1300.
         # if there are more than 2 ports on the left side, the fiber couplers are cycled. You can add more fiber couplers,
         # and the adapter will go down the list. You can add this cycle behaviour to almost all parameters of the generic fiber coupler
@@ -81,6 +74,7 @@ if __name__ == "__main__":
     layout.write_gdsii("example5.gds")
     # -------- verify the fabrication materials with a 2D visualization
     from ipkiss.plugins.vfabrication import *
+
     layout.visualize_2d()
     # -------- export a GDS file with the virtual fabrication
     layout.write_gdsii_vfabrication("example5_vfab.gds")

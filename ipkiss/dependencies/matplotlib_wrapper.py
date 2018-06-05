@@ -21,9 +21,11 @@
 
 import tkinter as Tk
 from sys import stderr
+
 try:
     import matplotlib as matplotlib
-    matplotlib.use('TkAgg')
+
+    matplotlib.use("TkAgg")
 
     from matplotlib import nxutils as nxutils
 
@@ -32,7 +34,10 @@ try:
     from matplotlib.collections import *
     from matplotlib.colors import colorConverter
 
-    from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg, NavigationToolbar2TkAgg
+    from matplotlib.backends.backend_tkagg import (
+        FigureCanvasTkAgg,
+        NavigationToolbar2TkAgg,
+    )
 
     from matplotlib.figure import Figure
 
@@ -45,9 +50,27 @@ try:
     pyplot.ion()
 
 except ImportError as e:
-    print("*************************** DEPENDENCY NOT FOUND **************************************************************************************** ", file=stderr)
-    print("**** MODULE MATPLOTLIB COULD NOT BE FOUND, PLEASE INSTALL IT                                                                          *** ", file=stderr)
-    print("**** On Windows, download from :                                                                                                      *** ", file=stderr)
-    print("****         http://sourceforge.net/projects/matplotlib/files/matplotlib/matplotlib-0.99.3/matplotlib-0.99.3.win32-py2.6.exe/download *** ", file=stderr)
-    print("**** On Linux : sudo apt-get install python-matplotlib                                                                                *** ", file=stderr)
-    print("***************************************************************************************************************************************** ", file=stderr)
+    print(
+        "*************************** DEPENDENCY NOT FOUND **************************************************************************************** ",
+        file=stderr,
+    )
+    print(
+        "**** MODULE MATPLOTLIB COULD NOT BE FOUND, PLEASE INSTALL IT                                                                          *** ",
+        file=stderr,
+    )
+    print(
+        "**** On Windows, download from :                                                                                                      *** ",
+        file=stderr,
+    )
+    print(
+        "****         http://sourceforge.net/projects/matplotlib/files/matplotlib/matplotlib-0.99.3/matplotlib-0.99.3.win32-py2.6.exe/download *** ",
+        file=stderr,
+    )
+    print(
+        "**** On Linux : sudo apt-get install python-matplotlib                                                                                *** ",
+        file=stderr,
+    )
+    print(
+        "***************************************************************************************************************************************** ",
+        file=stderr,
+    )

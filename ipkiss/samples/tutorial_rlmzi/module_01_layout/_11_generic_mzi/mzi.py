@@ -34,6 +34,7 @@ from dircoup import DirectionalCoupler
 
 class __MziArm__(Structure):
     """ abstract base class for an arm in a Mach-Zehnder interferometer """
+
     __name_prefix__ = "MZI_ARM"
     splitter_port = DefinitionProperty(restriction=RestrictType(OpticalPort))
     combiner_port = DefinitionProperty(restriction=RestrictType(OpticalPort))
@@ -41,16 +42,22 @@ class __MziArm__(Structure):
 
 class MziArmWaveguide(__MziArm__):
     """ A Mach-Zehnder arm with a given length: routing upward at right-angle """
+
     __name_prefix__ = "MZI_WG_ARM"
     extra_length = NonNegativeNumberProperty(default=0.0)
     bend_radius = PositiveNumberProperty(default=TECH.WG.BEND_RADIUS)
     length = DefinitionProperty()
-    route_south = BoolProperty(
-        default=False, doc="route downward instead of upward")
+    route_south = BoolProperty(default=False, doc="route downward instead of upward")
 
     @cache()
     def get_route(self):
-        from ipkiss.plugins.photonics.routing.to_line import RouteToNorth, RouteToEastAtY, RouteToWestAtY, RouteToEast, RouteToWest
+        from ipkiss.plugins.photonics.routing.to_line import (
+            RouteToNorth,
+            RouteToEastAtY,
+            RouteToWestAtY,
+            RouteToEast,
+            RouteToWest,
+        )
 
         # if we route south, we just flip the ports, and do all the calculation
         # for north. Then at the end we flip again.
@@ -68,11 +75,13 @@ class MziArmWaveguide(__MziArm__):
         if r1a[-1].y > r2a[-1].y:
             r1b = RouteToEast(input_port=r1a.ports[-1])
             r2b = RouteToWestAtY(
-                input_port=r2a.ports[-1], y_position=r1b.ports[-1].position.y)
+                input_port=r2a.ports[-1], y_position=r1b.ports[-1].position.y
+            )
         else:
             r2b = RouteToWest(input_port=r2a.ports[-1])
             r1b = RouteToEastAtY(
-                input_port=r1a.ports[-1], y_position=r2b.ports[-1].position.y)
+                input_port=r1a.ports[-1], y_position=r2b.ports[-1].position.y
+            )
         r = r1a + r1b + r2b.reversed() + r2a.reversed()
 
         if not self.extra_length == 0.0:
@@ -95,6 +104,7 @@ class MziArmWaveguide(__MziArm__):
 
     def define_elements(self, elems):
         from ipkiss.plugins.photonics.routing.connect import RouteConnectorRounded
+
         elems += RouteConnectorRounded(route=self.get_route())
         return elems
 
@@ -108,6 +118,7 @@ class MziArmWaveguide(__MziArm__):
 #
 class MZI(Structure):
     """ generic MZI, taking a splitter, combiner and two __MziArm__ objects """
+
     __name_prefix__ = "MZI"
     arm1 = DefinitionProperty(restriction=RestrictType(__MziArm__))
     arm2 = DefinitionProperty(restriction=RestrictType(__MziArm__))
@@ -123,31 +134,32 @@ class MZI(Structure):
         # Single References (SREF) place a copy of the layout at a given position with
         # transformation. This is a reference copy, so the layout data is not duplicated.
         elems += SRef(
-            reference=self.splitter,
-            transformation=self.splitter_transformation)
+            reference=self.splitter, transformation=self.splitter_transformation
+        )
         elems += SRef(
-            reference=self.combiner,
-            transformation=self.combiner_transformation)
-        elems += SRef(
-            reference=self.arm1, transformation=self.arm1_transformation)
-        elems += SRef(
-            reference=self.arm2, transformation=self.arm2_transformation)
+            reference=self.combiner, transformation=self.combiner_transformation
+        )
+        elems += SRef(reference=self.arm1, transformation=self.arm1_transformation)
+        elems += SRef(reference=self.arm2, transformation=self.arm2_transformation)
         return elems
 
     def define_ports(self, prts):
         prts += self.splitter.ports.transform_copy(
-            self.splitter_transformation).west_ports()
+            self.splitter_transformation
+        ).west_ports()
         prts += self.combiner.ports.transform_copy(
-            self.combiner_transformation).east_ports()
+            self.combiner_transformation
+        ).east_ports()
         return prts
 
 
 class MZIWaveguides(MZI):
     """ A MZI with two simple waveguide arms """
+
     __name_prefix__ = "MZI_WG"
     delay_length = NumberProperty(
         required=True,
-        doc="if positive, the upper arms is longer, if negative, the lower arm"
+        doc="if positive, the upper arms is longer, if negative, the lower arm",
     )
     bend_radius = PositiveNumberProperty(default=TECH.WG.BEND_RADIUS)
 
@@ -163,10 +175,8 @@ class MZIWaveguides(MZI):
     @cache()
     def get_transformations(self):
         # size_info objects: information about the footprint of the object
-        si_splitter = self.splitter.size_info(
-        )  # object with contours of the component
-        si_combiner = self.combiner.size_info(
-        )  # object with contours of the component
+        si_splitter = self.splitter.size_info()  # object with contours of the component
+        si_combiner = self.combiner.size_info()  # object with contours of the component
 
         # spacing between components to allow easy routing (can be optimized)
         spacing = 4 * self.bend_radius + TECH.WG.SHORT_STRAIGHT
@@ -174,8 +184,7 @@ class MZIWaveguides(MZI):
         t_splitter = IdentityTransform()  # place the splitter in (0,0)
         t_arm1 = IdentityTransform()
         t_arm2 = IdentityTransform()
-        t_combiner = Translation(
-            (spacing + si_splitter.east - si_combiner.west, 0.0))
+        t_combiner = Translation((spacing + si_splitter.east - si_combiner.west, 0.0))
 
         return (t_arm1, t_arm2, t_splitter, t_combiner)
 
@@ -197,18 +206,24 @@ class MZIWaveguides(MZI):
     def get_arms(self):
         arm1 = MziArmWaveguide(
             splitter_port=self.splitter.ports.transform_copy(
-                self.splitter_transformation)["E1"],
+                self.splitter_transformation
+            )["E1"],
             combiner_port=self.combiner.ports.transform_copy(
-                self.combiner_transformation)["W1"],
-            bend_radius=self.bend_radius)
+                self.combiner_transformation
+            )["W1"],
+            bend_radius=self.bend_radius,
+        )
         # arm 2 is calculated upside down
         arm2 = MziArmWaveguide(
             splitter_port=self.splitter.ports.transform_copy(
-                self.splitter_transformation)["E0"],
+                self.splitter_transformation
+            )["E0"],
             combiner_port=self.combiner.ports.transform_copy(
-                self.combiner_transformation)["W0"],
+                self.combiner_transformation
+            )["W0"],
             route_south=True,
-            bend_radius=self.bend_radius)
+            bend_radius=self.bend_radius,
+        )
         l1 = arm1.length
         l2 = arm2.length
         extra_length = self.delay_length - l1 + l2

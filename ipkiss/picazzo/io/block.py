@@ -39,8 +39,7 @@ class IoBlock(StrongPropertyInitializer):
     count_offset = FunctionNameProperty(fget_name="get_count_offset")
 
     def define_south_offset(self):
-        return int(
-            round((self.south_east[1] - self.south_west[1]) / self.y_spacing))
+        return int(round((self.south_east[1] - self.south_west[1]) / self.y_spacing))
 
     south_offset = NumberProperty(locked=True)
 
@@ -58,25 +57,28 @@ class IoBlock(StrongPropertyInitializer):
         return self.count_east - self.count_west + self.south_offset
 
     def get_count_west(self):
-        raise NotImplementedException(
-            "To be implemented by subclass :: get_count_west")
+        raise NotImplementedException("To be implemented by subclass :: get_count_west")
 
     def get_count_east(self):
-        raise NotImplementedException(
-            "To be implemented by subclass :: get_count_east")
+        raise NotImplementedException("To be implemented by subclass :: get_count_east")
 
     def size_info(self):
         return SizeInfo(
-            self.south_west[0], self.south_east[0],
-            max(self.south_west[1] + self.count_west * self.y_spacing,
+            self.south_west[0],
+            self.south_east[0],
+            max(
+                self.south_west[1] + self.count_west * self.y_spacing,
                 self.south_east[1],
-                self.south_east[1] + self.count_east * self.y_spacing),
-            min(self.south_west[1], self.south_east[1]))
+                self.south_east[1] + self.count_east * self.y_spacing,
+            ),
+            min(self.south_west[1], self.south_east[1]),
+        )
 
 
 class IoSpacerBlock(IoBlock):
     n_o_lines = FunctionNameProperty(
-        fget_name="get_n_o_lines", fset_name="set_n_o_lines")
+        fget_name="get_n_o_lines", fset_name="set_n_o_lines"
+    )
 
     def set_n_o_lines(self, value):
         if isinstance(value, int):
@@ -86,8 +88,11 @@ class IoSpacerBlock(IoBlock):
             self.__count_west__ = value[0]
             self.__count_east__ = value[1]
         else:
-            raise TypeError("Wrong type " + str(type(value)) +
-                            " for n_o_lines in IoSpacerBlock.__init__().")
+            raise TypeError(
+                "Wrong type "
+                + str(type(value))
+                + " for n_o_lines in IoSpacerBlock.__init__()."
+            )
 
     def get_n_o_lines(self):
         return (self.count_west, self.count_east)
@@ -112,9 +117,11 @@ class BlockList(TypedList):
         return el
 
     def is_empty(self):
-        if (len(self) == 0): return True
+        if len(self) == 0:
+            return True
         for e in self:
-            if not e.is_empty(): return False
+            if not e.is_empty():
+                return False
         return True
 
 
@@ -124,13 +131,11 @@ class BlockList(TypedList):
 
 
 class BlocksDefinitionProperty(DefinitionProperty):
-    __allowed_keyword_arguments__ = [
-        "required", "restriction", "default", "fdef_name"
-    ]
+    __allowed_keyword_arguments__ = ["required", "restriction", "default", "fdef_name"]
 
     def __init__(self, **kwargs):
         super(BlocksDefinitionProperty, self).__init__(**kwargs)
-        if ("restriction" in kwargs):
+        if "restriction" in kwargs:
             R = kwargs["restriction"]
             self.restriction = RestrictType(BlockList) & R
         else:
@@ -152,25 +157,23 @@ class IoCompoundBlock(IoBlock):
     blocks_pos = FunctionNameProperty(fget_name="get_blocks_pos")
 
     def get_count_west(self):
-        (count_west, count_east,
-         blocks_pos) = self.get_count_east_west_block_pos()
+        (count_west, count_east, blocks_pos) = self.get_count_east_west_block_pos()
         return count_west
 
     def get_count_east(self):
-        (count_west, count_east,
-         blocks_pos) = self.get_count_east_west_block_pos()
+        (count_west, count_east, blocks_pos) = self.get_count_east_west_block_pos()
         return count_east
 
     def get_blocks_pos(self):
-        (count_west, count_east,
-         blocks_pos) = self.get_count_east_west_block_pos()
+        (count_west, count_east, blocks_pos) = self.get_count_east_west_block_pos()
         return blocks_pos
 
     def add_block(self, block):
         if not isinstance(block, IoBlock):
             raise TypeError(
                 "You can only add an IoBlock to an io_composite_block, not a "
-                + str(type(block)))
+                + str(type(block))
+            )
         b = self.blocks
         b.append(block)
         self.blocks = b  # workaround to set 'dirty' flags
@@ -189,8 +192,11 @@ class IoCompoundBlock(IoBlock):
             count_west += max(0, CO - BO2)
             count_east += max(0, BO2 - CO) + b.count_east
             blocks_pos.append(
-                (self.south_west[0] - b.south_west[0], self.south_west[1] +
-                 self.y_spacing * count_west - b.south_west[1]))
+                (
+                    self.south_west[0] - b.south_west[0],
+                    self.south_west[1] + self.y_spacing * count_west - b.south_west[1],
+                )
+            )
             count_west += b.count_west
         return (count_west, count_east, blocks_pos)
 
@@ -202,7 +208,9 @@ class IoCompoundBlock(IoBlock):
                 y_spacing=self.y_spacing,
                 south_west=(0.0, 0.0),
                 south_east=(self.width, self.count_offset * self.y_spacing),
-                n_o_lines=(N_lines, N_lines)))
+                n_o_lines=(N_lines, N_lines),
+            )
+        )
 
     def add_emptyline_west(self, N_lines=1):
         self.add_block(
@@ -210,7 +218,9 @@ class IoCompoundBlock(IoBlock):
                 y_spacing=self.y_spacing,
                 south_west=(0.0, 0.0),
                 south_east=(self.width, self.count_offset * self.y_spacing),
-                n_o_lines=(N_lines, 0)))
+                n_o_lines=(N_lines, 0),
+            )
+        )
 
     def add_emptyline_east(self, N_lines=1):
         self.add_block(
@@ -218,7 +228,9 @@ class IoCompoundBlock(IoBlock):
                 y_spacing=self.y_spacing,
                 south_west=(0.0, 0.0),
                 south_east=(self.width, self.count_offset * self.y_spacing),
-                n_o_lines=(0, N_lines)))
+                n_o_lines=(0, N_lines),
+            )
+        )
 
     def straighten(self):
         CO = self.count_offset
@@ -229,7 +241,9 @@ class IoCompoundBlock(IoBlock):
                     y_spacing=self.y_spacing,
                     south_west=(0.0, 0.0),
                     south_east=(self.width, CO * self.y_spacing),
-                    n_o_lines=n_o_lines))
+                    n_o_lines=n_o_lines,
+                )
+            )
 
     def straighten_to_north(self):
         CO = self.count_offset
@@ -239,23 +253,41 @@ class IoCompoundBlock(IoBlock):
                 self.straighten()
             else:
                 t = self.blocks_pos[-1][1] + SI.north
-                L = max([
-                    int(
-                        ceil((t - self.south_west[1] + 0.0 * self.y_spacing) /
-                             self.y_spacing)) - self.count_west, 0, CO
-                ])
-                R = max([
-                    int(
-                        ceil((t - self.south_east[1] + 0.0 * self.y_spacing) /
-                             self.y_spacing)) - self.count_east, 0, -CO
-                ])
+                L = max(
+                    [
+                        int(
+                            ceil(
+                                (t - self.south_west[1] + 0.0 * self.y_spacing)
+                                / self.y_spacing
+                            )
+                        )
+                        - self.count_west,
+                        0,
+                        CO,
+                    ]
+                )
+                R = max(
+                    [
+                        int(
+                            ceil(
+                                (t - self.south_east[1] + 0.0 * self.y_spacing)
+                                / self.y_spacing
+                            )
+                        )
+                        - self.count_east,
+                        0,
+                        -CO,
+                    ]
+                )
                 if L > 0 or R > 0:
                     self.add_block(
                         IoSpacerBlock(
                             y_spacing=self.y_spacing,
                             south_west=(0.0, 0.0),
                             south_east=(self.width, CO * self.y_spacing),
-                            n_o_lines=(L, R)))
+                            n_o_lines=(L, R),
+                        )
+                    )
         else:
             self.straighten()
 

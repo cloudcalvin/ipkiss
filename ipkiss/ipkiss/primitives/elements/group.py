@@ -43,8 +43,7 @@ class Group(__Group__, __Element__, MixinBowl):
 
     def flat_copy(self, level=-1):
         if not level == 0:
-            return self.elements.flat_copy(level).transform(
-                self.transformation)
+            return self.elements.flat_copy(level).transform(self.transformation)
         else:
             return ElementList(self.elements)
 
@@ -55,4 +54,5 @@ class Group(__Group__, __Element__, MixinBowl):
 
     def __eq__(self, other):
         return (self.elements == other.elements) and (
-            self.transformation == other.transformation)
+            self.transformation == other.transformation
+        )

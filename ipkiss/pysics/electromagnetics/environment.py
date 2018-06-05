@@ -24,16 +24,18 @@ from .field import ElectricField, MagneticField
 
 from ..basics.environment import __Environment__, Environment, DEFAULT_ENVIRONMENT
 
-__all__ = ['DEFAULT_ENVIRONMENT']
+__all__ = ["DEFAULT_ENVIRONMENT"]
 
 
 class __ElectroMagneticEnvironment__(__Environment__):
     electric_field = RestrictedProperty(
         default=ElectricField(value=(0.0, 0.0, 0.0)),
-        restriction=RestrictType(ElectricField))
+        restriction=RestrictType(ElectricField),
+    )
     magnetic_field = RestrictedProperty(
         default=MagneticField(value=(0.0, 0.0, 0.0)),
-        restriction=RestrictType(MagneticField))
+        restriction=RestrictType(MagneticField),
+    )
 
 
 Environment.mixin(__ElectroMagneticEnvironment__)

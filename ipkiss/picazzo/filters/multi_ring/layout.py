@@ -31,13 +31,14 @@ __all__ = ["MultiRingRectNotchFilter", "MultiRingRect180DropFilter"]
 ############################################################
 
 
-def MultiRingRectNotchFilter(coupler_spacings,
-                             ring_wg_definition=TECH.WGDEF.WIRE,
-                             coupler_wg_definition=TECH.WGDEF.WIRE,
-                             bend_radius=TECH.WG.BEND_RADIUS,
-                             straights=(TECH.WG.SHORT_STRAIGHT,
-                                        TECH.WG.SHORT_STRAIGHT),
-                             **kwargs):
+def MultiRingRectNotchFilter(
+    coupler_spacings,
+    ring_wg_definition=TECH.WGDEF.WIRE,
+    coupler_wg_definition=TECH.WGDEF.WIRE,
+    bend_radius=TECH.WG.BEND_RADIUS,
+    straights=(TECH.WG.SHORT_STRAIGHT, TECH.WG.SHORT_STRAIGHT),
+    **kwargs
+):
     """ Notch filter with stacked identical rect rings, with adjustable spacings """
     first = _r.RingRectNotchFilter(
         coupler_spacings=[coupler_spacings[0]],
@@ -45,17 +46,17 @@ def MultiRingRectNotchFilter(coupler_spacings,
         straights=straights,
         ring_wg_definition=ring_wg_definition,
         coupler_wg_definitions=coupler_wg_definitions,
-        **kwargs)
+        **kwargs
+    )
     middle = _r.RingRect(
         bend_radius=bend_radius,
         straights=straights,
         ring_wg_definition=ring_wg_definition,
-        **kwargs)
+        **kwargs
+    )
     return _mrb.MultiRingIdenticalWithChangedInAndOutWithGaps(
-        ring_middle=middle,
-        ring_in=first,
-        ring_out=middle,
-        spacings=self.spacings[1:])
+        ring_middle=middle, ring_in=first, ring_out=middle, spacings=self.spacings[1:]
+    )
 
 
 ############################################################
@@ -64,12 +65,13 @@ def MultiRingRectNotchFilter(coupler_spacings,
 
 
 def MultiRingRect180DropFilter(
-        coupler_spacings,
-        ring_wg_definition=TECH.WGDEF.WIRE,
-        coupler_wg_definitions=[TECH.WGDEF.WIRE, TECH.WGDEF.WIRE],
-        bend_radius=TECH.WG.BEND_RADIUS,
-        straights=(TECH.WG.SHORT_STRAIGHT, TECH.WG.SHORT_STRAIGHT),
-        **kwargs):
+    coupler_spacings,
+    ring_wg_definition=TECH.WGDEF.WIRE,
+    coupler_wg_definitions=[TECH.WGDEF.WIRE, TECH.WGDEF.WIRE],
+    bend_radius=TECH.WG.BEND_RADIUS,
+    straights=(TECH.WG.SHORT_STRAIGHT, TECH.WG.SHORT_STRAIGHT),
+    **kwargs
+):
     """ Notch filter with stacked identical rect rings, with adjustable spacings """
     first = _r.RingRectNotchFilter(
         coupler_spacings=[coupler_spacings[0]],
@@ -77,22 +79,26 @@ def MultiRingRect180DropFilter(
         straights=straights,
         ring_wg_definition=ring_wg_definition,
         coupler_wg_definitions=[coupler_wg_definitions[0]],
-        **kwargs)
+        **kwargs
+    )
     middle = _r.RingRect(
         bend_radius=bend_radius,
         straights=straights,
         ring_wg_definition=ring_wg_definition,
-        **kwargs)
+        **kwargs
+    )
     last = _r.RingRectNotchFilter(
         coupler_spacings=[coupler_spacings[-1]],
         bend_radius=bend_radius,
         straights=straights,
         ring_wg_definition=ring_wg_definition,
         coupler_wg_definitions=[coupler_wg_definitions[-1]],
-        **kwargs)
+        **kwargs
+    )
     return _mrb.MultiRingIdenticalWithChangedInAndOutWithSpacings(
         ring_middle=middle,
         ring_in=first,
         ring_out=last,
         spacings=coupler_spacings[1:-1],
-        flip_last=True)
+        flip_last=True,
+    )

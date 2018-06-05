@@ -29,12 +29,9 @@ class W1HeteroCavity1Mirror(Structure):
     __name_prefix__ = "W1HC"
     mirror_unit_cell = StructureProperty(required=True)
     cavity_unit_cell = cavity_unit_cell(required=True)
-    n_o_cladding_layers = IntProperty(
-        restriction=RESTRICT_POSITIVE, required=True)
-    n_o_mirror_periods = IntProperty(
-        restriction=RESTRICT_POSITIVE, required=True)
-    n_o_cavity_periods = IntProperty(
-        restriction=RESTRICT_POSITIVE, required=True)
+    n_o_cladding_layers = IntProperty(restriction=RESTRICT_POSITIVE, required=True)
+    n_o_mirror_periods = IntProperty(restriction=RESTRICT_POSITIVE, required=True)
+    n_o_cavity_periods = IntProperty(restriction=RESTRICT_POSITIVE, required=True)
     mirror_pitch = PositiveNumberProperty(required=True)
     cavity_pitch = PositiveNumberProperty(required=True)
     process_wg = ProcessProperty(default=TECH.PROCESS.WG)
@@ -46,11 +43,17 @@ class W1HeteroCavity1Mirror(Structure):
 
     def define_name(self):
         return "%s_MA%d_CA%d_MU%d_CU%d_C%d_ML%d_CL%d_%s_%s" % (
-            self.__name_prefix__, self.mirror_pitch * 1000,
-            self.cavity_pitch * 1000, do_hash(self.mirror_unit_cell.name),
-            do_hash(self.cavity_unit_cell.name), self.n_o_cladding_layers,
-            self.n_o_mirror_periods, self.n_o_cavity_periods,
-            self.process_wg.extension, self.process_hfw.extension)
+            self.__name_prefix__,
+            self.mirror_pitch * 1000,
+            self.cavity_pitch * 1000,
+            do_hash(self.mirror_unit_cell.name),
+            do_hash(self.cavity_unit_cell.name),
+            self.n_o_cladding_layers,
+            self.n_o_mirror_periods,
+            self.n_o_cavity_periods,
+            self.process_wg.extension,
+            self.process_hfw.extension,
+        )
 
     def define_mirror(self):
         return generic_W1_waveguide_section(
@@ -59,7 +62,8 @@ class W1HeteroCavity1Mirror(Structure):
             self.n_o_cladding_layers,
             self.n_o_mirror_periods,
             process_wg=self.process_wg,
-            process_hfw=self.process_hfw)
+            process_hfw=self.process_hfw,
+        )
 
     def define_cavity(self):
         return generic_W1_waveguide(
@@ -68,14 +72,18 @@ class W1HeteroCavity1Mirror(Structure):
             self.n_o_cladding_layers,
             self.n_o_cavity_periods,
             process_wg=self.process_wg,
-            process_hfw=self.process_hfw)
+            process_hfw=self.process_hfw,
+        )
 
     def define_mirror_pos(self):
         return Coord2(0.0, 0.0)
 
     def define_cavity_pos(self):
-        return Coord2(self.mirror_pitch * (self.n_o_mirror_periods) - 0.5 *
-                      (self.mirror_pitch - self.cavity_pitch), 0.0)
+        return Coord2(
+            self.mirror_pitch * (self.n_o_mirror_periods)
+            - 0.5 * (self.mirror_pitch - self.cavity_pitch),
+            0.0,
+        )
 
     def define_elements(self, elems):
         elems += SRef(self.mirror, self.mirror_pos)
@@ -84,8 +92,8 @@ class W1HeteroCavity1Mirror(Structure):
 
     def define_ports(self, ports):
         return self.mirror.west_ports.move_copy(
-            self.mirror_pos) + self.cavity.east_ports.move_copy(
-                self.mirror_pos)
+            self.mirror_pos
+        ) + self.cavity.east_ports.move_copy(self.mirror_pos)
 
 
 class W1HeteroCavity(W1HeteroCavity1Mirror):
@@ -95,8 +103,11 @@ class W1HeteroCavity(W1HeteroCavity1Mirror):
     termination_pos = DefinitionProperty(fdef_name="define_termination_pos")
 
     def define_mirror_pos2(self):
-        return Coord2(self.mirror_pitch * (2 * self.n_o_mirror_periods - 1) +
-                      self.cavity_pitch * self.n_o_cavity_periods, 0.0)
+        return Coord2(
+            self.mirror_pitch * (2 * self.n_o_mirror_periods - 1)
+            + self.cavity_pitch * self.n_o_cavity_periods,
+            0.0,
+        )
 
     def define_termination(self):
         return generic_W1_waveguide_termination(
@@ -104,17 +115,19 @@ class W1HeteroCavity(W1HeteroCavity1Mirror):
             self.mirror_unit_cell,
             self.n_o_cladding_layers,
             process_wg=self.process_wg,
-            process_hfw=self.process_hfw)
+            process_hfw=self.process_hfw,
+        )
 
     def define_termination_pos(self):
         return [
-            coord2_match_position(self.termination.east_ports[0],
-                                  self.mirror.west_ports[0].move_copy(
-                                      self.mirror_pos)),
             coord2_match_position(
                 self.termination.east_ports[0],
-                self.mirror.west_ports[0].h_mirror_copy().move(
-                    self.mirror_pos2))
+                self.mirror.west_ports[0].move_copy(self.mirror_pos),
+            ),
+            coord2_match_position(
+                self.termination.east_ports[0],
+                self.mirror.west_ports[0].h_mirror_copy().move(self.mirror_pos2),
+            ),
         ]
 
     def define_elements__(self, elems):
@@ -125,11 +138,11 @@ class W1HeteroCavity(W1HeteroCavity1Mirror):
 
     def define_ports(self, ports):
         W = self.mirror_unit_cell.size_info().width
-        ports += (
-            self.termination.west_ports.move_copy(
-                self.termination_pos[0] - (self.mirror_pitch - 0.5 * W, 0.0)) +
-            self.termination.east_ports.move_copy(
-                self.termination_pos[1] + (self.mirror_pitch - 0.5 * W, 0.0)))
+        ports += self.termination.west_ports.move_copy(
+            self.termination_pos[0] - (self.mirror_pitch - 0.5 * W, 0.0)
+        ) + self.termination.east_ports.move_copy(
+            self.termination_pos[1] + (self.mirror_pitch - 0.5 * W, 0.0)
+        )
         return ports
 
 
@@ -140,17 +153,23 @@ class W1HeteroCavityMulti(W1HeteroCavity):
 
     def define_name(self):
         return "%s_MA%d_CA%d_MU%d_CU%d_C%d_ML%d_CL%d_N%d_%s_%s" % (
-            self.__name_prefix__, self.mirror_pitch * 1000,
-            self.cavity_pitch * 1000, do_hash(self.mirror_unit_cell.name),
-            do_hash(self.cavity_unit_cell.name), self.n_o_cladding_layers,
-            self.n_o_mirror_periods, self.n_o_cavity_periods,
-            self.n_o_cavities, self.process_wg.extension,
-            self.process_hfw.extension)
+            self.__name_prefix__,
+            self.mirror_pitch * 1000,
+            self.cavity_pitch * 1000,
+            do_hash(self.mirror_unit_cell.name),
+            do_hash(self.cavity_unit_cell.name),
+            self.n_o_cladding_layers,
+            self.n_o_mirror_periods,
+            self.n_o_cavity_periods,
+            self.n_o_cavities,
+            self.process_wg.extension,
+            self.process_hfw.extension,
+        )
 
     def define_cavity_period(self):
         return self.mirror_pitch * (
-            self.n_o_mirror_periods - 0.5) + self.cavity_pitch * (
-                self.n_o_cavity_periods - 0.5)
+            self.n_o_mirror_periods - 0.5
+        ) + self.cavity_pitch * (self.n_o_cavity_periods - 0.5)
 
     def define_elements(self, elems):
         M = generic_W1_waveguide_section(
@@ -159,14 +178,16 @@ class W1HeteroCavityMulti(W1HeteroCavity):
             self.n_o_cladding_layers,
             self.n_o_mirror_periods,
             process_wg=self.process_wg,
-            process_hfw=self.process_hfw)
+            process_hfw=self.process_hfw,
+        )
         C = generic_W1_waveguide(
             (self.cavity_pitch, self.mirror_pitch),
             self.cavity_unit_cell,
             self.n_o_cladding_layers,
             self.n_o_cavity_periods,
             process_wg=self.process_wg,
-            process_hfw=self.process_hfw)
+            process_hfw=self.process_hfw,
+        )
         p = -self.cavity_period
         elems += SRef(self.termination, self.termination_pos[0])
         for i in range(self.n_o_cavities):
@@ -179,10 +200,11 @@ class W1HeteroCavityMulti(W1HeteroCavity):
 
     def define_ports(self, ports):
         W = self.mirror_unit_cell.size_info().width
-        ports = (self.termination.west_ports.move_copy(
-            self.termination_pos[0] - (self.mirror_pitch - 0.5 * W, 0.0)) +
-                 self.termination.east_ports.move_copy(
-                     self.termination_pos[1] + (self.cavity_period *
-                                                (self.n_o_cavities - 1), 0.0) +
-                     (self.mirror_pitch - 0.5 * W, 0.0)))
+        ports = self.termination.west_ports.move_copy(
+            self.termination_pos[0] - (self.mirror_pitch - 0.5 * W, 0.0)
+        ) + self.termination.east_ports.move_copy(
+            self.termination_pos[1]
+            + (self.cavity_period * (self.n_o_cavities - 1), 0.0)
+            + (self.mirror_pitch - 0.5 * W, 0.0)
+        )
         return ports

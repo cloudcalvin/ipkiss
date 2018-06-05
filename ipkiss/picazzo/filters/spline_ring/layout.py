@@ -20,15 +20,28 @@
 # Contact: ipkiss@intec.ugent.be
 
 from ipkiss.all import *
-from ipkiss.geometry.shapes.spline import ShapeRoundAdiabaticSpline, ShapeRoundAdiabaticSplineGeneric, SplineRoundingAlgorithm
+from ipkiss.geometry.shapes.spline import (
+    ShapeRoundAdiabaticSpline,
+    ShapeRoundAdiabaticSplineGeneric,
+    SplineRoundingAlgorithm,
+)
 from picazzo.filters.ring import RingRoundedShape
-from picazzo.filters.ring.layout import __RingStraightCouplers__, __RingCouplerTransformation1__, __Ring180CouplerTransformation2__, __RingWaveguideCouplers1__, __RingWaveguideCouplers2__, __Ring90CouplerTransformation2__
+from picazzo.filters.ring.layout import (
+    __RingStraightCouplers__,
+    __RingCouplerTransformation1__,
+    __Ring180CouplerTransformation2__,
+    __RingWaveguideCouplers1__,
+    __RingWaveguideCouplers2__,
+    __Ring90CouplerTransformation2__,
+)
 
 import functools
 
 __all__ = [
-    "RingAdiabaticSpline", "RingSplineNotchFilter", "RingSpline180DropFilter",
-    "RingSpline90DropFilter"
+    "RingAdiabaticSpline",
+    "RingSplineNotchFilter",
+    "RingSpline180DropFilter",
+    "RingSpline90DropFilter",
 ]
 
 
@@ -41,6 +54,7 @@ def PartialProperty(internal_member_name=None, restriction=None, **kwargs):
 
 class RingAdiabaticSpline(RingRoundedShape):
     """ base Class: Ring with adiabatic spline bends """
+
     __name_prefix__ = "RINGSPLINE"
     length = PositiveNumberProperty(required=True)
     bend_radius = PositiveNumberProperty(default=TECH.WG.BEND_RADIUS)
@@ -55,20 +69,28 @@ class RingAdiabaticSpline(RingRoundedShape):
     rounding_algorithm = PartialProperty()
 
     def define_straights(self):
-        return (self.straight, )
+        return (self.straight,)
 
     def define_rounding_algorithm(self):
-        return SplineRoundingAlgorithm(adiabatic_angles=(
-            self.adiabatic_angle_in_coupler, self.adiabatic_angle_in_ring))
+        return SplineRoundingAlgorithm(
+            adiabatic_angles=(
+                self.adiabatic_angle_in_coupler,
+                self.adiabatic_angle_in_ring,
+            )
+        )
 
     def get_ring(self):
         return self.ring_wg_definition(shape=self.get_shape())
 
     def get_bend90_size(self):
         B = self.rounding_algorithm(
-            original_shape=[(-100 * self.bend_radius, 0.0), (0.0, 0.0),
-                            (0.0, 100 * self.bend_radius)],
-            radius=self.bend_radius)
+            original_shape=[
+                (-100 * self.bend_radius, 0.0),
+                (0.0, 0.0),
+                (0.0, 100 * self.bend_radius),
+            ],
+            radius=self.bend_radius,
+        )
         bend_size = B[1:-1].size_info.size
         return (bend_size[0] + 0.01, bend_size[1] + 0.01)
 
@@ -79,17 +101,18 @@ class RingAdiabaticSpline(RingRoundedShape):
         S = ShapeRoundAdiabaticSplineGeneric(
             original_shape=S,
             radii=[
-                self.bend_radius, self.bend_radius, self.bend_radius,
-                self.bend_radius
+                self.bend_radius,
+                self.bend_radius,
+                self.bend_radius,
+                self.bend_radius,
             ],
-            adiabatic_angles_list=[(self.adiabatic_angle_in_ring,
-                                    self.adiabatic_angle_in_coupler),
-                                   (self.adiabatic_angle_in_coupler,
-                                    self.adiabatic_angle_in_ring),
-                                   (self.adiabatic_angle_in_ring,
-                                    self.adiabatic_angle_in_coupler),
-                                   (self.adiabatic_angle_in_coupler,
-                                    self.adiabatic_angle_in_ring)])
+            adiabatic_angles_list=[
+                (self.adiabatic_angle_in_ring, self.adiabatic_angle_in_coupler),
+                (self.adiabatic_angle_in_coupler, self.adiabatic_angle_in_ring),
+                (self.adiabatic_angle_in_ring, self.adiabatic_angle_in_coupler),
+                (self.adiabatic_angle_in_coupler, self.adiabatic_angle_in_ring),
+            ],
+        )
         L = S.length()
         straight1 = 0.5 * (self.length - L) - self.straight
         return (self.straight, straight1)
@@ -101,51 +124,64 @@ class RingAdiabaticSpline(RingRoundedShape):
         S = ShapeRoundAdiabaticSplineGeneric(
             original_shape=S,
             radii=[
-                self.bend_radius, self.bend_radius, self.bend_radius,
-                self.bend_radius
+                self.bend_radius,
+                self.bend_radius,
+                self.bend_radius,
+                self.bend_radius,
             ],
-            adiabatic_angles_list=[(self.adiabatic_angle_in_ring,
-                                    self.adiabatic_angle_in_coupler),
-                                   (self.adiabatic_angle_in_coupler,
-                                    self.adiabatic_angle_in_ring),
-                                   (self.adiabatic_angle_in_ring,
-                                    self.adiabatic_angle_in_coupler),
-                                   (self.adiabatic_angle_in_coupler,
-                                    self.adiabatic_angle_in_ring)])
+            adiabatic_angles_list=[
+                (self.adiabatic_angle_in_ring, self.adiabatic_angle_in_coupler),
+                (self.adiabatic_angle_in_coupler, self.adiabatic_angle_in_ring),
+                (self.adiabatic_angle_in_ring, self.adiabatic_angle_in_coupler),
+                (self.adiabatic_angle_in_coupler, self.adiabatic_angle_in_ring),
+            ],
+        )
 
         return S
 
 
-class RingSplineNotchFilter(__RingStraightCouplers__,
-                            __RingCouplerTransformation1__,
-                            __RingWaveguideCouplers1__, RingAdiabaticSpline):
+class RingSplineNotchFilter(
+    __RingStraightCouplers__,
+    __RingCouplerTransformation1__,
+    __RingWaveguideCouplers1__,
+    RingAdiabaticSpline,
+):
     """ spline ring filter with one straight access waveguide (notch filter) """
+
     __name_prefix__ = "RINGSPLINE_NOTCH"
 
 
-class RingSpline180DropFilter(__RingStraightCouplers__,
-                              __Ring180CouplerTransformation2__,
-                              __RingWaveguideCouplers2__, RingAdiabaticSpline):
+class RingSpline180DropFilter(
+    __RingStraightCouplers__,
+    __Ring180CouplerTransformation2__,
+    __RingWaveguideCouplers2__,
+    RingAdiabaticSpline,
+):
     """ spline ring filter with two straight access waveguide (drop filter) """
+
     __name_prefix__ = "RINGSPLINE_180DROP"
 
 
-class RingSpline90DropFilter(__RingStraightCouplers__,
-                             __Ring90CouplerTransformation2__,
-                             __RingWaveguideCouplers2__, RingAdiabaticSpline):
+class RingSpline90DropFilter(
+    __RingStraightCouplers__,
+    __Ring90CouplerTransformation2__,
+    __RingWaveguideCouplers2__,
+    RingAdiabaticSpline,
+):
     """ spline ring filter with two straight access waveguides under 90 degrees (drop filter) """
+
     __name_prefix__ = "RINGSPLINE_90DROP"
 
 
-#FIXME: Make couplers with adiabatic splines as well
-#class RingSplineSymmNotchFilter(__RingSymmCouplers__, __RingCouplerTransformation1__, __RingWaveguideCouplers1__, RingAdiabaticSpline):
-#""" spline ring filter with one access waveguide (notch filter) """
-#__name_prefix__ = "RINGSPLINESYMM_NOTCH"
+# FIXME: Make couplers with adiabatic splines as well
+# class RingSplineSymmNotchFilter(__RingSymmCouplers__, __RingCouplerTransformation1__, __RingWaveguideCouplers1__, RingAdiabaticSpline):
+# """ spline ring filter with one access waveguide (notch filter) """
+# __name_prefix__ = "RINGSPLINESYMM_NOTCH"
 
-#class RingSplineSymm180DropFilter(__RingSymmCouplers__, __Ring180CouplerTransformation2__,__RingWaveguideCouplers2__,  RingAdiabaticSpline):
-#""" spline ring filter with two access waveguides (drop filter) """
-#__name_prefix__ = "RINGSPLINESYMM_180DROP"
+# class RingSplineSymm180DropFilter(__RingSymmCouplers__, __Ring180CouplerTransformation2__,__RingWaveguideCouplers2__,  RingAdiabaticSpline):
+# """ spline ring filter with two access waveguides (drop filter) """
+# __name_prefix__ = "RINGSPLINESYMM_180DROP"
 
-#class RingSplineSymm90DropFilter(__RingSymmCouplers__, __Ring90CouplerTransformation2__,__RingWaveguideCouplers2__,  RingAdiabaticSpline):
-#""" spline ring filter with two access waveguides (drop filter) """
-#__name_prefix__ = "RINGSPLINESYMM_90DROP"
+# class RingSplineSymm90DropFilter(__RingSymmCouplers__, __Ring90CouplerTransformation2__,__RingWaveguideCouplers2__,  RingAdiabaticSpline):
+# """ spline ring filter with two access waveguides (drop filter) """
+# __name_prefix__ = "RINGSPLINESYMM_90DROP"

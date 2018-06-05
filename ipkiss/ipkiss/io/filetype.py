@@ -19,7 +19,12 @@
 #
 # Contact: ipkiss@intec.ugent.be
 
-from ipcore.all import StrongPropertyInitializer, StringProperty, RestrictedProperty, RestrictType
+from ipcore.all import (
+    StrongPropertyInitializer,
+    StringProperty,
+    RestrictedProperty,
+    RestrictType,
+)
 
 
 class FileType(StrongPropertyInitializer):

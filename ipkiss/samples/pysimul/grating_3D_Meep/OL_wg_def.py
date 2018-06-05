@@ -21,7 +21,11 @@
 
 ##from technologies.si_photonics.picazzo.default import *
 from ipkiss.plugins.photonics.wg import *
-from ipkiss.plugins.photonics.wg.window import WindowWaveguideDefinition, WindowsOnWaveguideDefinition, PathWindow
+from ipkiss.plugins.photonics.wg.window import (
+    WindowWaveguideDefinition,
+    WindowsOnWaveguideDefinition,
+    PathWindow,
+)
 import numpy
 from ipkiss.all import *
 
@@ -36,5 +40,6 @@ class OverlayWgDefinition(WindowWaveguideDefinition):
             PathWindow(
                 layer=TECH.PPLAYER.ACO.DEFAULT,
                 start_offset=-0.5 * self.wg_width,
-                end_offset=0.5 * self.wg_width)
+                end_offset=0.5 * self.wg_width,
+            )
         ]

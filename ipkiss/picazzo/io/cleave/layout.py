@@ -52,34 +52,44 @@ class IoCleave(__RoundedShape__, IoBlockAdapter):
                 start_position=t_pos,
                 end_position=(t_pos[0] - self.taper_length, t_pos[1]),
                 start_wg_def=ip.wg_definition,
-                end_wg_def=self.wg_definition)
+                end_wg_def=self.wg_definition,
+            )
 
             elems += T
             # draw straight waveguides
             elems += self.wg_definition(
-                shape=[T.west_ports[0].position, (0.0, t_pos[1])])
+                shape=[T.west_ports[0].position, (0.0, t_pos[1])]
+            )
             # generic connector between structure port and taper port
             R = RouteToWestAtY(
                 input_port=ip,
                 y_position=T.east_ports[0].y,
                 bend_radius=self.bend_radius,
                 min_straight=self.minimum_straight,
-                rounding_algorithm=self.rounding_algorithm)
+                rounding_algorithm=self.rounding_algorithm,
+            )
             R.end_straight += R.out_ports[0].x - T.east_ports[0].x
             elems += RouteConnectorRounded(R)
-            #blocking trenches
+            # blocking trenches
             elems += Line(
                 PPLayer(self.wg_definition.process, TECH.PURPOSE.DF.TRENCH),
-                (self.block_trench_position, 0.5 * self.wg_definition.wg_width
-                 + self.wg_definition.trench_width),
+                (
+                    self.block_trench_position,
+                    0.5 * self.wg_definition.wg_width + self.wg_definition.trench_width,
+                ),
                 (self.block_trench_position, 0.5 * self.y_spacing),
-                self.block_trench_width)
+                self.block_trench_width,
+            )
             elems += Line(
                 PPLayer(self.wg_definition.process, TECH.PURPOSE.DF.TRENCH),
-                (self.block_trench_position, -0.5 * self.wg_definition.wg_width
-                 - self.wg_definition.trench_width),
+                (
+                    self.block_trench_position,
+                    -0.5 * self.wg_definition.wg_width
+                    - self.wg_definition.trench_width,
+                ),
                 (self.block_trench_position, -0.5 * self.y_spacing),
-                self.block_trench_width)
+                self.block_trench_width,
+            )
 
         for i in range(len(self.struct.east_ports)):
             op = self.struct_east_ports[i]
@@ -89,11 +99,13 @@ class IoCleave(__RoundedShape__, IoBlockAdapter):
                 start_position=t_pos,
                 end_position=(t_pos[0] + self.taper_length, t_pos[1]),
                 start_wg_def=op.wg_definition,
-                end_wg_def=self.wg_definition)
+                end_wg_def=self.wg_definition,
+            )
             elems += T
             # draw straight waveguides
             elems += self.wg_definition(
-                shape=[T.east_ports[0].position, (self.width, t_pos[1])])
+                shape=[T.east_ports[0].position, (self.width, t_pos[1])]
+            )
 
             # generic connector between structure port and taper port
             R = RouteToEastAtY(
@@ -101,7 +113,8 @@ class IoCleave(__RoundedShape__, IoBlockAdapter):
                 y_position=T.west_ports[0].y,
                 bend_radius=self.bend_radius,
                 min_straight=self.minimum_straight,
-                rounding_algorithm=self.rounding_algorithm)
+                rounding_algorithm=self.rounding_algorithm,
+            )
             R.end_straight += -R.out_ports[0].x + T.west_ports[0].x
             elems += RouteConnectorRounded(R)
 
@@ -111,14 +124,16 @@ class IoCleave(__RoundedShape__, IoBlockAdapter):
         # should reflect number of in and outputs in center structure
         ports += [
             OpticalPort(
-                position=(0.0, ypos),
-                wg_definition=self.wg_definition,
-                angle=180.0) for ypos in self.__y_west__
+                position=(0.0, ypos), wg_definition=self.wg_definition, angle=180.0
+            )
+            for ypos in self.__y_west__
         ]
         ports += [
             OpticalPort(
                 position=(self.width, ypos),
                 wg_definition=self.wg_definition,
-                angle=180.0) for ypos in self.__y_east__
+                angle=180.0,
+            )
+            for ypos in self.__y_east__
         ]
         return ports

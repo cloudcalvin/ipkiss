@@ -27,9 +27,11 @@ class StructureSimulationAspect(object):
         if not isinstance(simul_params, dict):
             raise Exception(
                 "create_simulation:: expected a dictionary for parameter 'simul_params', but received %s."
-                % str(type(simul_params)))
+                % str(type(simul_params))
+            )
         simul_params["structure"] = self
         from pysimul.integration import StructureSimulationDefinition
+
         simul_def = StructureSimulationDefinition(simul_params=simul_params)
         return simul_def
 

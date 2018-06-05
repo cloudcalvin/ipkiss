@@ -30,10 +30,9 @@ class __NameGenerator__(object):
 class CounterNameGenerator(__NameGenerator__):
     """Generate a unique name based on a counter for every prefix"""
 
-    def __init__(self,
-                 prefix_attribute="__name_prefix__",
-                 default_prefix="OBJ",
-                 counter_zero=0):
+    def __init__(
+        self, prefix_attribute="__name_prefix__", default_prefix="OBJ", counter_zero=0
+    ):
         self.prefix_attribute = prefix_attribute
         self.counter_zero = counter_zero
         self.default_prefix = default_prefix
@@ -56,33 +55,33 @@ class CounterNameGenerator(__NameGenerator__):
 
 
 # ---- DISABLED FOR NOW - niet sluitend - FIXME ----
-#class PropertyNameGenerator(__NameGenerator__):
-#def __init__(self, prefix_attribute = "__name_prefix__", default_prefix = "OBJ"):
-#self.prefix_attribute = prefix_attribute
-#self.default_prefix = default_prefix
-#self.names_counters = {}
+# class PropertyNameGenerator(__NameGenerator__):
+# def __init__(self, prefix_attribute = "__name_prefix__", default_prefix = "OBJ"):
+# self.prefix_attribute = prefix_attribute
+# self.default_prefix = default_prefix
+# self.names_counters = {}
 
-#def __call__(self, obj):
-#if hasattr(obj, self.prefix_attribute):
-#prefix = getattr(obj, self.prefix_attribute)
-#else:
-#prefix = self.default_prefix
+# def __call__(self, obj):
+# if hasattr(obj, self.prefix_attribute):
+# prefix = getattr(obj, self.prefix_attribute)
+# else:
+# prefix = self.default_prefix
 
-#if hasattr(obj, '__name_properties__'):
-#props = obj.__name_properties__
-#else:
-#props = obj.__unlocked_properties__()
-#props.sort()
+# if hasattr(obj, '__name_properties__'):
+# props = obj.__name_properties__
+# else:
+# props = obj.__unlocked_properties__()
+# props.sort()
 
-#name_list = [prefix]
-#for n in props:
-#p = getattr(obj, n)
-#if hasattr(p, 'id_string'):
-#name_list += ["%s%s_" % (string.upper(n[0]), p.id_string())]
-#else:
-#try:
-#name_list += ["%s%d_" % (string.upper(n[0]), hash(p))]
-#except:
-#name_list += ["%s%d_" % (string.upper(n[0]), hash(str(p)))]
+# name_list = [prefix]
+# for n in props:
+# p = getattr(obj, n)
+# if hasattr(p, 'id_string'):
+# name_list += ["%s%s_" % (string.upper(n[0]), p.id_string())]
+# else:
+# try:
+# name_list += ["%s%d_" % (string.upper(n[0]), hash(p))]
+# except:
+# name_list += ["%s%d_" % (string.upper(n[0]), hash(str(p)))]
 
-#return "".join(name_list)
+# return "".join(name_list)

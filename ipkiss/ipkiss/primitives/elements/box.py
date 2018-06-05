@@ -31,24 +31,35 @@ class Box(__LayerElement__):
     center = Coord2Property(default=(0.0, 0.0))
     box_size = Size2Property(default=(1.0, 1.0))
 
-    def __init__(self,
-                 layer,
-                 center=(0.0, 0.0),
-                 box_size=(1.0, 1.0),
-                 transformation=None,
-                 **kwargs):
+    def __init__(
+        self,
+        layer,
+        center=(0.0, 0.0),
+        box_size=(1.0, 1.0),
+        transformation=None,
+        **kwargs
+    ):
         super(Box, self).__init__(
             layer=layer,
             transformation=transformation,
             center=center,
             box_size=box_size,
-            **kwargs)
+            **kwargs
+        )
 
     def size_info(self):
-        return size_info.SizeInfo([(self.center[0] - 0.5 * self.box_size[0],
-                                    self.center[1] - 0.5 * self.box_size[1]),
-                                   (self.center[0] + 0.5 * self.box_size[0],
-                                    self.center[1] + 0.5 * self.box_size[1])])
+        return size_info.SizeInfo(
+            [
+                (
+                    self.center[0] - 0.5 * self.box_size[0],
+                    self.center[1] - 0.5 * self.box_size[1],
+                ),
+                (
+                    self.center[0] + 0.5 * self.box_size[0],
+                    self.center[1] + 0.5 * self.box_size[1],
+                ),
+            ]
+        )
 
     def convex_hull(self):
         return ShapeRectangle(center=self.center, box_size=self.box_size)
@@ -57,4 +68,4 @@ class Box(__LayerElement__):
         return ElementList(Box(self.layer, self.center, self.box_size))
 
     def is_empty(self):
-        return (self.box_size[0] == 0.0 and self.box_size[1] == 0.0)
+        return self.box_size[0] == 0.0 and self.box_size[1] == 0.0

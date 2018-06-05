@@ -31,8 +31,11 @@ from ipkiss.all import *
 from math import atan2
 
 __all__ = [
-    "BroadWgSocket", "TaperSocket", "OpenApertureSocket", "SocketProperty",
-    "LinearTaperSocket"
+    "BroadWgSocket",
+    "TaperSocket",
+    "OpenApertureSocket",
+    "SocketProperty",
+    "LinearTaperSocket",
 ]
 
 
@@ -58,11 +61,13 @@ class BroadWgSocket(__WgSocket__):
     wg_length = PositiveNumberProperty(default=50.0)
 
     def define_name(self):
-        return "%s_%d_%d_%d_%s" % (self.__name_prefix__,
-                                   self.wg_definition.wg_width * 1000,
-                                   self.wg_definition.trench_width * 1000,
-                                   self.wg_length * 1000,
-                                   self.wg_definition.process.extension)
+        return "%s_%d_%d_%d_%s" % (
+            self.__name_prefix__,
+            self.wg_definition.wg_width * 1000,
+            self.wg_definition.trench_width * 1000,
+            self.wg_length * 1000,
+            self.wg_definition.process.extension,
+        )
 
     def define_elements(self, elems):
         elems += self.wg_definition(shape=[(0.0, 0.0), (self.wg_length, 0.0)])
@@ -71,13 +76,13 @@ class BroadWgSocket(__WgSocket__):
     def define_ports(self, ports):
         ports += [
             OpticalPort(
-                position=(0.0, 0.0),
-                wg_definition=self.wg_definition,
-                angle=180.0),
+                position=(0.0, 0.0), wg_definition=self.wg_definition, angle=180.0
+            ),
             OpticalPort(
                 position=(self.wg_length, 0.0),
                 wg_definition=self.wg_definition,
-                angle=0.0)
+                angle=0.0,
+            ),
         ]
         return ports
 
@@ -86,9 +91,11 @@ class TaperSocket(__WgSocket__):
     "Base class for an aperture consisting of a taper"
     __name_prefix__ = "TAPS"
     start_wg_definition = WaveguideDefProperty(
-        default=TECH.WGDEF.WIRE, doc="waveguide definition at the start")
+        default=TECH.WGDEF.WIRE, doc="waveguide definition at the start"
+    )
     end_wg_definition = WaveguideDefProperty(
-        required=True, doc="waveguide definition at the end")
+        required=True, doc="waveguide definition at the end"
+    )
     length = PositiveNumberProperty(default=20.0)
     center = Coord2Property(default=(0.0, 0.0))
     extension = NonNegativeNumberProperty(default=0.0)
@@ -99,14 +106,16 @@ class TaperSocket(__WgSocket__):
         ports += [
             OpticalPort(
                 position=self.center.move_copy(
-                    (self.length + self.straight_entrance, 0.0)),
+                    (self.length + self.straight_entrance, 0.0)
+                ),
                 wg_definition=self.start_wg_definition,
-                angle=0.0)
+                angle=0.0,
+            )
         ]
         return ports
 
     def angle_rad(self):
-        #return 2* atan2(0.5* (self.start_width), self.length)
+        # return 2* atan2(0.5* (self.start_width), self.length)
         return 2 * atan2(0.5 * (self.end_wg_definition.wg_width), self.length)
         # end width is not included, because the approximation goes for a gaussian beam
 
@@ -116,45 +125,56 @@ class LinearTaperSocket(TaperSocket):
 
     def define_elements(self, elems):
         from ipkiss.plugins.photonics.wg.basic import WgElDefinition
+
         if self.extension != 0.0:
-            extended_start_width = self.start_wg_definition.wg_width + (
-                self.end_wg_definition.wg_width -
-                self.start_wg_definition.wg_width) * (
-                    self.extension + self.length - self.straight_extension
-                ) / self.length
+            extended_start_width = (
+                self.start_wg_definition.wg_width
+                + (self.end_wg_definition.wg_width - self.start_wg_definition.wg_width)
+                * (self.extension + self.length - self.straight_extension)
+                / self.length
+            )
         else:
             extended_start_width = self.end_wg_definition.wg_width
         end_wg_def = WgElDefinition(
             wg_width=extended_start_width,
             trench_width=self.end_wg_definition.trench_width,
-            process=self.end_wg_definition.process)
+            process=self.end_wg_definition.process,
+        )
         end_wg_def_ext = WgElDefinition(
             wg_width=extended_start_width + 0.05,
             trench_width=self.end_wg_definition.trench_width - 0.05,
-            process=self.end_wg_definition.process)
+            process=self.end_wg_definition.process,
+        )
 
         elems += WgElTaperLinear(
             start_position=(self.center[0] - self.extension, self.center[1]),
             end_position=(self.center[0] + self.length, self.center[1]),
             start_wg_def=end_wg_def,
             end_wg_def=self.start_wg_definition,
-            straight_extension=(0.0, 0.0))
+            straight_extension=(0.0, 0.0),
+        )
         if self.straight_extension > 0:
             elems += WgElTaperLinear(
-                start_position=(self.center[0] - self.extension,
-                                self.center[1]),
+                start_position=(self.center[0] - self.extension, self.center[1]),
                 end_position=(
                     self.center[0] - self.extension - self.straight_extension,
-                    self.center[1]),
+                    self.center[1],
+                ),
                 start_wg_def=end_wg_def,
                 end_wg_def=end_wg_def_ext,
-                straight_extension=(0.0, 0.0))
+                straight_extension=(0.0, 0.0),
+            )
 
         if self.straight_entrance > 0.0:
             elems += self.start_wg_definition(
-                shape=[(self.center[0] + self.length, self.center[1]),
-                       (self.center[0] + self.length + self.straight_entrance,
-                        self.center[1])])
+                shape=[
+                    (self.center[0] + self.length, self.center[1]),
+                    (
+                        self.center[0] + self.length + self.straight_entrance,
+                        self.center[1],
+                    ),
+                ]
+            )
 
         return elems
 

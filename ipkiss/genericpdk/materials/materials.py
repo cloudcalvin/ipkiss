@@ -32,61 +32,58 @@ __all__ = []
 ###########################################################
 
 AIR = Material(
-    name="air",
-    display_style=DisplayStyle(color=COLOR_BLUE, alpha=0.2),
-    solid=False)
-SILICON = Material(
-    name="silicon", display_style=DisplayStyle(color=COLOR_ORANGE))
+    name="air", display_style=DisplayStyle(color=COLOR_BLUE, alpha=0.2), solid=False
+)
+SILICON = Material(name="silicon", display_style=DisplayStyle(color=COLOR_ORANGE))
 SILICON_OXIDE = Material(
-    name="silicon oxide",
-    display_style=DisplayStyle(color=COLOR_YELLOW, alpha=0.7))
+    name="silicon oxide", display_style=DisplayStyle(color=COLOR_YELLOW, alpha=0.7)
+)
 SILICON_NITRIDE = Material(
-    name="silicon nitride", display_style=DisplayStyle(color=COLOR_CYAN))
+    name="silicon nitride", display_style=DisplayStyle(color=COLOR_CYAN)
+)
 SILICON_CARBON_NITRIDE = Material(
-    name="silicon carbon nitride",
-    display_style=DisplayStyle(color=COLOR_BLUE))
+    name="silicon carbon nitride", display_style=DisplayStyle(color=COLOR_BLUE)
+)
 
 PHOTORESIST = PatterningResistMaterial(
-    name="photoresist", display_style=DisplayStyle(color=COLOR_GREEN))
+    name="photoresist", display_style=DisplayStyle(color=COLOR_GREEN)
+)
 EXPOSED_PHOTORESIST = Material(
-    name="exposed_photoresist",
-    display_style=DisplayStyle(color=COLOR_DARK_GREEN))
+    name="exposed_photoresist", display_style=DisplayStyle(color=COLOR_DARK_GREEN)
+)
 
-BARC = Material(
-    name="BARC", display_style=DisplayStyle(color=COLOR_DEEP_GREEN))
+BARC = Material(name="BARC", display_style=DisplayStyle(color=COLOR_DEEP_GREEN))
 
 P_SILICON = Material(
-    name="P implanted silicon",
-    display_style=DisplayStyle(color=COLOR_BLUE_VIOLET))
+    name="P implanted silicon", display_style=DisplayStyle(color=COLOR_BLUE_VIOLET)
+)
 PP_SILICON = Material(
-    name="P+ implanted silicon",
-    display_style=DisplayStyle(color=COLOR_BLUE_CRAYOLA))
+    name="P+ implanted silicon", display_style=DisplayStyle(color=COLOR_BLUE_CRAYOLA)
+)
 N_SILICON = Material(
-    name="N implanted silicon", display_style=DisplayStyle(color=COLOR_CHERRY))
+    name="N implanted silicon", display_style=DisplayStyle(color=COLOR_CHERRY)
+)
 NP_SILICON = Material(
-    name="N+ implanted silicon",
-    display_style=DisplayStyle(color=COLOR_CHAMPAGNE))
+    name="N+ implanted silicon", display_style=DisplayStyle(color=COLOR_CHAMPAGNE)
+)
 IMPUNDEF_SILICON = Material(
     name="silicon with undefined implant",
-    display_style=DisplayStyle(
-        color=COLOR_RED, stipple=STIPPLE_LINES_DIAGONAL_L))
-NICKEL = Material(
-    name="Nickel", display_style=DisplayStyle(color=COLOR_SCARLET))
+    display_style=DisplayStyle(color=COLOR_RED, stipple=STIPPLE_LINES_DIAGONAL_L),
+)
+NICKEL = Material(name="Nickel", display_style=DisplayStyle(color=COLOR_SCARLET))
 NISI = Material(name="NiSi", display_style=DisplayStyle(color=COLOR_SANGRIA))
 
-TITANIUM = Material(
-    name="Titanium", display_style=DisplayStyle(color=COLOR_SILVER))
+TITANIUM = Material(name="Titanium", display_style=DisplayStyle(color=COLOR_SILVER))
 TITANIUM_NITRIDE = Material(
-    name="Titanium nitride",
-    display_style=DisplayStyle(color=COLOR_TITANIUM_YELLOW))
-TUNGSTEN = Material(
-    name="Tungsten", display_style=DisplayStyle(color=COLOR_GRAY))
-COPPER = Material(
-    name="Copper", display_style=DisplayStyle(color=COLOR_COPPER))
-TANTALUM = Material(
-    name="Tantalum", display_style=DisplayStyle(color=COLOR_SCARLET))
+    name="Titanium nitride", display_style=DisplayStyle(color=COLOR_TITANIUM_YELLOW)
+)
+TUNGSTEN = Material(name="Tungsten", display_style=DisplayStyle(color=COLOR_GRAY))
+COPPER = Material(name="Copper", display_style=DisplayStyle(color=COLOR_COPPER))
+TANTALUM = Material(name="Tantalum", display_style=DisplayStyle(color=COLOR_SCARLET))
 TANTALUM_NITRIDE = Material(
-    name="Tantalum_Nitride", display_style=DisplayStyle(color=COLOR_SANGRIA))
+    name="Tantalum_Nitride", display_style=DisplayStyle(color=COLOR_SANGRIA)
+)
 
 ALUMINIUM_COPPER = Material(
-    name="AlCu", display_style=DisplayStyle(color=COLOR_DARKSEA_GREEN))
+    name="AlCu", display_style=DisplayStyle(color=COLOR_DARKSEA_GREEN)
+)

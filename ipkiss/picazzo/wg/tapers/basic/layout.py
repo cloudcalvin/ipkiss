@@ -22,7 +22,12 @@
 ## Authors : Wim Bogaerts, Emmanuel Lambert
 
 from ipkiss.all import *
-from ipkiss.plugins.photonics.port.port import OpticalPort, InOpticalPort, OutOpticalPort, OpticalPortProperty
+from ipkiss.plugins.photonics.port.port import (
+    OpticalPort,
+    InOpticalPort,
+    OutOpticalPort,
+    OpticalPortProperty,
+)
 from ipkiss.plugins.photonics.wg.definition import WaveguideDefProperty
 from ipkiss.plugins.photonics.wg.basic import WgElDefinition
 from ipkiss.geometry.transforms.rotation import shape_rotate
@@ -32,32 +37,36 @@ __all__ = ["__WgElTaper__", "__WgElPortTaper__"]
 
 class __WgElTaper__(Group):
     """ Basic taper between 2 waveguide definitions """
-    start_position = Coord2Property(
-        required=True, doc="start position of the taper")
-    end_position = Coord2Property(
-        required=True, doc="end position of the taper")
+
+    start_position = Coord2Property(required=True, doc="start position of the taper")
+    end_position = Coord2Property(required=True, doc="end position of the taper")
     start_wg_def = WaveguideDefProperty(
-        required=True, doc="waveguide definition at the start")
+        required=True, doc="waveguide definition at the start"
+    )
     end_wg_def = WaveguideDefProperty(
-        required=True, doc="waveguide definition at the end")
+        required=True, doc="waveguide definition at the end"
+    )
     straight_extension = Size2Property(
-        default=(0.0, 0.0),
-        doc="tuple: straight extension at start and end of taper")
+        default=(0.0, 0.0), doc="tuple: straight extension at start and end of taper"
+    )
     process = ProcessProperty(
-        allow_none=True, doc="If case the tpaering process must be overruled")
+        allow_none=True, doc="If case the tpaering process must be overruled"
+    )
 
     def define_elements(self, elems):
         start_windows_list = self.start_wg_def.windows
         end_windows_list = self.end_wg_def.windows
         # Then we iterate over all the windows and get the corresponding taper shape
-        for start_window, end_window in zip(start_windows_list,
-                                            end_windows_list):
+        for start_window, end_window in zip(start_windows_list, end_windows_list):
             taper_window = self.__get_taper_shape__(
-                self.start_position, self.end_position, start_window,
-                end_window, self.straight_extension)
+                self.start_position,
+                self.end_position,
+                start_window,
+                end_window,
+                self.straight_extension,
+            )
             if self.process is None:
-                elems += Boundary(start_window.layer,
-                                  taper_window)  #normal case
+                elems += Boundary(start_window.layer, taper_window)  # normal case
             else:
                 purpose = start_window.layer.purpose
                 taper_ppl = PPLayer(self.process, purpose)
@@ -70,11 +79,11 @@ class __WgElTaper__(Group):
             InOpticalPort(
                 wg_definition=self.start_wg_def,
                 position=self.start_position,
-                angle=(angle + 180.0) % 360.0),
+                angle=(angle + 180.0) % 360.0,
+            ),
             OutOpticalPort(
-                wg_definition=self.end_wg_def,
-                position=self.end_position,
-                angle=angle)
+                wg_definition=self.end_wg_def, position=self.end_position, angle=angle
+            ),
         ]
         return ports
 
@@ -85,27 +94,30 @@ class __WgElTaper__(Group):
             )
         return True
 
-    def __get_taper_shape__(self, start_position, end_position, start_window,
-                            end_window, straight_extension):
+    def __get_taper_shape__(
+        self, start_position, end_position, start_window, end_window, straight_extension
+    ):
         raise NotImplementedError()
 
 
 class __WgElPortTaper__(__WgElTaper__):
     """ taper starting from ipkiss.plugins.photonics.port. The corresponding start_position and end_position are calculated internally """
+
     start_position = DefinitionProperty(fdef_name="define_start_position")
     end_position = DefinitionProperty(fdef_name="define_end_position")
     start_wg_def = DefinitionProperty(fdef_name="define_start_wg_def")
-    start_port = OpticalPortProperty(
-        required=True, doc="Port the taper starts from")
+    start_port = OpticalPortProperty(required=True, doc="Port the taper starts from")
     length = PositiveNumberProperty(
-        default=TECH.WG.SHORT_TAPER_LENGTH, doc="taper length")
+        default=TECH.WG.SHORT_TAPER_LENGTH, doc="taper length"
+    )
 
     def define_start_position(self):
         return self.start_port.position
 
     def define_end_position(self):
-        return self.start_position.move_polar_copy(self.length,
-                                                   self.start_port.angle_deg)
+        return self.start_position.move_polar_copy(
+            self.length, self.start_port.angle_deg
+        )
 
     def define_start_wg_def(self):
         return self.start_port.wg_definition
@@ -117,21 +129,25 @@ class __WgElPortTaper__(__WgElTaper__):
                 OutOpticalPort(
                     position=self.start_position,
                     wg_definition=self.start_wg_def,
-                    angle=(angle + 180.0) % 360.0),
+                    angle=(angle + 180.0) % 360.0,
+                ),
                 InOpticalPort(
                     position=self.end_position,
                     wg_definition=self.end_wg_def,
-                    angle=angle)
+                    angle=angle,
+                ),
             ]
         else:
             ports += [
                 InOpticalPort(
                     position=self.start_position,
                     wg_definition=self.start_wg_def,
-                    angle=(angle + 180.0) % 360.0),
+                    angle=(angle + 180.0) % 360.0,
+                ),
                 OutOpticalPort(
                     position=self.end_position,
                     wg_definition=self.end_wg_def,
-                    angle=angle)
+                    angle=angle,
+                ),
             ]
         return ports

@@ -34,8 +34,7 @@ class OpticalMode(__Mode__):
         raise NotImplementedError("lossdBcm not implemented")
 
     def angle_rad(self, wavelength):
-        raise NotImplementedError(
-            "angle (diffraction angle in slab) not implemented")
+        raise NotImplementedError("angle (diffraction angle in slab) not implemented")
 
     def angle_deg(self, wavelength):
         self.angle_rad(wavelength) * RAD2DEG

@@ -20,9 +20,11 @@
 # Contact: ipkiss@intec.ugent.be
 
 __all__ = [
-    "IpcoreException", "IpcoreAttributeException",
-    "IpcorePropertyDescriptorException", "IpcoreRestrictionException",
-    "OpenAccessIntegrationException"
+    "IpcoreException",
+    "IpcoreAttributeException",
+    "IpcorePropertyDescriptorException",
+    "IpcoreRestrictionException",
+    "OpenAccessIntegrationException",
 ]
 
 from ipcore.log import IPCORE_LOG as LOG

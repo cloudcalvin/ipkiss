@@ -34,7 +34,7 @@ def calculate_solid_height(stack):
     solid_height = 0.0
     check_that_no_solid_materials_follow = False
     for material, height in stack.materials_heights:
-        if (material == TECH.MATERIALS.AIR):
+        if material == TECH.MATERIALS.AIR:
             break
         else:
             solid_height = solid_height + height
@@ -43,8 +43,7 @@ def calculate_solid_height(stack):
 
 MaterialStack.define_solid_height = calculate_solid_height
 
-MaterialStack.solid_height = DefinitionProperty(
-    fdef_name="define_solid_height")
+MaterialStack.solid_height = DefinitionProperty(fdef_name="define_solid_height")
 
 material_stack_id_to_solid_height_map = dict()
 
@@ -53,11 +52,11 @@ def get_solid_height_for_material_stack_id(id):
     return material_stack_id_to_solid_height_map[id]
 
 
-def transform_material_stack_matrix_in_solid_height_matrix(
-        material_stack_matrix):
+def transform_material_stack_matrix_in_solid_height_matrix(material_stack_matrix):
     from numpy import vectorize
+
     f = vectorize(get_solid_height_for_material_stack_id, otypes=[float])
-    #re-initialize the mapping : for every material stack, store the epsilon value that corresponds to the z_coord
+    # re-initialize the mapping : for every material stack, store the epsilon value that corresponds to the z_coord
     material_stack_id_to_solid_height_map.clear()
     for id, material_stack in TECH.MATERIAL_STACKS:
         material_stack_id_to_solid_height_map[id] = material_stack.solid_height

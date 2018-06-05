@@ -52,24 +52,26 @@ class SaveFieldsHDF5Processor(FieldPropagationSimulationProcessor):
     fileName = RestrictedProperty(
         default="fields.h5",
         restriction=RESTRICT_STRING,
-        doc="HDF5 filename where to save the fields to")
+        doc="HDF5 filename where to save the fields to",
+    )
     H5OutputIntervalSteps = RestrictedProperty(
         default=25,
         restriction=RESTRICT_INT,
-        doc="Interval for output to HDF5 (default : every 25 steps)")
+        doc="Interval for output to HDF5 (default : every 25 steps)",
+    )
     field_component = RestrictedProperty(
         required=True,
         restriction=RestrictType(FieldComponent),
-        doc="The field component which must be exported")
+        doc="The field component which must be exported",
+    )
     stepsCount = RestrictedProperty(
         default=0,
         restriction=RESTRICT_INT,
-        doc=
-        "Counter for the steps (not to be set by the user ; for use by other objects such as the stopcriterium)"
+        doc="Counter for the steps (not to be set by the user ; for use by other objects such as the stopcriterium)",
     )
     surroundings = RestrictedProperty(
-        default=None,
-        doc="Surroundings of the box. (meep.vol2d(...).surroundings()")
+        default=None, doc="Surroundings of the box. (meep.vol2d(...).surroundings()"
+    )
 
     def __init__(self, **kwargs):
         super(SaveFieldsHDF5Processor, self).__init__(**kwargs)
@@ -84,9 +86,10 @@ class SaveFieldsHDF5Processor(FieldPropagationSimulationProcessor):
         del (self.h5file)
 
     def process(self, data=None, **kwargs):
-        if (self.stepsCount % self.H5OutputIntervalSteps == 0):
+        if self.stepsCount % self.H5OutputIntervalSteps == 0:
             self.engine.writeFieldsToHDF5File(
-                self.h5file, self.field_component, self.surroundings)
+                self.h5file, self.field_component, self.surroundings
+            )
         self.stepsCount = self.stepsCount + 1
 
     def __getstate__(self):
@@ -96,14 +99,18 @@ class SaveFieldsHDF5Processor(FieldPropagationSimulationProcessor):
             try:
                 import meep_mpi as Meep
             except:
-                print('Cannot import meep')
+                print("Cannot import meep")
 
         if isinstance(self.surroundings, Meep.volume):
-            print('WARNING: Cannot yet pickle surroundings-instance. (meep.vol2d(...).surroundings')
-            print('This is of type meep.volume; proxy of <Swig Object of type \'meep::volume *\' at 0x31...c0> ')
-            #self.surroundings = 'surrounding can not yet be pickled correctly'
+            print(
+                "WARNING: Cannot yet pickle surroundings-instance. (meep.vol2d(...).surroundings"
+            )
+            print(
+                "This is of type meep.volume; proxy of <Swig Object of type 'meep::volume *' at 0x31...c0> "
+            )
+            # self.surroundings = 'surrounding can not yet be pickled correctly'
             ndict = self.__dict__.copy()
-            del ndict['__prop_surroundings__']
+            del ndict["__prop_surroundings__"]
             return ndict
         else:
             return self.__dict__
@@ -122,24 +129,22 @@ class RunUntilFieldsDecayedAtProbingPoint(__StopCriterium__):
     probingpoint = RestrictedProperty(
         required=True,
         restriction=RestrictType(Probingpoint),
-        doc=
-        "Reference to the probing point that will be monitored for decay of the field"
+        doc="Reference to the probing point that will be monitored for decay of the field",
     )
     field_component = RestrictedProperty(
         required=True,
         restriction=RestrictType(FieldComponent),
-        doc="The field component which will be probed")
+        doc="The field component which will be probed",
+    )
     decayedStopAfterStepsInitialValue = RestrictedProperty(
         default=50,
         restriction=RESTRICT_INT,
-        doc=
-        "When the source has decayed, continue for another x timesteps (default: 50)"
+        doc="When the source has decayed, continue for another x timesteps (default: 50)",
     )
     decay_factor = RestrictedProperty(
         default=0.001,
         restriction=RESTRICT_FLOAT,
-        doc=
-        "When the field has decayed with this factor at the probing point, stop the simulation"
+        doc="When the field has decayed with this factor at the probing point, stop the simulation",
     )
 
     def __init__(self, **kwargs):
@@ -149,26 +154,29 @@ class RunUntilFieldsDecayedAtProbingPoint(__StopCriterium__):
         self.avoidEndlessLoopCount = 0
 
     def evaluateStopCriterium(self):
-        #check the current amplitude of the source component
+        # check the current amplitude of the source component
         self.currAmpl = self.probingpoint.collect(self.field_component)
         if self.currAmpl > self.peakAmpl:
             self.peakAmpl = self.currAmpl
-        #run for another 50 time steps when the amplitude has decayed to 'decay_factor' of the peak amplitude
-        if (self.peakAmpl !=
-                0) and (self.currAmpl / self.peakAmpl) < self.decay_factor:
-            if (self.decayedStopAfterSteps % 10 == 0):
-                LOG.debug("Source has decayed... counting down... %i\n" %
-                          self.decayedStopAfterSteps)
+        # run for another 50 time steps when the amplitude has decayed to 'decay_factor' of the peak amplitude
+        if (self.peakAmpl != 0) and (self.currAmpl / self.peakAmpl) < self.decay_factor:
+            if self.decayedStopAfterSteps % 10 == 0:
+                LOG.debug(
+                    "Source has decayed... counting down... %i\n"
+                    % self.decayedStopAfterSteps
+                )
             self.decayedStopAfterSteps = self.decayedStopAfterSteps - 1
         else:
             self.decayedStopAfterSteps = self.decayedStopAfterStepsInitialValue
-        #now make a final decision about stopping the simulation or not
-        if (self.peakAmpl == 0
-            ) or (self.currAmpl / self.peakAmpl) > self.decay_factor or (
-                self.decayedStopAfterSteps > 0):
-            return False  #continue with the simulation
+        # now make a final decision about stopping the simulation or not
+        if (
+            (self.peakAmpl == 0)
+            or (self.currAmpl / self.peakAmpl) > self.decay_factor
+            or (self.decayedStopAfterSteps > 0)
+        ):
+            return False  # continue with the simulation
         else:
-            return True  #stop the simulation
+            return True  # stop the simulation
 
 
 class StopAfterSteps(__StopCriterium__):
@@ -178,7 +186,7 @@ class StopAfterSteps(__StopCriterium__):
 
     def __call__(self):
         self.StepsCount = self.StepsCount + 1
-        if (self.StepsCount % int(self.maximumSteps / 10.0) == 0):
+        if self.StepsCount % int(self.maximumSteps / 10.0) == 0:
             print("The simulation is now at step %i" % self.StepsCount)
         return self.StepsCount >= self.maximumSteps
 
@@ -189,9 +197,10 @@ class PersistFluxplanes(FluxSimulationProcessor):
 
     def process(self, data=None, **kwargs):
         for dc in self.landscape.datacollectors:
-            if (isinstance(dc, Fluxplane)):
+            if isinstance(dc, Fluxplane):
                 charset = "abcdefghijklmnopqrstuvwxyz"
-                fn = "fluxplane_" + ''.join(
-                    [c for c in dc.name.lower() if c in charset])
+                fn = "fluxplane_" + "".join(
+                    [c for c in dc.name.lower() if c in charset]
+                )
                 dc.collect()
                 dc.persist_to_file(filename=fn)

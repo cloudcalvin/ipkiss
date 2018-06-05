@@ -24,25 +24,26 @@ from .holes import HexHole, DodecHole
 from ..log import PICAZZO_LOG as LOG
 from math import sqrt
 
-__all__ = [
-    "PhCLayout", "HexPhcLayout", "DodecPhCLayout", "TriangularPhCLayout"
-]
+__all__ = ["PhCLayout", "HexPhcLayout", "DodecPhCLayout", "TriangularPhCLayout"]
 
 
-def PhCCellsProperty(internal_member_name=None, restriction=None,
-                     **kwargs):  # should be refined
+def PhCCellsProperty(
+    internal_member_name=None, restriction=None, **kwargs
+):  # should be refined
     R = RestrictType(dict) & restriction
     return RestrictedProperty(internal_member_name, restriction=R, **kwargs)
 
 
-def PhcMapProperty(internal_member_name=None, restriction=None,
-                   **kwargs):  # should be refined
+def PhcMapProperty(
+    internal_member_name=None, restriction=None, **kwargs
+):  # should be refined
     R = restriction
     return StringProperty(internal_member_name, restriction=R, **kwargs)
 
 
-def PhCHolesProperty(internal_member_name=None, restriction=None,
-                     **kwargs):  # should be refined
+def PhCHolesProperty(
+    internal_member_name=None, restriction=None, **kwargs
+):  # should be refined
     R = RestrictType(dict) & restriction
     return RestrictedProperty(internal_member_name, restriction=R, **kwargs)
 
@@ -52,12 +53,10 @@ class PhCLayout(Structure):
     cells = PhCCellsProperty(required=True)
     map = PhcMapProperty(required=True)
     process_hfw = ProcessProperty(default=TECH.PROCESS.HFW)
-    zero_line_y = NumberProperty(
-        default=0, doc="Which line is located at zero")
+    zero_line_y = NumberProperty(default=0, doc="Which line is located at zero")
     ports_coordinates = RestrictedProperty(
         default=[],
-        doc=
-        "list of tuple with (coordinate (in pitches), angle, waveguide_definition)"
+        doc="list of tuple with (coordinate (in pitches), angle, waveguide_definition)",
     )
 
     def define_elements(self, elems):
@@ -98,8 +97,9 @@ class PhCLayout(Structure):
                     for char in content:
                         if char in self.cells:
                             nothing_added = False
-                            elems += ARefX(self.cells[char], (xpos, ypos),
-                                           period, n_o_periods)
+                            elems += ARefX(
+                                self.cells[char], (xpos, ypos), period, n_o_periods
+                            )
                         xpos += self.pitches[0]
                         t += n_o_periods
                     xpos += period * (n_o_periods - 1)
@@ -119,21 +119,27 @@ class PhCLayout(Structure):
         # HFW
         elems += Rectangle(
             PPLayer(self.process_hfw, TECH.PURPOSE.DF.TRENCH),
-            center=((maxlen / 2.0 - 0.5) * self.pitches[0], self.pitches[1] *
-                    (self.zero_line_y - len(lines) / 2.0 - 0.5)),
-            box_size=((maxlen + 2) * self.pitches[0],
-                      ((len(lines) + 2) * self.pitches[1])))
+            center=(
+                (maxlen / 2.0 - 0.5) * self.pitches[0],
+                self.pitches[1] * (self.zero_line_y - len(lines) / 2.0 - 0.5),
+            ),
+            box_size=(
+                (maxlen + 2) * self.pitches[0],
+                ((len(lines) + 2) * self.pitches[1]),
+            ),
+        )
 
         return elems
 
     def define_ports(self, prts):
         from ipkiss.plugins.photonics.port.port import OpticalPort
+
         for coord, angle, wg_def in self.ports_coordinates:
             p = OpticalPort(
-                position=(self.pitches[0] * coord[0],
-                          self.pitches[1] * coord[1]),
+                position=(self.pitches[0] * coord[0], self.pitches[1] * coord[1]),
                 angle_deg=angle,
-                wg_definition=wg_def)
+                wg_definition=wg_def,
+            )
             prts += p
         return prts
 
@@ -143,18 +149,21 @@ class TriangularPhCLayout(PhCLayout):
     lattice_pitches = Size2Property(required=True)
 
     def define_pitches(self):
-        pitches = (0.5 * self.lattice_pitches[0],
-                   sqrt(0.75) * self.lattice_pitches[1])
+        pitches = (0.5 * self.lattice_pitches[0], sqrt(0.75) * self.lattice_pitches[1])
         return pitches
 
     def define_ports(self, prts):
         from ipkiss.plugins.photonics.port.port import OpticalPort
+
         for coord, angle, wg_def in self.ports_coordinates:
             p = OpticalPort(
-                position=(self.lattice_pitches[0] * coord[0],
-                          self.lattice_pitches[1] * sqrt(3.0) * coord[1]),
+                position=(
+                    self.lattice_pitches[0] * coord[0],
+                    self.lattice_pitches[1] * sqrt(3.0) * coord[1],
+                ),
                 angle_deg=angle,
-                wg_definition=wg_def)
+                wg_definition=wg_def,
+            )
             prts += p
         return prts
 
@@ -164,8 +173,7 @@ class RectangularPhCLayout(PhCLayout):
     lattice_pitches = Size2Property(required=True)
 
     def define_pitches(self):
-        pitches = (0.5 * self.lattice_pitches[0],
-                   0.5 * self.lattice_pitches[1])
+        pitches = (0.5 * self.lattice_pitches[0], 0.5 * self.lattice_pitches[1])
         return pitches
 
 

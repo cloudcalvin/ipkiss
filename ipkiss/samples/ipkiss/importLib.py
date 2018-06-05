@@ -24,29 +24,27 @@ import sys
 from ipkiss.io.gds_layer import AutoGdsiiLayerOutputMap, AutoGdsiiLayerInputMap
 
 from os import path
+
 my_path = path.dirname(sys.modules[__name__].__file__)
 
 
 class ImportLibraryExample(Structure):
     def define_elements(self, elems):
-        #--------------------------------------------------
+        # --------------------------------------------------
         # Make a simple structure containing two rectangles
         rectangles = Structure("rectangles")
         rectangles += [
-            Rectangle(
-                layer=Layer(0), center=(0.0, -150), box_size=(200, 200.0)),
+            Rectangle(layer=Layer(0), center=(0.0, -150), box_size=(200, 200.0)),
             RectanglePath(
-                layer=Layer(0),
-                center=(0.0, 150),
-                box_size=(200, 200.0),
-                line_width=4.0)
+                layer=Layer(0), center=(0.0, 150), box_size=(200, 200.0), line_width=4.0
+            ),
         ]
-        #import another GDS-II file, put it in the
-        #structure "imported" and prefix all structure names with "imp_"
+        # import another GDS-II file, put it in the
+        # structure "imported" and prefix all structure names with "imp_"
         fnGds = path.join(my_path, "import/hex.gds")
         I1 = InputGdsii(file(fnGds, "rb"))
         I1.prefix = "imp1_"
-        #the following line is not required if you make a stand-alone ipkiss script (FIXME -- line was added to be able to combine ipkiss and picazzo in one unit test suite)
+        # the following line is not required if you make a stand-alone ipkiss script (FIXME -- line was added to be able to combine ipkiss and picazzo in one unit test suite)
         I1.layer_map = AutoGdsiiLayerInputMap()
         L1 = I1.read()
         S1 = L1.top_layout()
@@ -56,16 +54,20 @@ class ImportLibraryExample(Structure):
         I2 = InputGdsii(file(fn2Gds, "rb"))
         I2.prefix = "imp2_"
         I2.scaling = 0.7
-        I2.layer_map = GdsiiLayerInputMap(layer_map=({
-            GdsiiLayer(0): Layer(6),
-            GdsiiLayer(1): Layer(0),
-            GdsiiLayer(2): Layer(1),
-            GdsiiLayer(3): Layer(2)
-        }))
+        I2.layer_map = GdsiiLayerInputMap(
+            layer_map=(
+                {
+                    GdsiiLayer(0): Layer(6),
+                    GdsiiLayer(1): Layer(0),
+                    GdsiiLayer(2): Layer(1),
+                    GdsiiLayer(3): Layer(2),
+                }
+            )
+        )
         L2 = I2.read()
         S2 = L2.top_layout()
 
-        #-------------------------------------------------------------------
+        # -------------------------------------------------------------------
         # Add references to all structures
         xpos = 0.0
         ypos = 0.0

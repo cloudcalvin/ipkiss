@@ -20,6 +20,7 @@
 # Contact: ipkiss@intec.ugent.be
 
 from ipkiss.technology import get_technology
+
 TECH = get_technology()
 
 ####################################################################
@@ -29,6 +30,7 @@ TECH = get_technology()
 
 def set_auto_taper_database():
     from picazzo.wg.tapers.auto_taper.auto_taper_db import AutoTaperDataBase
+
     # instantiate the default lookup table
     TECH.WGDEF.AUTO_TAPER_DATA_BASE = AutoTaperDataBase()
 

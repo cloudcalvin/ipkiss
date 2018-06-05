@@ -25,8 +25,10 @@ import math
 from ipcore.mixin.mixin import MixinBowl
 
 __all__ = [
-    "Transformable", "NoDistortTransformable", "StoredTransformable",
-    "StoredNoDistortTransformable"
+    "Transformable",
+    "NoDistortTransformable",
+    "StoredTransformable",
+    "StoredNoDistortTransformable",
 ]
 
 
@@ -58,11 +60,13 @@ class Transformable_basic(__Transformable):
 
 class NoDistortTransformable(Transformable_basic):
     """ object that cannot be distorted """
+
     pass
 
 
 class Transformable(Transformable_basic):
     """ object that can be transformed """
+
     pass
 
 
@@ -71,12 +75,13 @@ from . import transforms
 
 class StoredTransformable(Transformable):
     """ transformable that stores its transforms """
+
     __transformation_type__ = transform.Transform
     transformation = transform.generic_TransformationProperty()
 
     def __init__(self, transformation=None, **kwargs):
-        if ((not "transformation" in kwargs) or (transformation != None)):
-            kwargs['transformation'] = transformation
+        if (not "transformation" in kwargs) or (transformation != None):
+            kwargs["transformation"] = transformation
         super(StoredTransformable, self).__init__(**kwargs)
 
     def transform(self, transformation):
@@ -86,8 +91,11 @@ class StoredTransformable(Transformable):
         elif transformation is None:
             return
         else:
-            raise TypeError("Wrong type " + str(type(transformation)) +
-                            " for transformation in StoredTransformable")
+            raise TypeError(
+                "Wrong type "
+                + str(type(transformation))
+                + " for transformation in StoredTransformable"
+            )
         return self
 
     def expand_transform(self):
@@ -96,13 +104,13 @@ class StoredTransformable(Transformable):
         return self
 
 
-class StoredNoDistortTransformable(StoredTransformable,
-                                   NoDistortTransformable):
+class StoredNoDistortTransformable(StoredTransformable, NoDistortTransformable):
     """ transformable that stores its homothetic transforms """
+
     __transformation_type__ = transform.GenericNoDistortTransform
     transformation = transform.TransformationProperty()
 
     def __init__(self, transformation=None, **kwargs):
-        if ((not "transformation" in kwargs) or (transformation != None)):
-            kwargs['transformation'] = transformation
+        if (not "transformation" in kwargs) or (transformation != None):
+            kwargs["transformation"] = transformation
         super(StoredNoDistortTransformable, self).__init__(**kwargs)

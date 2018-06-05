@@ -27,15 +27,14 @@ from ipkiss.plugins.photonics.wg.definition import WaveguideDefProperty
 from ipkiss.all import *
 from math import *
 
-__all__ = [
-    "WgY180Combiner", "WgY180Splitter", "WgY90Combiner", "WgY90Splitter"
-]
+__all__ = ["WgY180Combiner", "WgY180Splitter", "WgY90Combiner", "WgY90Splitter"]
 
 
 # structures
 class __WgYSplitter__(Structure):
     wg_definition = WaveguideDefProperty(
-        default=TECH.WGDEF.WIRE, doc="waveguide definition of the Y splitter")
+        default=TECH.WGDEF.WIRE, doc="waveguide definition of the Y splitter"
+    )
     bend_radius = PositiveNumberProperty(default=TECH.WG.BEND_RADIUS)
 
 
@@ -56,16 +55,20 @@ class WgY90Splitter(__WgYSplitter__):
             center=(0.0, 0.5 * wg_width + self.bend_radius),
             radius=self.bend_radius - 0.5 * wg_width,
             start_angle=-90.0,
-            end_angle=0.0)
+            end_angle=0.0,
+        )
 
-        a1 = RAD2DEG * acos((self.bend_radius - 0.07 + 0.5 * wg_width) /
-                            (self.bend_radius + 0.5 * wg_width))
+        a1 = RAD2DEG * acos(
+            (self.bend_radius - 0.07 + 0.5 * wg_width)
+            / (self.bend_radius + 0.5 * wg_width)
+        )
         shape += ShapeArc(
             center=(0.0, 0.5 * wg_width + self.bend_radius),
             radius=self.bend_radius + 0.5 * wg_width,
             start_angle=0,
             end_angle=-90.0 + a1,
-            clockwise=True)
+            clockwise=True,
+        )
 
         shape2 = shape.v_mirror_copy()
         shape2.reverse()
@@ -74,21 +77,25 @@ class WgY90Splitter(__WgYSplitter__):
         elems += Boundary(PPLayer(process, TECH.PURPOSE.LF.LINE), shape)
 
         # inversion layer
-        a1 = RAD2DEG * acos((self.bend_radius - 0.07 + 0.5 * wg_width) /
-                            (self.bend_radius + 0.5 * wg_width + trench_width))
+        a1 = RAD2DEG * acos(
+            (self.bend_radius - 0.07 + 0.5 * wg_width)
+            / (self.bend_radius + 0.5 * wg_width + trench_width)
+        )
         shape_inv = ShapeArc(
             center=(0.0, 0.5 * wg_width + self.bend_radius),
             radius=self.bend_radius + 0.5 * wg_width + trench_width,
             start_angle=-90.0 + a1,
             end_angle=0,
-            clockwise=False)
+            clockwise=False,
+        )
 
         shape_inv += ShapeArc(
             center=(0.0, 0.5 * wg_width + self.bend_radius),
             radius=self.bend_radius - 0.5 * wg_width - trench_width,
             start_angle=0.0,
             end_angle=-90.0,
-            clockwise=True)
+            clockwise=True,
+        )
         shape_inv += (-2.0, trench_width + wg_width)
         shape_inv += (-2.0, 0.5 * wg_width)
 
@@ -102,21 +109,24 @@ class WgY90Splitter(__WgYSplitter__):
     def define_ports(self, prts):
         prts += [
             InOpticalPort(
-                position=(-2.0, 0.0),
-                wg_definition=self.wg_definition,
-                angle=180.0),
+                position=(-2.0, 0.0), wg_definition=self.wg_definition, angle=180.0
+            ),
             OutOpticalPort(
                 position=(
                     self.bend_radius,
-                    self.bend_radius + 0.5 * self.wg_definition.wg_width),
+                    self.bend_radius + 0.5 * self.wg_definition.wg_width,
+                ),
                 wg_definition=self.wg_definition,
-                angle=90.0),
+                angle=90.0,
+            ),
             OutOpticalPort(
                 position=(
                     self.bend_radius,
-                    -self.bend_radius - 0.5 * self.wg_definition.wg_width),
+                    -self.bend_radius - 0.5 * self.wg_definition.wg_width,
+                ),
                 wg_definition=self.wg_definition,
-                angle=-90.0)
+                angle=-90.0,
+            ),
         ]
         return prts
 
@@ -148,7 +158,8 @@ class WgY180Splitter(__WgYSplitter__):
         return WgY90Splitter(
             name=self.name + "_90",
             wg_definition=self.wg_definition,
-            bend_radius=self.bend_radius)
+            bend_radius=self.bend_radius,
+        )
 
     @cache()
     def get_bend_north(self):
@@ -157,7 +168,8 @@ class WgY180Splitter(__WgYSplitter__):
             name=self.name + "_bend_north",
             wg_definition=self.wg_definition,
             bend_radius=self.bend_radius,
-            quadrant=-3)
+            quadrant=-3,
+        )
         return SRef(reference=bend, position=p[0].position)
 
     @cache()
@@ -167,7 +179,8 @@ class WgY180Splitter(__WgYSplitter__):
             name=self.name + "_bend_south",
             wg_definition=self.wg_definition,
             bend_radius=self.bend_radius,
-            quadrant=3)
+            quadrant=3,
+        )
         return SRef(reference=bend, position=p[0].position)
 
     def define_elements(self, elems):
@@ -193,7 +206,8 @@ class WgY180Combiner(WgY180Splitter):
         return WgY90Combiner(
             name=self.name + "_90",
             wg_definition=self.wg_definition,
-            bend_radius=self.bend_radius)
+            bend_radius=self.bend_radius,
+        )
 
     @cache()
     def get_bend_north(self):
@@ -202,7 +216,8 @@ class WgY180Combiner(WgY180Splitter):
             name=self.name + "_bend_north",
             wg_definition=self.wg_definition,
             bend_radius=self.bend_radius,
-            quadrant=1)
+            quadrant=1,
+        )
         return SRef(reference=bend, position=p[0].position)
 
     @cache()
@@ -212,7 +227,8 @@ class WgY180Combiner(WgY180Splitter):
             name=self.name + "_bend_south",
             wg_definition=self.wg_definition,
             bend_radius=self.bend_radius,
-            quadrant=-1)
+            quadrant=-1,
+        )
         return SRef(reference=bend, position=p[0].position)
 
     def define_ports(self, prts):

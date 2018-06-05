@@ -23,13 +23,15 @@ from ipcore.properties.initializer import StrongPropertyInitializer
 from ipcore.properties.descriptor import RestrictedProperty
 from ipcore.properties.processors import ProcessorTypeCast
 from ipcore.properties.restrictions import RestrictType
-from ipcore.properties.predefined import RESTRICT_FRACTION, BoolProperty, NonNegativeNumberProperty
+from ipcore.properties.predefined import (
+    RESTRICT_FRACTION,
+    BoolProperty,
+    NonNegativeNumberProperty,
+)
 from .color import ColorProperty, Color, COLOR_BLACK
 from .stipple import StippleProperty, STIPPLE_NONE
 
-__all__ = [
-    "ColorProperty", "DisplayStyle", "DisplayStyleSet", "DisplayStyleProperty"
-]
+__all__ = ["ColorProperty", "DisplayStyle", "DisplayStyleSet", "DisplayStyleProperty"]
 
 
 class DisplayStyle(StrongPropertyInitializer):
@@ -42,28 +44,44 @@ class DisplayStyle(StrongPropertyInitializer):
     visible = BoolProperty(default=True)
 
     def __str__(self):
-        return "DisplayStyle : color: %s - edgecolor: %s - stipple: %s - alpha: %f - edgewidth: %f - visible: %s" % (
-            str(self.color), str(self.edgecolor), str(self.stipple),
-            self.alpha, self.edgewidth, self.visible)
+        return (
+            "DisplayStyle : color: %s - edgecolor: %s - stipple: %s - alpha: %f - edgewidth: %f - visible: %s"
+            % (
+                str(self.color),
+                str(self.edgecolor),
+                str(self.stipple),
+                self.alpha,
+                self.edgewidth,
+                self.visible,
+            )
+        )
 
     def blend(self, other, fraction_first_color=0.33):
-        result_color_red = fraction_first_color * self.color.red + (
-            1.0 - fraction_first_color) * other.color.red
-        result_color_green = fraction_first_color * self.color.green + (
-            1.0 - fraction_first_color) * other.color.green
-        result_color_blue = fraction_first_color * self.color.blue + (
-            1.0 - fraction_first_color) * other.color.blue
+        result_color_red = (
+            fraction_first_color * self.color.red
+            + (1.0 - fraction_first_color) * other.color.red
+        )
+        result_color_green = (
+            fraction_first_color * self.color.green
+            + (1.0 - fraction_first_color) * other.color.green
+        )
+        result_color_blue = (
+            fraction_first_color * self.color.blue
+            + (1.0 - fraction_first_color) * other.color.blue
+        )
         result_color = Color(
-            name="#%02X%02X%02X" % (result_color_red, result_color_green,
-                                    result_color_blue),
+            name="#%02X%02X%02X"
+            % (result_color_red, result_color_green, result_color_blue),
             red=result_color_red,
             green=result_color_green,
-            blue=result_color_blue)
+            blue=result_color_blue,
+        )
         result_ds = DisplayStyle(
             color=result_color,
             edgecolor=self.edgecolor,
             stipple=self.stipple,
-            alpha=self.alpha)
+            alpha=self.alpha,
+        )
         return result_ds
 
 
@@ -82,13 +100,13 @@ class ProcessorDisplayStyle(ProcessorTypeCast):
             return ProcessorTypeCast.process(self, value, obj)
 
 
-def DisplayStyleProperty(internal_member_name=None,
-                         restriction=None,
-                         preprocess=None,
-                         **kwargs):
+def DisplayStyleProperty(
+    internal_member_name=None, restriction=None, preprocess=None, **kwargs
+):
     if not "default" in kwargs:
         kwargs["default"] = None
     R = RestrictType(DisplayStyle) & restriction
     P = ProcessorDisplayStyle() + preprocess
     return RestrictedProperty(
-        internal_member_name, restriction=R, preprocess=P, **kwargs)
+        internal_member_name, restriction=R, preprocess=P, **kwargs
+    )

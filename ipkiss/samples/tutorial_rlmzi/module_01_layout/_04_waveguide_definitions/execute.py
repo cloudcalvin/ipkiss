@@ -33,6 +33,7 @@ my_ring.write_gdsii("myring.gds")
 # create a new waveguide definition, and assign it
 # to the bus waveguide of the ring.
 from ipkiss.plugins.photonics.wg import WgElDefinition
+
 new_bus_wg_def = WgElDefinition(wg_width=0.6)
 my_ring.bus_wg_def = new_bus_wg_def
 my_ring.write_gdsii("myring2.gds")

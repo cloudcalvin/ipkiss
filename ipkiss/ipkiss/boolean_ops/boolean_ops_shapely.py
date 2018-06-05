@@ -59,6 +59,7 @@ class __ShapeBooleanOpsWithShapelyAspect__(__ShapeBooleanOpsAspect__):
     def __poly_to_shape_list__(self, poly):
         """Convert a Shapely polygon to a list of IPKISS shapes"""
         from dependencies.shapely_wrapper import shapely_geom_to_shape
+
         result_shapes = []
         if poly.is_empty:
             result_shapes.append(Shape())
@@ -86,7 +87,7 @@ from .boolean_ops import __BoundaryBooleanOpsAspect__
 
 class __BoundaryBooleanOpsWithShapelyAspect__(__BoundaryBooleanOpsAspect__):
     def __sub__(self, elem):
-        if (self.layer != elem.layer):
+        if self.layer != elem.layer:
             return ElementList([self])
         else:
             result_shapes = self.shape.__sub__(elem.shape)
@@ -96,7 +97,7 @@ class __BoundaryBooleanOpsWithShapelyAspect__(__BoundaryBooleanOpsAspect__):
             return result_elems
 
     def __and__(self, elem):
-        if (self.layer != elem.layer):
+        if self.layer != elem.layer:
             return ElementList([])
         else:
             result_shapes = self.shape.__and__(elem.shape)
@@ -106,7 +107,7 @@ class __BoundaryBooleanOpsWithShapelyAspect__(__BoundaryBooleanOpsAspect__):
             return result_elems
 
     def __or__(self, elem):
-        if (self.layer != elem.layer):
+        if self.layer != elem.layer:
             return ElementList([self, elem])
         else:
             result_shapes = self.shape.__or__(elem.shape)
@@ -116,7 +117,7 @@ class __BoundaryBooleanOpsWithShapelyAspect__(__BoundaryBooleanOpsAspect__):
             return result_elems
 
     def __xor__(self, elem):
-        if (self.layer != elem.layer):
+        if self.layer != elem.layer:
             return ElementList([])
         else:
             result_shapes = self.shape.__xor__(elem.shape)
