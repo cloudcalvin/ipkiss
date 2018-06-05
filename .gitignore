@@ -1,4 +1,5 @@
 Pipfile.lock
 *.gds
+.idea/
 
 IPKISS.egg-info/
