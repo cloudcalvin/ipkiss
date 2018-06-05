@@ -64,7 +64,7 @@ class __BasePropertyDescriptor__(object):
         else:
             self.__doc__ = ""
 
-        for (k, v) in kwargs.items():
+        for (k, v) in list(kwargs.items()):
             if k in self.__allowed_keyword_arguments__:
                 object.__setattr__(self, k, v)
             else:
@@ -143,7 +143,7 @@ class DefinitionProperty(__BasePropertyDescriptor__):
                 if type(clear_cached_values_in_store) == ndarray:
                     clear_cached_values_in_store = clear_cached_values_in_store.all(
                     )
-            except ValueError, e:  # precaution... if exceptionally this would occur because the comparison between old_value and value cannot be done, then clear caches anyway...
+            except ValueError as e:  # precaution... if exceptionally this would occur because the comparison between old_value and value cannot be done, then clear caches anyway...
                 clear_cached_values_in_store = True
         obj.__store__[self.__name__] = (value, SET_EXTERNALLY)
         if not (obj.flag_busy_initializing):
@@ -241,7 +241,7 @@ class DefinitionProperty(__BasePropertyDescriptor__):
         if self.preprocess is not None:
             try:
                 new_value = self.preprocess(value, obj)
-            except ProcessorException, e:
+            except ProcessorException as e:
                 LOG.info(
                     "RestrictedProperty::__set__ : an error was raised on self.preprocess : %s"
                     % str(e))

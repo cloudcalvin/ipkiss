@@ -97,7 +97,7 @@ class OutputXml(OutputBasic):
         '''Create an XML element as top element (without parent) or as subelement (with the given parent)'''
 
         #force all attribute values to string
-        for k in p_attribs.keys():
+        for k in list(p_attribs.keys()):
             p_attribs[k] = str(p_attribs[k])
 
         if (p_parentXMLElement == None):
@@ -166,7 +166,7 @@ class OutputXml(OutputBasic):
             gdsLayer = self.layer_map.get(p_Item, None)
             lyr = gdsLayer.number
             pur = gdsLayer.datatype
-        except Exception, e:
+        except Exception as e:
             LOG.error(
                 "Warning: layer %s not found: %s - forcing layer number to 1."
                 % (p_Item, e))
@@ -252,7 +252,7 @@ class OutputXml(OutputBasic):
             coordinates = T(ShapeRectangle(item.center,
                                            item.box_size)).tolist()
             self.collect_boundary_element(item.layer, coordinates)
-        except Exception, err:
+        except Exception as err:
             msg = "OutputXml::Fatal exception in collect_BoxElement : %s" % err
             LOG.error(msg)
             raise err
@@ -263,7 +263,7 @@ class OutputXml(OutputBasic):
             lyrPurp = self.__getLayerPurposeNmbr(layer)
             self.__makePathXMLElement(None, coordinates.points, lyrPurp[0],
                                       lyrPurp[1], line_width, self.topElem)
-        except Exception, err:
+        except Exception as err:
             msg = "OutputXml::Fatal exception in collect_path_element : %s" % err
             LOG.error(msg)
             raise err
@@ -274,7 +274,7 @@ class OutputXml(OutputBasic):
             lyrPurp = self.__getLayerPurposeNmbr(layer)
             self.__makeBoundaryXMLElement(None, coordinates.points, lyrPurp[0],
                                           lyrPurp[1], self.topElem)
-        except Exception, err:
+        except Exception as err:
             msg = "OutputXml::Fatal exception in collect_boundary_element : %s" % err
             LOG.error(msg)
             raise err

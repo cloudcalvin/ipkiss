@@ -44,7 +44,7 @@ __all__ = [
 
 
 def wrap_kwargs(kwargs_dict, **kwargs):
-    for kwa_k, kwa_v in kwargs.items():
+    for kwa_k, kwa_v in list(kwargs.items()):
         kwargs_dict[kwa_k] = kwa_v
     return kwargs_dict
 
@@ -415,7 +415,7 @@ class ShapeRegularPolygon(Shape):
             pts.append(self.center)
             return pts
         angle_step = 2 * math.pi / self.n_o_sides
-        for i in xrange(0, self.n_o_sides):
+        for i in range(0, self.n_o_sides):
             pts.append(
                 (self.center[0] +
                  self.radius * math.cos((i + 0.5) * angle_step + math.pi / 2),

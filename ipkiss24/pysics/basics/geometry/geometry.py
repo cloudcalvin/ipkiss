@@ -39,16 +39,16 @@ class __Geometry__(StrongPropertyInitializer):
     """ abstract Geometry base class """
 
     def get_material(self, coordinate):
-        raise AssertionError, "__Geometry__ instance or subclass should have material(self, coordinate) method"
+        raise AssertionError("__Geometry__ instance or subclass should have material(self, coordinate) method")
 
     def get_environment(self, coordinate):
-        raise AssertionError, "__Geometry__ instance or subclass should have environment(self, coordinate) method"
+        raise AssertionError("__Geometry__ instance or subclass should have environment(self, coordinate) method")
 
     def size_info(self):
-        raise AssertionError, "__Geometry__ instance or subclass should have size_info() method"
+        raise AssertionError("__Geometry__ instance or subclass should have size_info() method")
 
     def get_material_array(self, **kwargs):
-        raise AssertionError, "__Geometry__ instance or subclass should have get_material_array(self) method"
+        raise AssertionError("__Geometry__ instance or subclass should have get_material_array(self) method")
 
     def __repr__(self):
         return "<Geometry %s>" % self.name

@@ -121,7 +121,7 @@ class PathWindow(__OffsetPathWindow__):
             #Wim: This should not be handled here! This should be processed at the interface with Shapely.
             from ipkiss.primitives.filters.path_cut_filter import ShapeCutFilter
             import sys
-            f = ShapeCutFilter(max_path_length=sys.maxint)
+            f = ShapeCutFilter(max_path_length=sys.maxsize)
             shapes_to_offset = f(shape)
             shapes = [
                 self.get_path_shape_with_termination_offsets(

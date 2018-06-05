@@ -29,10 +29,10 @@ from ipcore import *
 
 try:
     import meep as Meep
-except ImportError, e:
+except ImportError as e:
     try:
         import meep_mpi as Meep
-    except ImportError, e:
+    except ImportError as e:
         raise ImportError("Modules 'meep' or 'meep_mpi' not found.")
 
 import h5py
@@ -65,8 +65,8 @@ class MeepChi3_2D(Meep.CallbackMatrix2D):
                                resolution_factor)
             LOG.debug("Meep node %i -MeepMaterial2D (chi3) object initialized."
                       % int(Meep.my_rank()))
-        except Exception, e:
-            print "Exception in MeepMaterial2D::__init__ : %s" % e
+        except Exception as e:
+            print("Exception in MeepMaterial2D::__init__ : %s" % e)
             raise e
 
     def __getstate__(self):  #for pickle : do not serialize
@@ -195,10 +195,10 @@ class AmplitudeFactor(Meep.Callback):
                 return factor
             else:
                 return complex(factor)
-        except Exception, e:
-            print "Exception in AmplitudeFactor::complex_vec (%f,%f): %s" % (x,
+        except Exception as e:
+            print("Exception in AmplitudeFactor::complex_vec (%f,%f): %s" % (x,
                                                                              y,
-                                                                             e)
+                                                                             e))
             raise e
 
     def __getstate__(self):  #for pickle : do not serialize
@@ -241,7 +241,7 @@ class MeepSimulationEngine(FDTDEngine):
             try:
                 self.material = MeepMaterial2DPolygons(
                     landscape.simulation_volume, self.meepVol)
-            except Exception, err:
+            except Exception as err:
                 LOG.error(
                     "MeepMaterial2DPolygons gives errors -> using MeepMaterial2DMatrix instead..."
                 )
@@ -385,15 +385,15 @@ class MeepSimulationEngine(FDTDEngine):
         if isinstance(src, __EMPointSource__):
             vec = self.__make_meep_vec__(src.point)
             meep_fields.add_point_source(meepComp, meepSource, vec)
-            print "Point source at point (%f , %f)" % (vec.x(), vec.y())
+            print("Point source at point (%f , %f)" % (vec.x(), vec.y()))
         elif isinstance(src, __EMVolumeSource__):
             vec1 = self.__make_meep_vec__(src.south)
             vec2 = self.__make_meep_vec__(src.north)
             LOG.debug("Meep node %i -Creating volume for source plane..." %
                       (self.node_nr))
             meepSrcVol = Meep.volume(vec1, vec2)
-            print "Meep node %i - source plane between points (%f , %f) and (%f , %f)." % (
-                self.node_nr, vec1.x(), vec1.y(), vec2.x(), vec2.y())
+            print("Meep node %i - source plane between points (%f , %f) and (%f , %f)." % (
+                self.node_nr, vec1.x(), vec1.y(), vec2.x(), vec2.y()))
             LOG.debug("Meep node %i -Now adding the volume source to Meep..." %
                       (self.node_nr))
             if isinstance(src, __AmplitudeShapedSource__):
@@ -418,8 +418,8 @@ class MeepSimulationEngine(FDTDEngine):
             (self.node_nr))
         vec1 = self.__make_meep_vec__(flx.north)
         vec2 = self.__make_meep_vec__(flx.south)
-        print "Meep node %i : flux plane between points (%f , %f) and (%f , %f) " % (
-            self.node_nr, vec1.x(), vec1.y(), vec2.x(), vec2.y())
+        print("Meep node %i : flux plane between points (%f , %f) and (%f , %f) " % (
+            self.node_nr, vec1.x(), vec1.y(), vec2.x(), vec2.y()))
         meepFlxVol = Meep.volume(vec1, vec2)
         center_freq = 1.0 / (float(flx.center_wavelength) / 1000.0)
         pw = ((float(flx.pulse_width) / 1000.0) /
@@ -501,7 +501,7 @@ class MeepSimulationEngine(FDTDEngine):
         h5FileName = self.generate_material_hdf5()
         f = h5py.File(h5FileName, 'r')
         #check that the dimension of the dataset that we receive match what we expect
-        ds = f.items()[0][1]
+        ds = list(f.items())[0][1]
         if (abs(ds.shape[0] - epsDim[0]) > 1) or (abs(ds.shape[1] - epsDim[1])
                                                   > 1):
             raise PythonSimulateException(

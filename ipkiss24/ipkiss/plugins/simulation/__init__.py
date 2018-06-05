@@ -32,4 +32,4 @@ from pysimul.runtime.definition import SimulationDefinition
 from pysimul.integration.component_integration import *
 from pysimul.integration.camfr_integration import camfr_stack_expr_for_structure
 
-from simulation import *
+from .simulation import *

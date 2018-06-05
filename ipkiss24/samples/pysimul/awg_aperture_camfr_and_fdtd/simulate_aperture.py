@@ -74,7 +74,7 @@ simul_camfr = aperture.create_simulation(simul_params=params)
 #run the simulation and extract the fields at x = -0.01 (in the coordinate system of the original component, see the GDS)
 f = simul_camfr.procedure.run(field_extraction_geometry_x_positions=[-0.01])
 #look in trunk/pysimul_camfr_output for plots of the fields
-print "Done with CAMFR simulation"
+print("Done with CAMFR simulation")
 
 #------------- Simulation with Meep----------------------
 from pysimul.runtime.MeepFDTD import *
@@ -143,4 +143,4 @@ simul_meep.procedure.run(interactive_mode=False)
 name = simul_meep.landscape.simulation_id
 create_animated_gif_from_hdf5(name + "_Hz.h5", name + "_Eps.h5")
 
-print "Done with Meep simulation."
+print("Done with Meep simulation.")

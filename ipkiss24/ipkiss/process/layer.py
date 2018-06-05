@@ -65,11 +65,10 @@ class MetaProcessLayerCreator(MetaPropertyInitializer):
             return L
 
 
-class ProcessLayer(StrongPropertyInitializer):
+class ProcessLayer(StrongPropertyInitializer, metaclass=MetaProcessLayerCreator):
     """ Process layer represents a specific process step which requires a defined mask pattern. 
         Typically this is a lithography step in.
         """
-    __metaclass__ = MetaProcessLayerCreator
     name = StringProperty(required=True)
     extension = IdStringProperty(required=True)
 
@@ -126,11 +125,10 @@ class MetaPatternPurposeCreator(MetaPropertyInitializer):
             return L
 
 
-class PatternPurpose(StrongPropertyInitializer):
+class PatternPurpose(StrongPropertyInitializer, metaclass=MetaPatternPurposeCreator):
     """ Pattern Purpose represents what should be done with the geometric patterns which is defined.
         e.g. etch, inversion, comment, ...
         """
-    __metaclass__ = MetaPatternPurposeCreator
     name = StringProperty(required=True)
     extension = IdStringProperty(required=True)
     doc = StringProperty(default="")

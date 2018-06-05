@@ -64,14 +64,14 @@ class TechGdsiiTree(DelayedInitTechnologyTree):
         from ipkiss.io.gds_layer import AutoGdsiiLayerOutputMap
 
         #if not hasattr(self, "EXPORT_LAYER_MAP"):
-        if not "EXPORT_LAYER_MAP" in self.keys():
+        if not "EXPORT_LAYER_MAP" in list(self.keys()):
             self.EXPORT_LAYER_MAP = AutoGdsiiLayerOutputMap()
             self.overwrite_allowed.append('EXPORT_LAYER_MAP')
-        if not "IMPORT_LAYER_MAP" in self.keys():
+        if not "IMPORT_LAYER_MAP" in list(self.keys()):
             self.IMPORT_LAYER_MAP = AutoGdsiiLayerInputMap()
             self.overwrite_allowed.append('IMPORT_LAYER_MAP')
 
-        if not "FILTER" in self.keys():
+        if not "FILTER" in list(self.keys()):
             from ipkiss.primitives.filters.path_cut_filter import PathCutFilter
             from ipkiss.primitives.filters.empty_filter import EmptyFilter
             from ipkiss.primitives.filters.path_to_boundary_filter import PathToBoundaryFilter

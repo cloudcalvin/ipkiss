@@ -19,9 +19,9 @@
 #
 # Contact: ipkiss@intec.ugent.be
 
-from simple import SimpleExample
-from shapes_advanced import AdvancedShapesExample
-from shapes import ShapesExample
-from references import ReferencesExample
-from importLib import ImportLibraryExample
-from elements import ElementsExample
+from .simple import SimpleExample
+from .shapes_advanced import AdvancedShapesExample
+from .shapes import ShapesExample
+from .references import ReferencesExample
+from .importLib import ImportLibraryExample
+from .elements import ElementsExample

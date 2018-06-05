@@ -217,7 +217,7 @@ class __ProcessSuperpositionMaterialStackGeometry2DPolygons__(
     def get_material_array(self):
         """Convert the geometrical model with polygons into a discrete matrix"""
         if (self.__material_array__ is None):
-            from vfabrication import __common_function_apply_polygon_to_array_memory_sparing__
+            from .vfabrication import __common_function_apply_polygon_to_array_memory_sparing__
             mat_bm = self.material_stacks_shapely_polygons
             mat_bm[0] = (
                 mat_bm[0][0], None

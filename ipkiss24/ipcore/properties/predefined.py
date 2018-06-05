@@ -29,7 +29,7 @@ import inspect
 # Predefined Restrictions
 #######################################################
 RESTRICT_INT = restrictions.RestrictType(int)
-RESTRICT_LONG = restrictions.RestrictType(long)
+RESTRICT_LONG = restrictions.RestrictType(int)
 RESTRICT_FLOAT = restrictions.RestrictType(float)
 RESTRICT_NUMBER = restrictions.RestrictType((int, float))
 RESTRICT_COMPLEX = restrictions.RestrictType((int, float, complex))

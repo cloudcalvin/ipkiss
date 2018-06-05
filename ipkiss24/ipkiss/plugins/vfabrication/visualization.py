@@ -112,7 +112,7 @@ class StructureVisualizationAspect(object):
             fnull.close()
             return result_value
         else:
-            print "Additionally, run the following command : ", cmd
+            print("Additionally, run the following command : ", cmd)
             return 0
 
     def __get_meep_engine_type__(self):
@@ -242,15 +242,15 @@ Structure.mixin_first(StructureVisualizationAspect)
 
 from ipkiss.primitives import Library
 
-import tkSimpleDialog
-from Tkinter import *
+import tkinter.simpledialog
+from tkinter import *
 
 
-class __StructuresVFabricationDialog__(tkSimpleDialog.Dialog):
+class __StructuresVFabricationDialog__(tkinter.simpledialog.Dialog):
     def __init__(self, master, library, aspect_ratio_equal=True):
         self.library = library
         self.cb_initial_value = aspect_ratio_equal
-        tkSimpleDialog.Dialog.__init__(self, parent=master)
+        tkinter.simpledialog.Dialog.__init__(self, parent=master)
 
     def body(self, master):
         #label
@@ -308,7 +308,7 @@ class LibraryVisualizationAspect(object):
             if d.result:
                 struct = self.__fast_get_structure__(d.result)
                 aspect_ratio_equal = d.aspect_ratio_equal
-                print "Preparing the virtual fabrication of %s..." % d.result
+                print("Preparing the virtual fabrication of %s..." % d.result)
                 func(self, struct, aspect_ratio_equal=aspect_ratio_equal)
             else:
                 break

@@ -19,8 +19,8 @@
 #
 # Contact: ipkiss@intec.ugent.be
 
-import environment
-import field
+from . import environment
+from . import field
 
 from ..basics.domain import __Domain__
 

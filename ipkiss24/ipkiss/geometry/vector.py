@@ -56,7 +56,7 @@ class Vector(StrongPropertyInitializer, transformable.Transformable):
     def get_angle_rad(self):
         try:
             return constants.DEG2RAD * self.__angle__
-        except AttributeError, e:
+        except AttributeError as e:
             return 0.0
 
     def set_angle_rad(self, value):
@@ -72,7 +72,7 @@ class Vector(StrongPropertyInitializer, transformable.Transformable):
     def get_angle_deg(self):
         try:
             return self.__angle__
-        except AttributeError, e:
+        except AttributeError as e:
             return 0.0
 
     def set_angle_deg(self, value):
@@ -170,7 +170,7 @@ class Vector3(Vector):
     def get_inclination_rad(self):
         try:
             return constants.DEG2RAD * self.__inclination__
-        except AttributeError, e:
+        except AttributeError as e:
             return 0.0
 
     def set_inclination_rad(self, value):
@@ -186,7 +186,7 @@ class Vector3(Vector):
     def get_inclination_deg(self):
         try:
             return self.__inclination__
-        except AttributeError, e:
+        except AttributeError as e:
             return 0.0
 
     def set_inclination_deg(self, value):

@@ -26,10 +26,10 @@ import sys
 
 
 def vfabrication_for_gds(gds_file):
-    print "Reading %s..." % (gds_file)
+    print("Reading %s..." % (gds_file))
     I = InputGdsii(file(gds_file, "rb"))
     L = I.read()
-    print "Done reading the gds. Now starting the virtual fabrication..."
+    print("Done reading the gds. Now starting the virtual fabrication...")
     L.visualize_structures_2d()
 
 

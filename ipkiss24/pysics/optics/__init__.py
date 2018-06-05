@@ -19,8 +19,8 @@
 #
 # Contact: ipkiss@intec.ugent.be
 
-import material
-import environment
+from . import material
+from . import environment
 
 from ..basics.domain import __Domain__
 

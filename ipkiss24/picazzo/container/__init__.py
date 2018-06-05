@@ -19,9 +19,9 @@
 #
 # Contact: ipkiss@intec.ugent.be
 
-from extend_ports import *
-from fanout import *
-from route_ports import *
-from suppress_ports import *
-from taper_ports import *
-from auto_taper_ports import *
+from .extend_ports import *
+from .fanout import *
+from .route_ports import *
+from .suppress_ports import *
+from .taper_ports import *
+from .auto_taper_ports import *

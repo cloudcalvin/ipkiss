@@ -32,28 +32,28 @@ try:
     from shapely.geometry.collection import GeometryCollection
     from shapely.geos import TopologicalError
 
-except ImportError, e:
-    print >> stderr, "*************************** DEPENDENCY NOT FOUND **************************************************************************************** "
-    print >> stderr, "**** MODULE SHAPELY COULD NOT BE FOUND, PLEASE INSTALL IT                                                                             *** "
-    print >> stderr, "**** On Windows, download from :                                                                                                      *** "
-    print >> stderr, "****         http://gispython.org/dist/Shapely-1.2.1.win32.exe                                                                        *** "
-    print >> stderr, "**** On Linux :                                                                                                                       *** "
-    print >> stderr, "****         install from source (version 1.2.1 needed) :                                                                             *** "
-    print >> stderr, "****         http://pypi.python.org/packages/source/S/Shapely/Shapely-1.2.1.tar.gz#md5=da54c772443bd0398aa588e0f3e9c190               *** "
-    print >> stderr, "***************************************************************************************************************************************** "
+except ImportError as e:
+    print("*************************** DEPENDENCY NOT FOUND **************************************************************************************** ", file=stderr)
+    print("**** MODULE SHAPELY COULD NOT BE FOUND, PLEASE INSTALL IT                                                                             *** ", file=stderr)
+    print("**** On Windows, download from :                                                                                                      *** ", file=stderr)
+    print("****         http://gispython.org/dist/Shapely-1.2.1.win32.exe                                                                        *** ", file=stderr)
+    print("**** On Linux :                                                                                                                       *** ", file=stderr)
+    print("****         install from source (version 1.2.1 needed) :                                                                             *** ", file=stderr)
+    print("****         http://pypi.python.org/packages/source/S/Shapely/Shapely-1.2.1.tar.gz#md5=da54c772443bd0398aa588e0f3e9c190               *** ", file=stderr)
+    print("***************************************************************************************************************************************** ", file=stderr)
 
 try:
     from descartes import PolygonPatch
 
-except ImportError, e:
-    print >> stderr, "*************************** DEPENDENCY NOT FOUND **************************************************************************************** "
-    print >> stderr, "**** MODULE DESCARTES COULD NOT BE FOUND, PLEASE INSTALL IT                                                                           *** "
-    print >> stderr, "**** On both Windows and Linux, install from source as follows:                                                                       *** "
-    print >> stderr, "****         * download from : http://pypi.python.org/packages/source/d/descartes/descartes-1.0.tar.gz                                *** "
-    print >> stderr, "****         * extract it. On Windows, you can use 7-zip (available at www.7-zip.org)                                                 *** "
-    print >> stderr, "****         * run the following command in the directory where you extracted the file :                                              *** "
-    print >> stderr, "****                    python setup.py install                                                                                       *** "
-    print >> stderr, "***************************************************************************************************************************************** "
+except ImportError as e:
+    print("*************************** DEPENDENCY NOT FOUND **************************************************************************************** ", file=stderr)
+    print("**** MODULE DESCARTES COULD NOT BE FOUND, PLEASE INSTALL IT                                                                           *** ", file=stderr)
+    print("**** On both Windows and Linux, install from source as follows:                                                                       *** ", file=stderr)
+    print("****         * download from : http://pypi.python.org/packages/source/d/descartes/descartes-1.0.tar.gz                                *** ", file=stderr)
+    print("****         * extract it. On Windows, you can use 7-zip (available at www.7-zip.org)                                                 *** ", file=stderr)
+    print("****         * run the following command in the directory where you extracted the file :                                              *** ", file=stderr)
+    print("****                    python setup.py install                                                                                       *** ", file=stderr)
+    print("***************************************************************************************************************************************** ", file=stderr)
 
 
 def shapely_polygon_to_image(polygon, filename, show=False):
@@ -109,7 +109,7 @@ def shapely_geom_to_shape(g):
                     interior_start_point = interior.coords[0]
                     result_points.append(interior_start_point)
                     interior_start_point_coord2 = Coord2(interior_start_point)
-                    dist = sys.maxint
+                    dist = sys.maxsize
                     exterior_point_index = -1
                     for exterior_point in g_exterior_coords_list:
                         exterior_point_index = exterior_point_index + 1
@@ -286,7 +286,7 @@ class ShapelyPolygonCollection(StrongPropertyInitializer):
             p2 = self.__do_cascaded_union__(my_georep)
             try:
                 diff_p = p2.difference(p1)
-            except TopologicalError, err:
+            except TopologicalError as err:
                 if isinstance(p1, MultiPolygon):
                     diffs = []
                     for p1pol in p1.geoms:

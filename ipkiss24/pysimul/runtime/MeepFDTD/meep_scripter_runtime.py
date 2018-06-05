@@ -27,10 +27,10 @@
 
 try:
     import meep as meep
-except ImportError, e:
+except ImportError as e:
     try:
         import meep_mpi as meep
-    except ImportError, e:
+    except ImportError as e:
         raise Exception("Modules 'meep' or 'meep_mpi' not found.")
 
 import h5py
@@ -83,7 +83,7 @@ class MeepMaterial2DPolygonsFromFile(__MeepMaterialPolygonsFromFile__,
                                      meep.PolygonCallback2D):
     def __get_config_from_file__(self, file_name):
         file_handle = open(file_name, "r")
-        from cPickle import load
+        from pickle import load
         (bitmap_polygons, eps_values, south_west) = load(file_handle)
         file_handle.close()
         return (bitmap_polygons, eps_values, south_west)
@@ -102,7 +102,7 @@ class MeepMaterial3DPolygonsFromFile(__MeepMaterialPolygonsFromFile__,
                                      meep.PolygonCallback3D):
     def __get_config_from_file__(self, file_name):
         file_handle = open(file_name, "r")
-        from cPickle import load
+        from pickle import load
         (bitmap_polygons, material_stack_ids, south_west, material_stacks_npy,
          n_o_material_stacks) = load(file_handle)
         file_handle.close()
@@ -128,7 +128,7 @@ class AmplitudeFactorFromFile(meep.Callback):
         self.mode_profile = self.__get_config_from_file__(config_file)
 
     def __get_config_from_file__(self, file_name):
-        from cPickle import load
+        from pickle import load
         file_handle = open(file_name, 'r')
         mode_profile = load(file_handle)
         return mode_profile
@@ -157,8 +157,8 @@ class AmplitudeFactorFromFile(meep.Callback):
                 return factor
             else:
                 return complex(factor)
-        except Exception, e:
-            print "Exception in AmplitudeFactor::complex_vec (%f,%f): %s" % (x,
+        except Exception as e:
+            print("Exception in AmplitudeFactor::complex_vec (%f,%f): %s" % (x,
                                                                              y,
-                                                                             e)
+                                                                             e))
             raise e

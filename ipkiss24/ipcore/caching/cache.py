@@ -29,7 +29,7 @@ def cache():
 
     def _cache(function):
         def __cache(*args, **kw):
-            key = hashlib.sha1(function.func_name).hexdigest()
+            key = hashlib.sha1(function.__name__).hexdigest()
             obj = args[0]
             if not hasattr(obj, "__IPCORE_CACHE__"):
                 obj.__IPCORE_CACHE__ = dict()

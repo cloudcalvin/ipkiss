@@ -97,7 +97,7 @@ class TechFibcoupTree(DelayedInitTechnologyTree):
 
         try:
             self.DEFAULT_2D_GRATING = STANDARD_2DGRATING_1550_TE()
-        except Exception, exc:
+        except Exception as exc:
             LOG.warn("TECH.IO.FIBCOUP.DEFAULT_2D_GRATING will not be set : " +
                      str(exc))
 

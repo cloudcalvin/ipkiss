@@ -33,4 +33,4 @@ my_two_rings = TwoRings(ring1=my_ring1, ring2=my_ring2)
 
 my_two_rings.write_gdsii("tworings.gds")
 
-print my_two_rings.ports
+print(my_two_rings.ports)

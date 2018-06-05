@@ -36,4 +36,4 @@ cycle_colors = [
 ]
 DEFAULT_DISPLAY_LAYER_SET = [(D, DisplayStyle(
     color=cycle_colors[D % len(cycle_colors)], alpha=0.5))
-                             for D in xrange(256)]
+                             for D in range(256)]

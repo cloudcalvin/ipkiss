@@ -91,7 +91,7 @@ OH1 = numpy.zeros(len(x_positions), dtype=numpy.complex)
 OH2 = numpy.zeros(len(x_positions), dtype=numpy.complex)
 
 LOG.debug("Now extracting the fields...")
-for x_pos, i in zip(x_positions, range(len(x_positions))):
+for x_pos, i in zip(x_positions, list(range(len(x_positions)))):
     coord_input = camfr.Coord(x_pos, 0.0, 0.0)
     coord_output = camfr.Coord(x_pos, 0.0, co_east - co_west)
     field_input = camfr_stack.field(coord_input)
@@ -141,8 +141,8 @@ from scipy.integrate import trapz
 PI = trapz(numpy.square(IH2))
 PO = trapz(numpy.square(OH2))
 
-print "Integral over H2 square at input : ", PI
-print "Integral over H2 square at output : ", PO
-print PO / PI * 100.0, "%"
+print("Integral over H2 square at input : ", PI)
+print("Integral over H2 square at output : ", PO)
+print(PO / PI * 100.0, "%")
 
 pyplot.show()

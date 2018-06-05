@@ -19,7 +19,7 @@
 #
 # Contact: ipkiss@intec.ugent.be
 
-from output import OutputBasic
+from .output import OutputBasic
 from inspect import ismethod
 from ipkiss.log import IPKISS_LOG as LOG
 DO = set(dir(list()))

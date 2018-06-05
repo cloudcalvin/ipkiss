@@ -86,7 +86,7 @@ except ImportError, e:
                 eps_values.append(landscape.simulation_volume.geometry.
                                   material_stack_factory[material_stack_id]
                                   .effective_index_epsilon)
-            from cPickle import dump
+            from pickle import dump
             file_handle = open(materials_2d_filename, "w")
             dump((bitmap_polygons, eps_values, south_west), file_handle)
             file_handle.close()
@@ -110,7 +110,7 @@ except ImportError, e:
             )
             n_o_material_stacks = landscape.simulation_volume.geometry.get_number_of_material_stacks_in_store(
             )
-            from cPickle import dump
+            from pickle import dump
             file_handle = open(materials_3d_filename, "w")
             dump((bitmap_polygons, material_stack_ids, south_west,
                   material_stacks_npy, n_o_material_stacks), file_handle)
@@ -304,7 +304,7 @@ except ImportError, e:
                 self.__script__(
                     "meep_fields.add_volume_source(%s, meepSource%i, meepSrcVol%i, meep.AMPL)"
                     % (meepComp, seq_nr, seq_nr))
-                from cPickle import dump
+                from pickle import dump
                 file_handle = open(file_name, 'w')
                 dump(src.mode_profile, file_handle)
                 file_handle.close()
@@ -412,8 +412,8 @@ class MeepScripterProcedure(FDTDFieldCalculationProcedure):
         self.interactive_mode = interactive_mode
         try:
             self.visualize_landscape()
-        except Exception, e:
-            print 'Cannot visualize in FDTDFieldCalculationProcedure. Maybe DISPLAY is not set and you' 're working remote? Error:', e
+        except Exception as e:
+            print('Cannot visualize in FDTDFieldCalculationProcedure. Maybe DISPLAY is not set and you' 're working remote? Error:', e)
         if name_template is None:
             name_template = self.landscape.simulation_volume.name
         script_filename = "meep_" + name_template + ".py"
@@ -476,4 +476,4 @@ class MeepScripterProcedure(FDTDFieldCalculationProcedure):
         self.engine.fini_script(self.landscape, self.__script__, name_template)
         self.__script__(append_script.replace("%name", name_template))
         self.__close_script_file_handle__()
-        print "Meep script generated : %s" % script_filename
+        print("Meep script generated : %s" % script_filename)

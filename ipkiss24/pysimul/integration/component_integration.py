@@ -37,7 +37,7 @@ from ipcore.runtime.processor import __Processor__
 from pysics.basics.environment import DEFAULT_ENVIRONMENT
 from ipkiss.plugins.photonics.wg.basic import WgElDefinition
 from ipkiss.technology.technology import *
-import cPickle
+import pickle
 from math import cos, sin, pi
 from pysimul.log import PYSIMUL_LOG as LOG
 import logging

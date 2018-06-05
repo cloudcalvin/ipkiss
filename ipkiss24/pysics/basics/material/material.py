@@ -65,7 +65,7 @@ class MaterialFactory(object):
     store_id = dict()  #key = the binary id of the material
 
     def get_number_of_materials_in_store(self):
-        return len(self.store_id.keys())
+        return len(list(self.store_id.keys()))
 
     def __getitem__(self, key):
         if isinstance(key, int):
@@ -86,10 +86,10 @@ class MaterialFactory(object):
         self.__dict__["id_counter"] = self.id_counter + 1
 
     def __iter__(self):
-        return self.store_id.iteritems()
+        return iter(self.store_id.items())
 
     def find_item_key(self, item):
-        for k, v in self.__dict__.items():
+        for k, v in list(self.__dict__.items()):
             if isinstance(v, Material) and v == item:
                 return k
 

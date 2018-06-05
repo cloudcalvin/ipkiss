@@ -19,8 +19,8 @@
 #
 # Contact: ipkiss@intec.ugent.be
 
-import elements
-from structure import Structure, StructureProperty, StructureList
-from library import Library
-from font import BoundaryFont, PathFont, FontProperty
-from layer import Layer, LayerProperty
+from . import elements
+from .structure import Structure, StructureProperty, StructureList
+from .library import Library
+from .font import BoundaryFont, PathFont, FontProperty
+from .layer import Layer, LayerProperty

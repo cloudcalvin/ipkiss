@@ -21,7 +21,7 @@
 
 from ipkiss.all import *
 from picazzo.io.column import IoColumn, IoColumnGroup
-import constants
+from . import constants
 
 
 class StdIoColumnGroup(IoColumnGroup):

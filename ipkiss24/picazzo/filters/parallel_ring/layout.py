@@ -127,7 +127,7 @@ class ParallelRingReturnBend(ParallelRing):
         x = self.simple_rings[-1].east_ports.y_sorted()[-1].transform_copy(
             self.transformations[-1]).position.x
 
-        for (r, t) in reversed(zip(self.simple_rings, self.transformations)):
+        for (r, t) in reversed(list(zip(self.simple_rings, self.transformations))):
             y_r = r.west_ports.y_sorted()[-1].transform_copy(t).position.y
             s = y - y_r - 2 * self.rbend_radius
 

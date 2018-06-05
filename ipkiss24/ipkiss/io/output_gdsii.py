@@ -36,7 +36,7 @@ from .collector import StreamA2BHexCollector
 from ipkiss.log import IPKISS_LOG as LOG
 import logging
 from io import BytesIO
-from output_xml import FileOutputXml
+from .output_xml import FileOutputXml
 import numpy as np
 from ipcore.properties.predefined import BoolProperty, RestrictedProperty
 from ipcore.properties.restrictions import RestrictType
@@ -440,14 +440,14 @@ def __hex_float__(number):
             B1 = 128
             number = abs(number)
         E = int(math.ceil(math.log(number) / math.log(16)))
-        inumber = long(number * 16L**(-E + 14))
+        inumber = int(number * 16**(-E + 14))
         B1 += E + 64
         B2 = (inumber / 281474976710656) % 256
         if B2 == 0:
             B2 = 16
             B1 += 1
-        S3 = (inumber % 281474976710656) / 4294967296L
-        L4 = inumber % 4294967296L
+        S3 = (inumber % 281474976710656) / 4294967296
+        L4 = inumber % 4294967296
     return __hex_text__(pack(">BBHL", B1, B2, S3, L4))
 
 

@@ -402,7 +402,7 @@ class W1WaveguideWithInlineCavity(__W1__):
             hole_sizes['Z'] = self.defect_diameter
         cav_str = ""
         for i in range(len(self.cavity_holes)):
-            hole_sizes[chr(66 + i)] = self.cavity_holes.values()[i]
+            hole_sizes[chr(66 + i)] = list(self.cavity_holes.values())[i]
             cav_str += chr(66 + i) + " "
         cav_str += "  "
         for i in range(len(self.cavity_holes), 0, -1):

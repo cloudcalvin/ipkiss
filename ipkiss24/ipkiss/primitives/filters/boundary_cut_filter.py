@@ -51,10 +51,10 @@ class BoundaryCutFilter(Filter):
                     (DEBUG_ID),
                     cut_boundaries=False)
                 OP2.write(lib_debug)
-                print DEBUG_ID, " -- DECISION CRITERIUM len(item.shape) = ", len(
-                    item.shape)
-                print "max_vertex_count = ", self.max_vertex_count
-                print "-------------"
+                print(DEBUG_ID, " -- DECISION CRITERIUM len(item.shape) = ", len(
+                    item.shape))
+                print("max_vertex_count = ", self.max_vertex_count)
+                print("-------------")
             result_boundaries = []
             #define the horizontal cutting line
             si = item.size_info()

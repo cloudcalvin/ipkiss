@@ -19,4 +19,4 @@
 #
 # Contact: ipkiss@intec.ugent.be
 
-from wgdef import *
+from .wgdef import *

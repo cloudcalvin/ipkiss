@@ -190,13 +190,13 @@ class MaterialStackFactory(object):
         self.__dict__["id_counter"] = self.id_counter + 1
 
     def get_key_from_material_stack(self, matstack):
-        for (k, v) in self.__dict__.items():
+        for (k, v) in list(self.__dict__.items()):
             if isinstance(v, MaterialStack) and v == matstack:
                 return k
         return None
 
     def get_number_of_material_stacks_in_store(self):
-        return len(self.store_id.keys())
+        return len(list(self.store_id.keys()))
 
     def get_numpy_matrix_representation_of_all_material_stacks(self):
         """Make a numpy matrix with for each layer in each material stack a row that contains:
@@ -206,7 +206,7 @@ class MaterialStackFactory(object):
 
         #first iteration: find out how many rows should be included
         total_number_of_layers = 0
-        for key in self.store_id.keys():
+        for key in list(self.store_id.keys()):
             total_number_of_layers += self.store_id[key].get_number_of_layers()
 
         #create numpy matrix
@@ -214,7 +214,7 @@ class MaterialStackFactory(object):
 
         #second iteration: add contributions to final matrix
         current_row_index = 0
-        for key in self.store_id.keys():
+        for key in list(self.store_id.keys()):
             mat_stack = self.store_id[key]
             number_of_layers = mat_stack.get_number_of_layers()
             nm[current_row_index:
@@ -229,11 +229,11 @@ class MaterialStackFactory(object):
         self.id_counter = 1
 
     def get_material_stack_id(self, material_stack):
-        for (i, mstack) in self.store_id.items():
+        for (i, mstack) in list(self.store_id.items()):
             if mstack == material_stack:
                 return i
         raise Exception(
             "Material stack with id = %i not found." % material_stack)
 
     def __iter__(self):
-        return self.store_id.iteritems()
+        return iter(self.store_id.items())

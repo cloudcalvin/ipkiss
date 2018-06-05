@@ -30,14 +30,14 @@ material_id_to_epsilon = dict()
 
 
 def fill_material_id_to_epsilon_map():
-    for id, material in MATERIAL_FACTORY.store_id.items():
+    for id, material in list(MATERIAL_FACTORY.store_id.items()):
         material_id_to_epsilon[id] = material.epsilon
 
 
 def get_epsilon_for_material_id(id):
     try:
         return material_id_to_epsilon[id]
-    except KeyError, e:
+    except KeyError as e:
         fill_material_id_to_epsilon_map()
         return material_id_to_epsilon[id]
 

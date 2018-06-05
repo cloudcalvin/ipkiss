@@ -20,6 +20,6 @@
 # Contact: ipkiss@intec.ugent.be
 
 from .log import PYSIMUL_LOG as LOG
-import settings
+from . import settings
 
-print settings.START_MESSAGE
+print(settings.START_MESSAGE)

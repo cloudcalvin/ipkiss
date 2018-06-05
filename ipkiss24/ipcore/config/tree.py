@@ -50,7 +50,7 @@ class ConfigTree(object):
 
     def __generate_doc__(self, header):
         doc = ""
-        keys = self.__dict__.keys()
+        keys = list(self.__dict__.keys())
         for k in keys:
             value = self.__dict__[k]
             if isinstance(value, ConfigTree):

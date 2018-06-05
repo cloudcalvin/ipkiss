@@ -19,4 +19,4 @@
 #
 # Contact: ipkiss@intec.ugent.be
 
-from layout import *
+from .layout import *

@@ -22,7 +22,7 @@
 from ipcore.all import *
 from pysimul.runtime.basic import *
 from pysimul.runtime.procedure import *
-import cPickle
+import pickle
 import glob
 
 __all__ = ['SimulationDefinition']
@@ -78,7 +78,7 @@ class SimulationDefinition(StrongPropertyInitializer):
             ) + '.def.pysimul'
         f = open(filename, 'wb')
         LOG.debug("Persisting simulation definition to file : %s" % filename)
-        cPickle.dump(self, f)
+        pickle.dump(self, f)
         f.close()
         return filename
 
@@ -88,7 +88,7 @@ class SimulationDefinition(StrongPropertyInitializer):
             filename = self.__get_default_filename_without_extension()
             filename = filename + '.datacollectors.pysimul'
         f = open(filename, 'wb')
-        cPickle.dump(self.landscape.datacollectors, f)
+        pickle.dump(self.landscape.datacollectors, f)
         f.close()
         self.save_datacollectors_to_file_function(filename + ".png")
 
@@ -97,6 +97,6 @@ class SimulationDefinition(StrongPropertyInitializer):
         '''deserialize a SimulationDefinition from file'''
         LOG.debug("Loading simulation definition from file : %s" % filename)
         f = open(filename, 'rb')
-        simul_def = cPickle.load(f)
+        simul_def = pickle.load(f)
         f.close()
         return simul_def

@@ -22,7 +22,7 @@
 from .. import constants
 from . import coord
 from . import shape
-from transforms.rotation import Rotation
+from .transforms.rotation import Rotation
 import numpy
 from math import atan2, pi, sqrt
 from ipkiss.log import IPKISS_LOG as LOG

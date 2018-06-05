@@ -249,8 +249,8 @@ class ARef(__AutoRefPositions__, MRef, MixinBowl):
             transpose(
                 reshape(
                     meshgrid(
-                        range(self.n_o_periods[0]), range(
-                            self.n_o_periods[1])),
+                        list(range(self.n_o_periods[0])), list(range(
+                            self.n_o_periods[1]))),
                     (2, self.n_o_periods[0] * self.n_o_periods[1]))) * array(
                         [self.period[0], self.period[1]]))
         return p

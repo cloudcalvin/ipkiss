@@ -19,7 +19,7 @@
 #
 # Contact: ipkiss@intec.ugent.be
 
-import Tkinter as Tk
+import tkinter as Tk
 from sys import stderr
 try:
     import matplotlib as matplotlib
@@ -44,10 +44,10 @@ try:
 
     pyplot.ion()
 
-except ImportError, e:
-    print >> stderr, "*************************** DEPENDENCY NOT FOUND **************************************************************************************** "
-    print >> stderr, "**** MODULE MATPLOTLIB COULD NOT BE FOUND, PLEASE INSTALL IT                                                                          *** "
-    print >> stderr, "**** On Windows, download from :                                                                                                      *** "
-    print >> stderr, "****         http://sourceforge.net/projects/matplotlib/files/matplotlib/matplotlib-0.99.3/matplotlib-0.99.3.win32-py2.6.exe/download *** "
-    print >> stderr, "**** On Linux : sudo apt-get install python-matplotlib                                                                                *** "
-    print >> stderr, "***************************************************************************************************************************************** "
+except ImportError as e:
+    print("*************************** DEPENDENCY NOT FOUND **************************************************************************************** ", file=stderr)
+    print("**** MODULE MATPLOTLIB COULD NOT BE FOUND, PLEASE INSTALL IT                                                                          *** ", file=stderr)
+    print("**** On Windows, download from :                                                                                                      *** ", file=stderr)
+    print("****         http://sourceforge.net/projects/matplotlib/files/matplotlib/matplotlib-0.99.3/matplotlib-0.99.3.win32-py2.6.exe/download *** ", file=stderr)
+    print("**** On Linux : sudo apt-get install python-matplotlib                                                                                *** ", file=stderr)
+    print("***************************************************************************************************************************************** ", file=stderr)

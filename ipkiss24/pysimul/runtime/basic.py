@@ -271,8 +271,8 @@ class Fluxplane(__DataCollector__):
             filename = "fluxplane_%s_%s.pickle" % (self.north, self.south)
         f = open(filename, 'wb')
         LOG.debug("Persisting Fluxplane to file : %s" % filename)
-        import cPickle
-        cPickle.dump(self, f)
+        import pickle
+        pickle.dump(self, f)
         f.close()
 
     def save_hdf5(self, filename):
@@ -473,7 +473,7 @@ class SimulationLandscape(SimulationParameterContainer):
         if filename == None:
             try:
                 filename = self.default_filename_without_extension + ".datacollectors.pysimul.png"
-            except Exception, e:
+            except Exception as e:
                 raise PythonSimulateException(
                     "Could not find a default filename for the 'visualizeDatacollectorsToFile' function. Fatal error."
                 )

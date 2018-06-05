@@ -68,9 +68,7 @@ class MetaLayerCreator(MetaPropertyInitializer):
             return layer
 
 
-class __Layer__(StrongPropertyInitializer):
-    __metaclass__ = MetaLayerCreator
-
+class __Layer__(StrongPropertyInitializer, metaclass=MetaLayerCreator):
     def __and__(self, other):
         if isinstance(other, __Layer__):
             return __GeneratedLayerAnd__(self, other)

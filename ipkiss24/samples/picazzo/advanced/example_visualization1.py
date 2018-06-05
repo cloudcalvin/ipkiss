@@ -20,7 +20,7 @@
 # Contact: ipkiss@intec.ugent.be
 
 from technologies.si_photonics.picazzo.default import *
-from example3_three_port import *  # our structure
+from .example3_three_port import *  # our structure
 from ipkiss.plugins.vfabrication import *
 
 #Illustrates how to create a 2D- and 3D-visualization of a certain component.

@@ -58,7 +58,7 @@ if (__name__ == "__main__"):
     OP = FileOutputGdsii(fileName)
     # Write library
     OP.write(my_lib)
-    print "Done : GDS2 file written to %s" % fileName
+    print("Done : GDS2 file written to %s" % fileName)
     #remark : instead of manually creating a Library and exporting it to GDS2, it is also possible to use
     #the convenient shortcut function "write_gdsii" directly on the Structure, i.e.:
     #layout.write_gdsii("example_simple.gds")

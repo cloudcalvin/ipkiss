@@ -51,7 +51,7 @@ class UnconstrainedGdsiiPPLayerOutputMap(StrongPropertyInitializer):
             ln = self.process_layer_map.get(key.process, None)
             dt = self.purpose_datatype_map.get(key.purpose, None)
             if ln is None or dt is None:
-                for pplayer, gdsiilayer in self.layer_map.items():
+                for pplayer, gdsiilayer in list(self.layer_map.items()):
                     if (key.process == pplayer.process) and (
                             key.purpose == pplayer.purpose):
                         return gdsiilayer
@@ -98,10 +98,10 @@ class GdsiiPPLayerOutputMap(StrongPropertyInitializer):
     def define_layer_map(self):
         lm = dict()
         #iterate over all pplayers in TECH.PPLAYER
-        for pplayer_node_str in TECH.PPLAYER.keys():
+        for pplayer_node_str in list(TECH.PPLAYER.keys()):
             pplayer_node = getattr(TECH.PPLAYER, pplayer_node_str)
             if isinstance(pplayer_node, TechnologyTree):
-                for pplayer_str in pplayer_node.keys():
+                for pplayer_str in list(pplayer_node.keys()):
                     pplayer = getattr(pplayer_node, pplayer_str)
                     if isinstance(pplayer, ProcessPurposeLayer):
                         if pplayer.purpose in self.purpose_layer_map:
@@ -123,7 +123,7 @@ class GdsiiPPLayerOutputMap(StrongPropertyInitializer):
     def __getitem__(self, key, default=None):
         if isinstance(key, ProcessPurposeLayer):
             if not key in self.ignore_pplayer:
-                for pplayer, gdsiilayer in self.layer_map.items():
+                for pplayer, gdsiilayer in list(self.layer_map.items()):
                     if (pplayer == key):
                         return gdsiilayer
                 self.__warn__(key)
@@ -176,7 +176,7 @@ class GenericGdsiiPPLayerInputMap(GenericGdsiiPPLayerOutputMap):
 
     def define_gdsiilayer_map(self):
         lm = {}
-        for k, v in self.pplayer_map.items():
+        for k, v in list(self.pplayer_map.items()):
             if v in lm:
                 LOG.warning(
                     "PPLayer to GDSII layer mapping for GDSII %i:%i => %s:%s overwritten with %s:%s"
@@ -211,13 +211,13 @@ class UnconstrainedGdsiiPPLayerInputMap(StrongPropertyInitializer):
 
     def define_layer_process_map(self):
         lpm = {}
-        for k, v in self.process_layer_map.items():
+        for k, v in list(self.process_layer_map.items()):
             lpm[v] = k
         return lpm
 
     def define_datatype_purpose_map(self):
         dpm = {}
-        for k, v in self.purpose_datatype_map.items():
+        for k, v in list(self.purpose_datatype_map.items()):
             dpm[v] = k
         return dpm
 
@@ -226,7 +226,7 @@ class UnconstrainedGdsiiPPLayerInputMap(StrongPropertyInitializer):
             pr = self.layer_process_map.get(key.number, None)
             pu = self.datatype_purpose_map.get(key.datatype, None)
             if pr is None or pu is None:
-                for gdsiilayer, pplayer in self.layer_map.items():
+                for gdsiilayer, pplayer in list(self.layer_map.items()):
                     if (key.number == gdsiilayer.number) and (
                             key.datatype == gdsiilayer.datatype):
                         return pplayer
@@ -268,7 +268,7 @@ class GdsiiPPLayerInputMap(GdsiiPPLayerOutputMap):
     def define_layer_map(self):
         layer_map = super(GdsiiPPLayerInputMap, self).define_layer_map()
         reverse_layer_map = dict()
-        for pplayer, gdsiilayer in layer_map.items():
+        for pplayer, gdsiilayer in list(layer_map.items()):
             reverse_layer_map[(gdsiilayer.number,
                                gdsiilayer.datatype)] = pplayer
         return reverse_layer_map

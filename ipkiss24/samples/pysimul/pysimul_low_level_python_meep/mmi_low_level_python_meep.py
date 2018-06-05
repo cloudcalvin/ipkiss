@@ -25,10 +25,10 @@ from ipkiss.plugins.simulation import *
 
 try:
     import meep as meep
-except ImportError, e:
+except ImportError as e:
     try:
         import meep_mpi as meep
-    except ImportError, e:
+    except ImportError as e:
         raise Exception("Modules 'meep' or 'meep_mpi' not found.")
 
 #This example illustrates how you can combine automatic interface of a Picazzo geometry with low-level Python-Meep scripting.
@@ -76,7 +76,7 @@ class MyProcedure(LowLevelPythonMeepProcedure):
             resolution=simul_params["resolution"],
             port=mmi.west_ports[0],
             wavelength=simul_params["center_wavelength"])
-        print mp
+        print(mp)
         #create a Gaussian source
         center_wavelength = simul_params["center_wavelength"]
         pulse_width = 30

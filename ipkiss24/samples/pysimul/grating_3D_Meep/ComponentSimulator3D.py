@@ -25,10 +25,10 @@ from ipkiss.plugins.photonics.port.port import OpticalPort
 from os import *
 try:
     import meep_mpi as meep
-except ImportError, e:
+except ImportError as e:
     try:
         import meep as meep
-    except ImportError, e:
+    except ImportError as e:
         raise Exception("Modules 'meep' or 'meep_mpi' not found.")
 
 
@@ -57,13 +57,13 @@ class ProcedureClass(LowLevelPythonMeepProcedure, StrongPropertyInitializer):
 
         ## Sources
 
-        print 'Center wavelength:', po.wavelength
-        print 'Bandwidth:', po.pulse_width
+        print('Center wavelength:', po.wavelength)
+        print('Bandwidth:', po.pulse_width)
         center_freq = 1.0 / (float(po.wavelength))
         pulse_width_freq = (float(po.pulse_width)) / (
             float(po.wavelength)) * center_freq
-        print 'Center frequency:', center_freq
-        print 'Bandwidth:', pulse_width_freq
+        print('Center frequency:', center_freq)
+        print('Bandwidth:', pulse_width_freq)
 
         if (po.pulsed_source):
             src = meep.gaussian_src_time(center_freq, pulse_width_freq)
@@ -72,12 +72,12 @@ class ProcedureClass(LowLevelPythonMeepProcedure, StrongPropertyInitializer):
 
         source_port_position = po.input_port.transform_copy(
             Translation(translation=(po.source_input_port_offset, 0))).position
-        print 'wg_center_old:', wg_center
+        print('wg_center_old:', wg_center)
         wg_center = (po.input_port.wg_definition.process.wg_upper_z_coord +
                      po.input_port.wg_definition.process.wg_lower_z_coord) / 2.
-        print 'wg_center_new:', wg_center
+        print('wg_center_new:', wg_center)
         c = Coord3(source_port_position[0], source_port_position[1], wg_center)
-        print 'coord:', c
+        print('coord:', c)
         source_position_vec = self.make_meep_vec(c)
 
         fields.add_point_source(meep.Ey, src, source_position_vec)
@@ -124,7 +124,7 @@ class ProcedureClass(LowLevelPythonMeepProcedure, StrongPropertyInitializer):
         else:
             stop = po.stop_time
 
-        print 'Simulation will run for', stop, 'time units'
+        print('Simulation will run for', stop, 'time units')
 
         output_files = []
         for oc in po.output_cuts:
@@ -146,17 +146,17 @@ class ProcedureClass(LowLevelPythonMeepProcedure, StrongPropertyInitializer):
             fields.step()
             i += 1
 
-        print n_o_output, 'images outputted'
-        print 'Outputting field images..'
+        print(n_o_output, 'images outputted')
+        print('Outputting field images..')
         del output_files[:]
         for oc in po.output_cuts:
             fn = '%s.h5' % oc.filename
             fn_eps = '%s_eps.h5' % oc.filename
             st = 'h5topng -t 0:%d -R -Zc dkbluered -a yarg -A %s %s' % (
                 n_o_output - 1, fn_eps, fn)
-            print st
+            print(st)
             system(st)
-        print 'Outputting done!'
+        print('Outputting done!')
 
         #print 'obtaining fluxes:'
         self.flux_data = []
@@ -246,7 +246,7 @@ class StructureMeep3DSimulator(StrongPropertyInitializer):
 
     def simulate(self):
 
-        print 'begining to simulate'
+        print('begining to simulate')
         simul_params = dict()
         simul_params["resolution"] = self.resolution
         simul_params["engine"] = MeepSimulationEngine(

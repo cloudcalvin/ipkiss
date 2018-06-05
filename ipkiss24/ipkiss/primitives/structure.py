@@ -136,10 +136,8 @@ class __StructureHierarchy__(StrongPropertyInitializer):
         return not self.__eq__(other)
 
 
-class Structure(UnitGridContainer, __StructureHierarchy__, MixinBowl):
+class Structure(UnitGridContainer, __StructureHierarchy__, MixinBowl, metaclass=MetaStructureCreator):
     """Base class for a parametric cell"""
-
-    __metaclass__ = MetaStructureCreator
     __name_generator__ = TECH.ADMIN.NAME_GENERATOR
     created = TimeProperty(
         doc=

@@ -61,11 +61,11 @@ class ModeList(TypedList):
             return None
 
     def set_mode_name(self, item, name):
-        if name in self.namedict.keys():
+        if name in list(self.namedict.keys()):
             return
         if not item in self:
             raise ValueError("Mode %s is not in list" % str(item))
-        for (key, it) in self.namedict.iteritems():
+        for (key, it) in self.namedict.items():
             if it == item:
                 it = self.namedict.pop(key)
                 self.namedict[name] = it

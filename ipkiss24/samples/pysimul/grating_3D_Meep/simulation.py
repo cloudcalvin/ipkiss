@@ -64,8 +64,8 @@ if not os.path.exists(source_output_directory):
 for f in files_to_copy:
     new_file = '%s/%s' % (source_output_directory, f)
     copy_command = 'cp %s %s' % (f, new_file)
-    print 'Executing:'
-    print copy_command
+    print('Executing:')
+    print(copy_command)
     os.system(copy_command)
 
 wg_def_cavity = WgElDefinition(wg_width=0.45, trench_width=1.0)
@@ -77,7 +77,7 @@ period = 0.330
 taper_len = 5.0
 section_len = 5.0
 
-print 'Reference Simulation'
+print('Reference Simulation')
 
 grating_unit_cell = WgGratingPeriodShallow(
     length=period,
@@ -109,7 +109,7 @@ reference_component.write_gdsii('comp_for_3d_simulation.gds')
 from ipkiss.plugins.vfabrication import *
 reference_component.visualize_2d()
 
-print 'Creating reference component simulator'
+print('Creating reference component simulator')
 reference_component_simulator = StructureMeep3DSimulator(
     component=reference_component,
     input_port=p_w,
@@ -122,7 +122,7 @@ reference_component_simulator = StructureMeep3DSimulator(
 
 filename = '%s/reversed_flux' % output_directory
 
-print 'Done creating reference component simulator'
+print('Done creating reference component simulator')
 
 reference_component_simulator.pulse_width = 0.4
 reference_component_simulator.add_output_cut(
@@ -140,7 +140,7 @@ reference_component_simulator.stop_time_multiplier = 2.0  #stop after 2 times th
 reference_component_simulator.dft_terms = 500  #number of sampling points for DFT flux plane
 reference_component_simulator.simulate()
 
-print 'Done simulating reference component'
+print('Done simulating reference component')
 
 output_filename = '%s/output.txt' % output_directory
 output_data = []
@@ -161,7 +161,7 @@ output_data.append(data_ref_e)
 ## with reversed flux
 ## ------------------
 
-print 'Simulating with reversed flux'
+print('Simulating with reversed flux')
 
 grating_unit_cell = WgGratingPeriodShallow(
     length=period,

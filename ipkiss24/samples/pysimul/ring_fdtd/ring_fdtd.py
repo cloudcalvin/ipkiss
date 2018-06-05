@@ -80,14 +80,14 @@ params["datacollectors"] = [
 
 params["step_processor"] = SaveFieldsHDF5Processor(
     fileName="RING_Hz.h5", H5OutputIntervalSteps=1000, field_component=compHz)
-print
-print
-print "*************************************** WARNING **********************************************************************"
-print "***** WARNING : INCREASE THE maximum_steps PARAMETER TO 750000 IN ORDER TO SEE RESONANCE PEAK !!!!!!!! ***************"
-print "*************************************** WARNING **********************************************************************"
-print
-print
-print
+print()
+print()
+print("*************************************** WARNING **********************************************************************")
+print("***** WARNING : INCREASE THE maximum_steps PARAMETER TO 750000 IN ORDER TO SEE RESONANCE PEAK !!!!!!!! ***************")
+print("*************************************** WARNING **********************************************************************")
+print()
+print()
+print()
 params["stopcriterium"] = StopAfterSteps(
     maximum_steps=10000
 )  #INCREASE TO 750000 IN ORDER TO SEE RESONANCE PEAK !!!!!!!!
@@ -97,13 +97,13 @@ params["post_processor"] = PersistFluxplanes()
 simul = ring.create_simulation(simul_params=params)
 simul.procedure.run(interactive_mode=False)
 
-print "Done with the simulation. Now plotting the flux..."
+print("Done with the simulation. Now plotting the flux...")
 
-import cPickle
+import pickle
 from dependencies.matplotlib_wrapper import *
 file_flux_output = open("fluxplane_datacollector", 'r')
 
-flux_output = cPickle.load(file_flux_output)
+flux_output = pickle.load(file_flux_output)
 file_flux_output.close()
 
 frequencies = 1000.0 / flux_output.flux_per_freq[0]

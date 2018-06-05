@@ -52,7 +52,7 @@ class GratingGeneric(Structure):
         restriction=RestrictType(dict), required=True)  # should be elaborated?
 
     def define_elements(self, elems):
-        k = self.cells_positions.keys()
+        k = list(self.cells_positions.keys())
         k.sort(
         )  #to ensure a deterministic build-up of the elements. -- FIXME : this should not be required, but the best solution right now to get the unit testing framework in order
         for cell in k:

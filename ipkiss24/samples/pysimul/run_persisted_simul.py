@@ -22,7 +22,7 @@
 from technologies.si_photonics.picazzo.default import *
 from ipkiss.all import *
 from ipkiss.plugins.simulation import *
-import cPickle
+import pickle
 
 simul_def = SimulationDefinition.load_from_file("mmibuwgp_1_tp.def.pysimul")
 

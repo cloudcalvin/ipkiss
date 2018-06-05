@@ -31,7 +31,7 @@ from ipkiss.technology.technology import *
 from ipkiss.geometry.vector import *
 try:
     import camfr
-except ImportError, e:
+except ImportError as e:
     raise PythonSimulateException("Cannot load CAMFR engine:%s" % e.message)
 from ipkiss.plugins.photonics.port.port import OpticalPort
 from pysics.basics import *
@@ -233,7 +233,7 @@ class CamfrEngine(ModeSolverEngine):
         #the other columns will indicate if there is a difference between that columns in "eps" and the next column
         deltas = numpy.ones_like(eps)
         d = numpy.diff(eps, axis=0)
-        for d_counter in xrange(d.shape[0]):
+        for d_counter in range(d.shape[0]):
             deltas[d_counter + 1] = d[d_counter]
         #now identify the slabs and their width
         slabs_specifications = []

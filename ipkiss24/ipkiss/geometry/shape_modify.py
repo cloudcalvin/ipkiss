@@ -104,7 +104,7 @@ def shape_delete_loops(coordinates):
             c4 = nc[k + 1]
             if lines_cross(c1, c2, c3, c4):
                 nc[i + 1] = intersection(c1, c2, c3, c4)
-                dels.update(range(i + 2, k + 1))
+                dels.update(list(range(i + 2, k + 1)))
                 c2 = nc[i + 1]
             k += 1
     return numpy.delete(nc, dels, 0)

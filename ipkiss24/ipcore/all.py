@@ -19,15 +19,15 @@
 #
 # Contact: ipkiss@intec.ugent.be
 
-from properties.predefined import *
-from properties.descriptor import *
-from properties.restrictions import *
-from properties.initializer import *
-from exceptions.exc import *
-from runtime.processor import __Processor__, __StopCriterium__
-from runtime.processor import ProcessorStopCriterium
-from runtime.procedure import __Procedure__, EMPTY_PROCEDURE
-from helperfunc import *
-from caching.cache import cache
-from config.tree import *
-from types_list import TypedList, TypedListProperty
+from .properties.predefined import *
+from .properties.descriptor import *
+from .properties.restrictions import *
+from .properties.initializer import *
+from .exceptions.exc import *
+from .runtime.processor import __Processor__, __StopCriterium__
+from .runtime.processor import ProcessorStopCriterium
+from .runtime.procedure import __Procedure__, EMPTY_PROCEDURE
+from .helperfunc import *
+from .caching.cache import cache
+from .config.tree import *
+from .types_list import TypedList, TypedListProperty

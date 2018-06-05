@@ -130,7 +130,7 @@ class ProcessorFont(ProcessorTypeCast):
         if isinstance(value, Font):
             return value
         try:
-            import fonts
+            from . import fonts
             new_val = fonts.TEXT_FONTS[value]
             return new_val
         except:

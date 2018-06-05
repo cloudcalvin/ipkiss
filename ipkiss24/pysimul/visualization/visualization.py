@@ -75,8 +75,8 @@ class SimulationVolumeVisualization2D(__SimulationVolumeVisualization__):
         ##legend
         from dependencies.matplotlib_wrapper import font_manager
         prop = font_manager.FontProperties(size=10)
-        patches_for_legend = [ref[0] for ref in references_for_legend.values()]
-        labels_for_legend = [ref[1] for ref in references_for_legend.values()]
+        patches_for_legend = [ref[0] for ref in list(references_for_legend.values())]
+        labels_for_legend = [ref[1] for ref in list(references_for_legend.values())]
 
         ax.legend(
             patches_for_legend, labels_for_legend, loc=(0.5, 0.9), prop=prop)
@@ -114,10 +114,10 @@ class SimulationVolumeVisualization3D(SimulationVolumeVisualization2D):
                     shape.points,
                     heights=(0, solid_height * z_extrusion_factor),
                     opts=[Texture(Pigment(color=color.capitalize()))])
-                print "Writing prism with %i points for %s (solid height : %f) in %s" % (
+                print("Writing prism with %i points for %s (solid height : %f) in %s" % (
                     len(shape.points),
                     geom.material_stack_factory[material_stack_id].name,
                     geom.material_stack_factory[
-                        material_stack_id].solid_height, color)
+                        material_stack_id].solid_height, color))
                 povray_file.write(povray_prism)
-        print "Povray file generated : ", file_name
+        print("Povray file generated : ", file_name)

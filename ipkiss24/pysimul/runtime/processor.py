@@ -96,11 +96,11 @@ class SaveFieldsHDF5Processor(FieldPropagationSimulationProcessor):
             try:
                 import meep_mpi as Meep
             except:
-                print 'Cannot import meep'
+                print('Cannot import meep')
 
         if isinstance(self.surroundings, Meep.volume):
-            print 'WARNING: Cannot yet pickle surroundings-instance. (meep.vol2d(...).surroundings'
-            print 'This is of type meep.volume; proxy of <Swig Object of type \'meep::volume *\' at 0x31...c0> '
+            print('WARNING: Cannot yet pickle surroundings-instance. (meep.vol2d(...).surroundings')
+            print('This is of type meep.volume; proxy of <Swig Object of type \'meep::volume *\' at 0x31...c0> ')
             #self.surroundings = 'surrounding can not yet be pickled correctly'
             ndict = self.__dict__.copy()
             del ndict['__prop_surroundings__']
@@ -179,7 +179,7 @@ class StopAfterSteps(__StopCriterium__):
     def __call__(self):
         self.StepsCount = self.StepsCount + 1
         if (self.StepsCount % int(self.maximumSteps / 10.0) == 0):
-            print "The simulation is now at step %i" % self.StepsCount
+            print("The simulation is now at step %i" % self.StepsCount)
         return self.StepsCount >= self.maximumSteps
 
 

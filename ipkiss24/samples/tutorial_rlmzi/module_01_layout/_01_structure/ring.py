@@ -57,4 +57,4 @@ class RingResonator(Structure):
 # As this is only contains a library component, we should call it from
 # another file. In this case, it is 'execute.py'
 if __name__ == "__main__":
-    print "This is not the main file. Run 'execute.py' in the same folder"
+    print("This is not the main file. Run 'execute.py' in the same folder")

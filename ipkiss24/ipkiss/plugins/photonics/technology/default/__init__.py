@@ -36,7 +36,7 @@ TECH.METRICS.UNIT = 1E-6
 TECH.METRICS.ANGLE_STEP = 1.0
 
 from ..common import *
-from agnostic import *
+from .agnostic import *
 
 #activate the "ports" mixin
 import ipkiss.plugins.photonics.port.aspect

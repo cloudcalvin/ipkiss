@@ -24,7 +24,7 @@ if __name__ == "__main__":
 from ipkiss.plugins.photonics.wg.basic import *  # basic waveguides
 from picazzo.io.column import *  # Standard io columns
 
-from example3_three_port import *  # our structure
+from .example3_three_port import *  # our structure
 
 
 ######################################

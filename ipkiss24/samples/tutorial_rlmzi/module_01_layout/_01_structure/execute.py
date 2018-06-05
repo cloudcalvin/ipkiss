@@ -22,12 +22,12 @@
 from ring import RingResonator
 
 # documentation for your class
-print RingResonator.__doc__
+print(RingResonator.__doc__)
 
 # create a new ringResonator object
 my_ring = RingResonator(ring_radius=5.0)
 
-print my_ring.name  # unique name with prefix
+print(my_ring.name)  # unique name with prefix
 
 # change property
 my_ring.ring_wg_width = 0.6

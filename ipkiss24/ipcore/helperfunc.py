@@ -44,7 +44,7 @@ def do_hash(obj):
 def extract_kwarg(kwargs, arg_name):
     try:
         arg = kwargs[arg_name]
-    except KeyError, ke:
+    except KeyError as ke:
         raise Exception(
             "Keyword argument '%s' is required but was not found." % arg_name)
     del kwargs[arg_name]

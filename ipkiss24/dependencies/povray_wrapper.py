@@ -118,7 +118,7 @@ class Item:
                 opt.write(file)
             else:
                 file.writeln(str(opt))
-        for key, val in self.kwargs.items():
+        for key, val in list(self.kwargs.items()):
             if type(val) == tuple or type(val) == list:
                 val = Vector(*val)
                 file.writeln("%s %s" % (key, val))

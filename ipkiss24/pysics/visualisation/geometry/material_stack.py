@@ -94,8 +94,8 @@ class __MaterialStackGeometry2DVisualizationMixin__(StrongPropertyInitializer):
 
         # legend
         prop = font_manager.FontProperties(size=10)
-        patches_for_legend = [ref[0] for ref in legend_refs.values()]
-        labels_for_legend = [ref[1] for ref in legend_refs.values()]
+        patches_for_legend = [ref[0] for ref in list(legend_refs.values())]
+        labels_for_legend = [ref[1] for ref in list(legend_refs.values())]
         axes.legend(
             patches_for_legend, labels_for_legend, loc=(0.5, 0.9), prop=prop)
 
@@ -128,7 +128,7 @@ class __MaterialStackGeometry3DVisualizationMixin__(StrongPropertyInitializer):
             # polygon cell with one shape
             polys = tvtk.CellArray()
             cells = numpy.array(
-                [n_points] + range(n_points)
+                [n_points] + list(range(n_points))
             )  # number of points in the cell, and cell indices
             polys.set_cells(1, cells)  # number of cells, list of cell points
             pd = tvtk.PolyData()
@@ -214,8 +214,8 @@ class __MaterialStackGeometry3DVisualizationMixin__(StrongPropertyInitializer):
         cell_array = tvtk.CellArray()
         cell_array.set_cells(n_cells, numpy.hstack(wedge_cell_indices))
         cell_types = numpy.array([wedge_type for i in range(n_cells)])
-        cell_offset = numpy.array(range(
-            0, 7 * n_cells, 7))  # each cell has one counter and 6 points
+        cell_offset = numpy.array(list(range(
+            0, 7 * n_cells, 7)))  # each cell has one counter and 6 points
 
         # Now create the UnstructuredGrid which will contain the material data.
         ug = tvtk.UnstructuredGrid(points=numpy.vstack(wedge_points))

@@ -170,9 +170,7 @@ def is_suppressed(propvalue):
         return False
 
 
-class PropertyInitializer(MixinBowl):
-    __metaclass__ = MetaPropertyInitializer
-
+class PropertyInitializer(MixinBowl, metaclass=MetaPropertyInitializer):
     def __init__(self, **kwargs):
         self.flag_busy_initializing = True
 
@@ -181,7 +179,7 @@ class PropertyInitializer(MixinBowl):
         props = self.__properties__()
 
         # assign properties
-        for (key, value) in kwargs.items():
+        for (key, value) in list(kwargs.items()):
             if not is_suppressed(value):
                 setattr(self, key, value)
 
@@ -235,7 +233,7 @@ class PropertyInitializer(MixinBowl):
 
     def __clear_cached_values_in_store__(self):  # FIXME: improve performance?
         if (not self.flag_busy_initializing):
-            store_content_flattened = self.__store__.items()
+            store_content_flattened = list(self.__store__.items())
             for (key, item) in store_content_flattened:
                 origin = item[1]
                 if origin == CACHED:
@@ -305,7 +303,7 @@ class PropertyInitializer(MixinBowl):
             try:
                 if (myVal != otherVal):
                     return False
-            except ValueError, e:
+            except ValueError as e:
                 import numpy
                 if isinstance(myVal, numpy.ndarray):
                     if (myVal != otherVal).any():
@@ -365,7 +363,7 @@ class StrongPropertyInitializer(PropertyInitializer):
         else:
             allow_unmatched_kwargs = False
         props = self.__properties__()
-        for (key, value) in kwargs.items():
+        for (key, value) in list(kwargs.items()):
             if (not key in props) and (not allow_unmatched_kwargs):
                 raise IpcoreAttributeException(
                     "Keyword argument '%s' does not match a property of %s." %

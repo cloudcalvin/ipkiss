@@ -31,7 +31,7 @@ class SimulationParameterContainer(StrongPropertyInitializer):
     def __set_properties__(self, obj, kwargs):
         props = obj.__unlocked_properties__()
         kwargs_to_assign = dict()
-        for name, val in kwargs.items():
+        for name, val in list(kwargs.items()):
             if name in props:
                 kwargs_to_assign[name] = val
         obj.__assign_properties__(kwargs_to_assign)
@@ -52,7 +52,7 @@ class SimulationParameterContainer(StrongPropertyInitializer):
                     "Keyword argument 'simul_params' must be of type 'dict'. Current type is : '%'"
                     % type(p))
             props = self.__unlocked_properties__()
-            for name, val in p.items():
+            for name, val in list(p.items()):
                 if isinstance(val, SimulationParameterContainer):
                     self.__set_properties__(val, p)
                 elif isinstance(val, list):

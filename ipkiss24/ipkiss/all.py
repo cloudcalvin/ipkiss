@@ -21,58 +21,58 @@
 
 import ipkiss.aspects
 
-from constants import *
-from settings import *
+from .constants import *
+from .settings import *
 
 from ipcore.all import *
 from ipkiss.log import IPKISS_LOG as LOG
 
-from geometry.transform import *
-from geometry.transformable import *
-from geometry.transforms.no_distort import *
-from geometry.transforms.translation import *
-from geometry.transforms.rotation import *
-from geometry.transforms.identity import *
-from geometry.transforms.magnification import *
-from geometry.transforms.mirror import *
-from geometry.transforms.stretch import *
-from geometry.coord import *
-from geometry.vector import *
-from geometry.shape import *
-from geometry.line import *
-from geometry.shapes.basic import *
-from geometry.shapes.advanced import *
-from geometry.shape_cut import *
-from geometry.shape_info import *
-from geometry.size_info import *
-from geometry.shape_modify import *
-from geometry.shape_modifier import *
-from geometry.shapes.modifiers import *
-from geometry.shapes.curves import *
+from .geometry.transform import *
+from .geometry.transformable import *
+from .geometry.transforms.no_distort import *
+from .geometry.transforms.translation import *
+from .geometry.transforms.rotation import *
+from .geometry.transforms.identity import *
+from .geometry.transforms.magnification import *
+from .geometry.transforms.mirror import *
+from .geometry.transforms.stretch import *
+from .geometry.coord import *
+from .geometry.vector import *
+from .geometry.shape import *
+from .geometry.line import *
+from .geometry.shapes.basic import *
+from .geometry.shapes.advanced import *
+from .geometry.shape_cut import *
+from .geometry.shape_info import *
+from .geometry.size_info import *
+from .geometry.shape_modify import *
+from .geometry.shape_modifier import *
+from .geometry.shapes.modifiers import *
+from .geometry.shapes.curves import *
 
-from primitives.layer import *
-from primitives.elements import *
-from primitives.fonts import *
-from primitives.library import *
-from primitives.structure import *
+from .primitives.layer import *
+from .primitives.elements import *
+from .primitives.fonts import *
+from .primitives.library import *
+from .primitives.structure import *
 
-from io.import_hpgl import *
-from io.input_gdsii import *
-from io.output import OutputBasic
-from io.output_gdsii import *
-from io.output_object import *
-from io.output_xml import *
-from io.file_io import *
-from io.gds_layer import *
+from .io.import_hpgl import *
+from .io.input_gdsii import *
+from .io.output import OutputBasic
+from .io.output_gdsii import *
+from .io.output_object import *
+from .io.output_xml import *
+from .io.file_io import *
+from .io.gds_layer import *
 
-from process import ProcessProperty, PurposeProperty, PPLayer, ProcessPurposeLayer, ProcessLayer, PatternPurpose
+from .process import ProcessProperty, PurposeProperty, PPLayer, ProcessPurposeLayer, ProcessLayer, PatternPurpose
 
-from technology.settings import get_technology
+from .technology.settings import get_technology
 
 TECH = get_technology()
 
-from exceptions import *
+from .exceptions import *
 
 #from settings import *
 
-from boolean_ops import *
+from .boolean_ops import *

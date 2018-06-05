@@ -244,7 +244,7 @@ class RestrictValueList(__PropertyRestriction__):
 
 class RestrictIterable(__PropertyRestriction__):
     def validate(self, value, obj=None):
-        return isinstance(value, basestring) or getattr(
+        return isinstance(value, str) or getattr(
             value, '__iter__', False)
 
     def __repr__(self):

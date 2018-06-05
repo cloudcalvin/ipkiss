@@ -32,4 +32,4 @@ from ring import RingResonator
 # create a new ringResonator object
 my_ring = RingResonator(ring_radius=5.0)
 
-print my_ring.name  # unique name with prefix
+print(my_ring.name)  # unique name with prefix

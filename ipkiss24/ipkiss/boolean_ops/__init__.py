@@ -19,5 +19,5 @@
 #
 # Contact: ipkiss@intec.ugent.be
 
-from boolean_ops_shapely import *
-from boolean_ops_elements import *
+from .boolean_ops_shapely import *
+from .boolean_ops_elements import *

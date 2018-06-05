@@ -19,9 +19,9 @@
 #
 # Contact: ipkiss@intec.ugent.be
 
-from standard import TEXT_FONT_STANDARD
-from compact import TEXT_FONT_COMPACT
-from simple import TEXT_FONT_SIMPLE
+from .standard import TEXT_FONT_STANDARD
+from .compact import TEXT_FONT_COMPACT
+from .simple import TEXT_FONT_SIMPLE
 
 #----------------------------------------------------------------------------
 #List of all Fonts

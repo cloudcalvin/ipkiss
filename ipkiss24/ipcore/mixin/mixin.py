@@ -48,6 +48,5 @@ class MetaMixinBowl(type):
             cls.mixin_last(mixin_class)
 
 
-class MixinBowl(object):
-    __metaclass__ = MetaMixinBowl
+class MixinBowl(object, metaclass=MetaMixinBowl):
     pass

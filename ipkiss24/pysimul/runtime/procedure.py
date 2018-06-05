@@ -94,8 +94,8 @@ class FDTDFieldCalculationProcedure(__FieldCalculationProcedure__):
         LOG.debug("Starting run of FDTDFieldCalculationProcedure...")
         try:
             self.visualize_landscape()
-        except Exception, e:
-            print 'Cannot visualize in FDTDFieldCalculationProcedure. Maybe DISPLAY is not set and you' 're working remote? Error:', e
+        except Exception as e:
+            print('Cannot visualize in FDTDFieldCalculationProcedure. Maybe DISPLAY is not set and you' 're working remote? Error:', e)
 
         LOG.debug("Initializing the engine...")
         self.engine.initialise_engine(self.landscape)
@@ -106,7 +106,7 @@ class FDTDFieldCalculationProcedure(__FieldCalculationProcedure__):
         stop = False
         stepCount = 1
         if self.interactive_mode:
-            i = raw_input("Press <return> to start the simulation...")
+            i = input("Press <return> to start the simulation...")
         while (not stop):
             self.engine.step()
             self.step_processor.process()
@@ -120,10 +120,10 @@ class FDTDFieldCalculationProcedure(__FieldCalculationProcedure__):
                         wavelengths = 1000.0 / flx.flux_per_freq[0]
                         fluxes = flx.flux_per_freq[1]
                         for wl, flux in zip(wavelengths, fluxes):
-                            print 'flux', flxcntr, ': (step', stepCount, '), ', wl, flux
+                            print('flux', flxcntr, ': (step', stepCount, '), ', wl, flux)
                         #double enter so gnuplot can interpret this correctly as new data.
-                        print 'flux', flxcntr, ': '
-                        print 'flux', flxcntr, ': '
+                        print('flux', flxcntr, ': ')
+                        print('flux', flxcntr, ': ')
                         flxcntr += 1
 
         LOG.debug("Finalizing the processor...")
@@ -144,7 +144,7 @@ class FDTDFieldCalculationProcedure(__FieldCalculationProcedure__):
             ds = self.engine.get_material_dataset()
             self.create_visualization(ds, indicate_window=False)
             PYPLOT.draw()
-            i = raw_input("Press <return> to continue...")
+            i = input("Press <return> to continue...")
             LOG.debug("End of visualization...")
 
     def visualize_landscape(self):
@@ -160,10 +160,10 @@ class FDTDFieldCalculationProcedure(__FieldCalculationProcedure__):
                     self.landscape.simulation_id + "_landscape.png", dpi=500)
             if self.interactive_mode:
                 PYPLOT.draw()
-                i = raw_input("Press <return> to continue or '0' to abort...")
+                i = input("Press <return> to continue or '0' to abort...")
                 if (i.find("0") >= 0):
                     import sys
-                    print "Exiting..."
+                    print("Exiting...")
                     sys.exit(0)
                 PYPLOT.clf()
                 PYPLOT.cla()
@@ -179,7 +179,7 @@ class FDTDFieldCalculationProcedure(__FieldCalculationProcedure__):
                     png_file = filename.replace(".h5", ".png")
                     im = Image.open(png_file)
                     im.show()
-                except Exception, e:
+                except Exception as e:
                     LOG.error("Unexpected error with python-PIL : %s" % str(e))
 
     def __contourf_material_matrix_effective_index__(

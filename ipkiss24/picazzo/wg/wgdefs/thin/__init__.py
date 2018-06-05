@@ -19,5 +19,5 @@
 #
 # Contact: ipkiss@intec.ugent.be
 
-from wgdef import *
-from tapers import *
+from .wgdef import *
+from .tapers import *

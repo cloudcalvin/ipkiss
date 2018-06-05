@@ -84,7 +84,7 @@ def cut_open_shape_in_n_sections_with_overlap(shape, n_o_sections, overlap=1):
     section_length = int(math.ceil(l / n_o_sections))
     return cut_open_shape_with_overlap(
         shape,
-        range(section_length - 1, l - overlap - 1, section_length), overlap)
+        list(range(section_length - 1, l - overlap - 1, section_length)), overlap)
 
 
 def cut_open_shape_in_sections_with_overlap(shape,

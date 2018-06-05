@@ -97,4 +97,4 @@ if __name__ == "__main__":
     OP = FileOutputGdsii(fileName, filter=OrthogonalReferenceFilter())
     # Write library
     OP.write(my_lib)
-    print "Done : GDS2 file written to %s" % fileName
+    print("Done : GDS2 file written to %s" % fileName)

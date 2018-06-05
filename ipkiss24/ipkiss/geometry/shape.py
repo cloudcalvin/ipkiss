@@ -21,7 +21,7 @@
 
 from .. import constants
 from . import transformable
-from coord import Coord2, Coord3, Coord
+from .coord import Coord2, Coord3, Coord
 
 from . import size_info
 from copy import copy, deepcopy
@@ -165,7 +165,7 @@ class Shape(transformable.Transformable, StrongPropertyInitializer, MixinBowl):
                         kwargs["points"] = pl
                     else:
                         raise Exception()
-                except Exception, e:
+                except Exception as e:
                     raise IpkissException(
                         "Unexpected type %s for parameter 'points' in Shape::__init__"
                         % str(type(points)))
@@ -507,14 +507,14 @@ class Shape(transformable.Transformable, StrongPropertyInitializer, MixinBowl):
         if len(p) < 2:
             return []
         if self.is_closed():
-            segments = zip(p, roll(p, 1, 0))
+            segments = list(zip(p, roll(p, 1, 0)))
         else:
-            segments = zip(p[:-1], p[1:])
+            segments = list(zip(p[:-1], p[1:]))
         return segments
 
     def intersections(self, other_shape):
         """ the intersections with this shape and the other shape """
-        from shape_info import intersection, lines_cross, lines_coincide, sort_points_on_line, points_unique
+        from .shape_info import intersection, lines_cross, lines_coincide, sort_points_on_line, points_unique
         s = Shape(self)
         s.remove_straight_angles()
         segments1 = s.segments()
@@ -628,7 +628,7 @@ class Shape(transformable.Transformable, StrongPropertyInitializer, MixinBowl):
 
     def __delslice__(self, i, j):
         """ remove a slice of points """
-        self.points = delete(self.points, range(i, j), 0)
+        self.points = delete(self.points, list(range(i, j)), 0)
         return self
 
     def __mul__(self, times):

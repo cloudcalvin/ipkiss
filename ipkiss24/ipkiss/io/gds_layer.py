@@ -64,7 +64,7 @@ class GdsiiLayerOutputMap(StrongPropertyInitializer):
             layer_map=layer_map, **kwargs)
         # check if the input map doesn't contain any duplicates on the "source side" (duplicates may exist on the target size)
         ln = []
-        for L in self.layer_map.keys():
+        for L in list(self.layer_map.keys()):
             ln.append(str(L))
         if len(ln) != len(list(set(ln))):
             raise InvalidArgumentException(
@@ -72,7 +72,7 @@ class GdsiiLayerOutputMap(StrongPropertyInitializer):
             )
 
     def __getitem__(self, layer):
-        for key, value in self.layer_map.items():
+        for key, value in list(self.layer_map.items()):
             if (layer == key):
                 return value
         raise IpkissException(
@@ -125,7 +125,7 @@ class GdsiiLayerInputMap(StrongPropertyInitializer):
         super(GdsiiLayerInputMap, self).__init__(layer_map=layer_map, **kwargs)
         # check if the input map doesn't contain any duplicates on the "source side" (duplicates may exist on the target size)
         ln = []
-        for L in self.layer_map.keys():
+        for L in list(self.layer_map.keys()):
             ln.append((L.number, L.datatype))
         if len(ln) != len(list(set(ln))):
             raise IpkissException(
@@ -133,7 +133,7 @@ class GdsiiLayerInputMap(StrongPropertyInitializer):
             )
 
     def __getitem__(self, key):
-        for L in self.layer_map.keys():
+        for L in list(self.layer_map.keys()):
             if L.number == key.number and L.datatype == key.datatype:
                 return self.layer_map[L]
         return self.default
@@ -144,7 +144,7 @@ class GdsiiLayerInputMap(StrongPropertyInitializer):
 
 def make_layer_input_map(layermap, default=None):
     lm = {}
-    for k in layermap.keys():
+    for k in list(layermap.keys()):
         if isinstance(k, int):
             datatype = 0
             number = k

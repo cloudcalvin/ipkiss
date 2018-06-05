@@ -154,7 +154,7 @@ class ToggledCompoundFilter(__CompoundFilter__):
             raise KeyError(
                 "__ToggledCompoundFilter__: key must be of type str, is type %s"
                 % (type(key)))
-        if not key in self.__filter_status.keys():
+        if not key in list(self.__filter_status.keys()):
             return True
         return self.__filter_status[key]
 
@@ -162,7 +162,7 @@ class ToggledCompoundFilter(__CompoundFilter__):
         """ processes the item """
         LOG.debug("Applying all subfilters. Item = %s" % item)
         v = item
-        k = self.__filter_status.keys()
+        k = list(self.__filter_status.keys())
         for R in self._sub_filters:
             if R.name not in k or self.__filter_status[R.name]:
                 LOG.debug("** Applying subfilter %s to %s" % (R, v))
@@ -175,8 +175,8 @@ class ToggledCompoundFilter(__CompoundFilter__):
         S = "< Toggled Compound Filter:"
         for i in self._sub_filters:
             S += "   %s" % i.__repr__()
-            if i.name not in self.__filter_status.keys(
-            ) or self.__filter_status[i.name]:
+            if i.name not in list(self.__filter_status.keys(
+            )) or self.__filter_status[i.name]:
                 S += "(enabled)"
             else:
                 S += "(disabled)"

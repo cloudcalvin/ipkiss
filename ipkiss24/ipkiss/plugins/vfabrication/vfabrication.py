@@ -174,7 +174,7 @@ def __common_function_cartesian__(arrays, out=None):
     out[:, 0] = numpy.repeat(arrays[0], m)
     if arrays[1:]:
         __common_function_cartesian__(arrays[1:], out=out[0:m, 1:])
-        for j in xrange(1, arrays[0].size):
+        for j in range(1, arrays[0].size):
             out[j * m:(j + 1) * m, 1:] = out[0:m, 1:]
     return out
 
@@ -206,7 +206,7 @@ class LayerShapelyPolygons(ShapelyPolygonCollection):
                 grids_per_unit=int(1.0 / grid),
                 overlap=1)
             filter += PathToBoundaryFilter()
-            elems = filter(e)
+            elems = list(filter(e))
             for e2 in elems:
                 if not isinstance(e2, __LayerElement__):
                     continue
@@ -307,14 +307,14 @@ class VirtualFabricationProcessSuperposition2DMaterialStackPolygonsOnly(
                         number=0, name="VFABRICATION_%s" % process.extension),
                     size_info=size_info)
 
-        for process, is_lf_fabrication in self.process_flow.is_lf_fabrication.items(
-        ):
+        for process, is_lf_fabrication in list(self.process_flow.is_lf_fabrication.items(
+        )):
             bm = process_polygons[process]
             if is_lf_fabrication:
                 process_polygons[process] = bm.bitwise_not()
 
         if self.save_debug_images:
-            for process, bm in process_polygons.items():
+            for process, bm in list(process_polygons.items()):
                 bm.save_to_image("vfabrication_%s_process_polygon_%s.png" %
                                  (self.structure.name, process.extension))
 

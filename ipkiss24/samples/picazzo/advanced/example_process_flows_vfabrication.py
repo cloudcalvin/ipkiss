@@ -150,4 +150,4 @@ r.visualize_2d()
 r.visualize_3d_y_crosssection(y_co=0.0, resolution=30)
 
 vtk_filename = r.visualize_3d_vtk(resolution=30)
-print "Generated VTK file : ", vtk_filename
+print("Generated VTK file : ", vtk_filename)

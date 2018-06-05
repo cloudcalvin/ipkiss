@@ -24,7 +24,7 @@ if __name__ == "__main__":
 from ipkiss.plugins.photonics.wg.basic import *  # basic waveguides
 from picazzo.io.column import *  # Standard io columns
 
-from example4_grating_mmi import *  #our structure (in seperate file example4_grating_mmi.py)
+from .example4_grating_mmi import *  #our structure (in seperate file example4_grating_mmi.py)
 from picazzo.fibcoup.inverted_taper import *
 from picazzo.io.fibcoup import *
 

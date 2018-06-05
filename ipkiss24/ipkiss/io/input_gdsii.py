@@ -124,7 +124,7 @@ class InputGdsiiHeader(InputBasic):
             datalen = int(b2a_hex(b1), 16) - 4
             b2 = self.__istream__.read(2)
             rtype = int(b2a_hex(b2), 16)
-        except Exception, e:
+        except Exception as e:
             msg = "Could not read record : %s" % str(e)
             from ipkiss.exceptions.exc import IpkissException
             raise IpkissException(msg)
@@ -178,14 +178,14 @@ class InputGdsiiHeader(InputBasic):
     def __parse_int2__(self):
         try:
             return unpack(">h", self.__istream__.read(2))[0]
-        except Exception, e:
+        except Exception as e:
             LOG.error("Could not read INT2 : %s" % e)
             raise SystemError
 
 
 class InputGdsiiTree(InputGdsiiHeader):
     """ Parses a GDSII file but extracts only the hierarchy """
-    log_bufsize = LongIntProperty(default=0L)
+    log_bufsize = LongIntProperty(default=0)
 
     def __init__(self,
                  i_stream=sys.stdin,
@@ -420,7 +420,7 @@ class InputGdsiiTree(InputGdsiiHeader):
     def __parse_int4__(self):
         try:
             return unpack(">l", self.__istream__.read(4))[0]
-        except Exception, e:
+        except Exception as e:
             LOG.error("Could not read INT4 : %s" % e)
             raise SystemError
 

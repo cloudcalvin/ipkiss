@@ -103,8 +103,8 @@ def get_elements_for_generated_layers(elements, mapping):
     Given a list of elements and a list of tuples (GeneratedLayer, PPLayer), create new elements according to the boolean
     operations of the GeneratedLayer and place these elements on the specified PPLayer.
     """
-    generated_layers = mapping.keys()
-    export_layers = mapping.values()
+    generated_layers = list(mapping.keys())
+    export_layers = list(mapping.values())
     elems = ElementList()
     process_processelems_dict = dict()
     for generated_layer, export_layer in zip(generated_layers, export_layers):

@@ -97,4 +97,4 @@ if __name__ == "__main__":
     layout = MyDesign(name="layout")
     layout.write_gdsii("example_grating_mmi.gds")
     layout.visualize_2d()
-    print "Finished !"
+    print("Finished !")

@@ -24,4 +24,4 @@ __all__ = []
 from .log import PICAZZO_LOG as LOG  #enable logging output
 from . import settings
 import sys
-print >> sys.stderr, settings.START_MESSAGE
+print(settings.START_MESSAGE, file=sys.stderr)

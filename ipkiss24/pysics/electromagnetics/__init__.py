@@ -19,9 +19,9 @@
 #
 # Contact: ipkiss@intec.ugent.be
 
-import material
-import environment
-import field
+from . import material
+from . import environment
+from . import field
 import pysics.materials.electromagnetics
 from ..basics.domain import __Domain__
 

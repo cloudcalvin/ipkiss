@@ -111,7 +111,7 @@ class __LayerSuperpositionMaterialGeometry2D__(__ImageGeometry2D__):
         try:
             layers_at_coordinate = self.layer_superposition_array[pixel_coord[
                 0], pixel_coord[1]]
-        except IndexError, e:  #some engines will request the material 1 step over the border of the simulation volume
+        except IndexError as e:  #some engines will request the material 1 step over the border of the simulation volume
             if (pixel_coord[0] >= self.len_0):
                 X = self.len_0 - 1
             else:
@@ -138,7 +138,7 @@ class __ProcessSuperpositionMaterialGeometry2D__(__ImageGeometry2D__):
     def __init__(self, **kwargs):
         super(__ProcessSuperpositionMaterialGeometry2D__,
               self).__init__(**kwargs)
-        self.processes = self.process_flags.keys()
+        self.processes = list(self.process_flags.keys())
         self.processes.sort()
         self.len_0 = self.process_flags[self.processes[0]].shape[0]
         self.len_1 = self.process_flags[self.processes[0]].shape[1]
@@ -171,7 +171,7 @@ class __ProcessSuperpositionMaterialGeometry2D__(__ImageGeometry2D__):
         try:
             processes_at_coordinate = self.__processes_at_coordinate(
                 pixel_coord)
-        except IndexError, e:  #some engines will request the material 1 step over the border of the simulation volume
+        except IndexError as e:  #some engines will request the material 1 step over the border of the simulation volume
             if (pixel_coord[0] >= self.len_0):
                 X = self.len_0 - 1
             else:
