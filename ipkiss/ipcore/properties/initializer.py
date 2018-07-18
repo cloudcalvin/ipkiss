@@ -69,7 +69,7 @@ class MetaPropertyInitializer(MetaMixinBowl):
         cls.__required_props__ = req_props
         cls.__locked_props__ = locked_props
         cls.__unlocked_props__ = unlocked_props
-        cls.compile_doc()
+        # cls.compile_doc()
 
     def mixin_first(cls, mixin_class):
         super(MetaPropertyInitializer, cls).mixin_first(mixin_class)
@@ -344,9 +344,9 @@ class StrongPropertyInitializer(PropertyInitializer):
 
     def __assign_properties__(self, kwargs):
         """Assign properties from keyword arguments that are passed.
-        
-        This function assigns values to the properties based on keyword arguments that were passed. 
-        It will look at self.__properties__ for all possible properties. 
+
+        This function assigns values to the properties based on keyword arguments that were passed.
+        It will look at self.__properties__ for all possible properties.
         One can use the keyword argument "allow_unmatched_kwargs" to allow keyword arguments which do not have a corresponding property.
         These will be ignored, but not error will be raised.
 
@@ -357,9 +357,9 @@ class StrongPropertyInitializer(PropertyInitializer):
 
             This is useful for PySimul, where all component and simulation parameters can be given in one dictionary, and
             each object extracts the parameters which are relevant for it.
-        
+
         Raises:
-            IpcoreAttributeException when a keyword argument cannot be matched 
+            IpcoreAttributeException when a keyword argument cannot be matched
                 (unless "allow_unmatched_kwargs" is given as a keyword argument)
         """
         if "allow_unmatched_kwargs" in kwargs:
@@ -402,11 +402,11 @@ class StrongPropertyInitializer(PropertyInitializer):
 
     def validate_properties(self):
         """Check whether a combination of properties is valid.
-        
-        This function checks whether a combination of properties is valid. 
-        It does not check the individual properties for valid use, this is done through the 
+
+        This function checks whether a combination of properties is valid.
+        It does not check the individual properties for valid use, this is done through the
         use of DefinitionProperty with restrictions (for example: length = FloatProperty(default=5.0)).
-        
+
         Returns:
             True: When the properties for this StrongPropertyInitializer are valid.
             False: When the properties are not valid. In this case, an IpcorePropertyDescriptorException will be raised

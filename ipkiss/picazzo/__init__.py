@@ -25,4 +25,4 @@ from .log import PICAZZO_LOG as LOG  # enable logging output
 from . import settings
 import sys
 
-print(settings.START_MESSAGE, file=sys.stderr)
+# print(settings.START_MESSAGE, file=sys.stderr)

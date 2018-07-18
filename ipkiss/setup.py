@@ -28,7 +28,7 @@ DEPENDENCIES = [
 
 setup(
     name="ipkiss",
-    version="2.5.0",
+    version="2.4.5",
     packages=find_packages(),
     install_requires=DEPENDENCIES,
 )

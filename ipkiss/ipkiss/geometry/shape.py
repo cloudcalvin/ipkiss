@@ -162,7 +162,7 @@ class Shape(transformable.Transformable, StrongPropertyInitializer, MixinBowl):
             if not "end_face_angle" in kwargs:
                 kwargs["end_face_angle"] = points.end_face_angle
 
-        if points != None:
+        if points is not None:
             if (
                 isinstance(points, list)
                 or isinstance(points, ndarray)
@@ -433,7 +433,7 @@ class Shape(transformable.Transformable, StrongPropertyInitializer, MixinBowl):
 
     def winding_number_test(self, point, inclusive=False):
         """ Returns the number of times a polygon winds around a point.
-                    point can be a single point, an array or list of points or a shape. 
+                    point can be a single point, an array or list of points or a shape.
                     For a single point, a number is returned. For a shape or a list of points,
                     an array of values is returned.
                     inclusive=True denotes inclusion of points on the shape"""
