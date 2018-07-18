@@ -25,7 +25,6 @@ from .translation import Translation
 from .rotation import Rotation
 from .magnification import Magnification
 from ..coord import Coord2
-from types import NoneType
 
 __all__ = ["IdentityTransform"]
 
@@ -90,7 +89,8 @@ class IdentityTransform(
 
     def __add__(self, other):
         """ returns the concatenation of this transform and other """
-        if isinstance(other, (NoneType, IdentityTransform)):
+        # if isinstance(other, (NoneType, IdentityTransform)):
+        if type(other) is None or isinstance(other, IdentityTransform):
             return IdentityTransform()
         elif isinstance(other, Translation):
             return Translation(other.translation)
@@ -109,7 +109,8 @@ class IdentityTransform(
 
     def __iadd__(self, other):
         """ concatenates other to this transform """
-        if isinstance(other, (NoneType, IdentityTransform)):
+        # if isinstance(other, (NoneType, IdentityTransform)):
+        if type(other) is None or isinstance(other, IdentityTransform):
             return self
         else:
             return __SpecialNoDistortTransform__.__iadd__(self, other)

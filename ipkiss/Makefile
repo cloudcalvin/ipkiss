@@ -1,12 +1,11 @@
-install:
-	python setup.py develop
+install: pipenv
 
 pipenv:
 	pip install pipenv
+	pipenv --three
 	pipenv install --dev
 	pipenv shell
-	python setup.py develop
-
+	pip install -e .
 
 dependencies:
 	pip install shapely

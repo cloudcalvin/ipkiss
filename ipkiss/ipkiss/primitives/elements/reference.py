@@ -41,7 +41,6 @@ from ipcore.properties.predefined import (
     NumberProperty,
 )
 from ipcore.properties.initializer import SUPPRESSED
-from types import NoneType
 from copy import copy, deepcopy
 from numpy import transpose, reshape, meshgrid, array
 from ipkiss.log import IPKISS_LOG as LOG

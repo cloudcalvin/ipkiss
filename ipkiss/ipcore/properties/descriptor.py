@@ -23,7 +23,6 @@ from .restrictions import RestrictNothing, RestrictFunction, RestrictionError
 from .restrictions import RestrictTypeList
 from .processors import PropertyProcessor, ProcessorException
 
-from types import NoneType
 
 from ipcore.log import IPCORE_LOG as LOG
 from ipcore.exceptions.exc import *
@@ -235,7 +234,7 @@ class DefinitionProperty(__BasePropertyDescriptor__):
             )
 
     def __cache_property_value_on_object__(self, obj, value):
-        if type(obj) != NoneType:  # FIXME: ???
+        if type(obj) is not None:
             new_value = self.preprocess(value, obj)
             self.__check_restriction__(obj, new_value)
             obj.__store__[self.__name__] = (new_value, CACHED)
