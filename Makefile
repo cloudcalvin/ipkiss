@@ -20,3 +20,7 @@ dependencies:
 
 python-user:
 	sudo chown -R $USER /usr/local
+
+venv:
+	python3 -m venv env
+	source env/bin/activate.fish
